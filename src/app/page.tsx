@@ -3,6 +3,7 @@ import Footer from '@/components/layout/Footer';
 import HeroSection from '@/components/sections/HeroSection';
 import FeaturesSection from '@/components/sections/FeaturesSection';
 import FeatureGridSection from '@/components/sections/FeatureGridSection';
+import PromptsSection from '@/components/sections/PromptsSection';
 import UseCasesSection from '@/components/sections/UseCasesSection';
 import PrivacySection from '@/components/sections/PrivacySection';
 import TestimonialsSection from '@/components/sections/TestimonialsSection';
@@ -17,6 +18,7 @@ export default function Home() {
         <HeroSection />
         <FeaturesSection />
         <FeatureGridSection />
+        <PromptsSection />
         <UseCasesSection />
         <PrivacySection />
         <TestimonialsSection />
