@@ -38,9 +38,9 @@ const navigationItems = [
 ]
 
 const connectedApps = [
+  { icon: Camera, label: 'Google Photos', connected: false, color: 'text-green-500' },
   { icon: Calendar, label: 'Google Calendar', connected: true, color: 'text-blue-500' },
   { icon: Mail, label: 'Gmail', connected: true, color: 'text-red-500' },
-  { icon: Camera, label: 'Google Photos', connected: false, color: 'text-green-500' },
   { icon: Music, label: 'Spotify', connected: true, color: 'text-green-600' },
   { icon: FileText, label: 'Notion', connected: false, color: 'text-gray-600' },
   { icon: Cloud, label: 'Google Drive', connected: true, color: 'text-blue-600' },
@@ -146,7 +146,7 @@ export default function DashboardSidebar() {
               <ChevronLeft
                 className={cn(
                 "w-4 h-4 ml-auto transition-transform",
-                showApps ? "-rotate-90" : "rotate-0"
+                showApps ? "-rotate-90" : "rotate-180"
                 )}
               />
               </div>

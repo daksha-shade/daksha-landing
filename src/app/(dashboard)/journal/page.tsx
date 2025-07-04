@@ -1,12 +1,9 @@
 "use client"
 
 import { useState } from 'react'
-import { Edit3, Save, Calendar, Search, Video, Mic, Camera, Upload, Play, Pause, Clock, Filter, Grid, List, Plus, X, Volume2, FileText, Image as ImageIcon } from 'lucide-react'
+import { Edit3, Search, Video, Mic, FileText, Clock, Filter, Grid, List, Plus, Volume2, Image as ImageIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 type JournalEntry = {
   id: string
@@ -23,15 +20,6 @@ type JournalEntry = {
 }
 
 export default function JournalPage() {
-  const [entry, setEntry] = useState("")
-  const [title, setTitle] = useState("")
-  const [isRecording, setIsRecording] = useState(false)
-  const [isVideoRecording, setIsVideoRecording] = useState(false)
-  const [recordedAudio, setRecordedAudio] = useState<string | null>(null)
-  const [recordedVideo, setRecordedVideo] = useState<string | null>(null)
-  const [attachedFiles, setAttachedFiles] = useState<Array<{type: 'video' | 'audio' | 'image', name: string, url: string}>>([])
-  const [showMediaOptions, setShowMediaOptions] = useState(false)
-  const [activeTab, setActiveTab] = useState<'text' | 'audio' | 'video'>('text')
   const [viewMode, setViewMode] = useState<'timeline' | 'grid'>('timeline')
   const [filterType, setFilterType] = useState<'all' | 'text' | 'audio' | 'video' | 'mixed'>('all')
 
@@ -89,37 +77,6 @@ export default function JournalPage() {
       tags: ['competition', 'strategy', 'differentiation']
     }
   ])
-
-  const handleAudioRecord = () => {
-    if (isRecording) {
-      setIsRecording(false)
-      setRecordedAudio("recorded-audio-" + Date.now())
-    } else {
-      setIsRecording(true)
-    }
-  }
-
-  const handleVideoRecord = () => {
-    if (isVideoRecording) {
-      setIsVideoRecording(false)
-      setRecordedVideo("recorded-video-" + Date.now())
-    } else {
-      setIsVideoRecording(true)
-    }
-  }
-
-  const handleFileUpload = (type: 'video' | 'audio' | 'image') => {
-    const mockFile = {
-      type,
-      name: `${type}-${Date.now()}.${type === 'video' ? 'mp4' : type === 'audio' ? 'mp3' : 'jpg'}`,
-      url: `mock-url-${Date.now()}`
-    }
-    setAttachedFiles(prev => [...prev, mockFile])
-  }
-
-  const removeAttachment = (index: number) => {
-    setAttachedFiles(prev => prev.filter((_, i) => i !== index))
-  }
 
   const filteredEntries = journalEntries.filter(entry => {
     if (filterType === 'all') return true
@@ -213,221 +170,47 @@ export default function JournalPage() {
         </div>
       </div>
 
-      {/* New Entry Creation */}
-      <div className="bg-background border border-border/30 rounded-lg overflow-hidden">
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'text' | 'audio' | 'video')}>
-          <TabsList className="w-full justify-start rounded-none border-b bg-muted/20">
-            <TabsTrigger value="text" className="gap-2">
-              <FileText className="w-4 h-4" />
-              Text Entry
-            </TabsTrigger>
-            <TabsTrigger value="audio" className="gap-2">
-              <Mic className="w-4 h-4" />
-              Audio Journal
-            </TabsTrigger>
-            <TabsTrigger value="video" className="gap-2">
-              <Video className="w-4 h-4" />
-              Video Journal
-            </TabsTrigger>
-          </TabsList>
-
-          <div className="p-6">
-            <TabsContent value="text" className="mt-0 space-y-4">
-              <Input
-                placeholder="Entry title..."
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="text-lg font-medium border-0 focus:ring-0 px-2"
-              />
-              <Textarea
-                placeholder="What's on your mind today?"
-                value={entry}
-                onChange={(e) => setEntry(e.target.value)}
-                className="min-h-[200px] border-0 focus:ring-0 resize-none text-base leading-relaxed px-2"
-              />
-            </TabsContent>
-
-            <TabsContent value="audio" className="mt-0 space-y-4">
-              <Input
-                placeholder="Audio journal title..."
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="text-lg font-medium border-0 focus:ring-0 px-2"
-              />
-              <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                <div className={`w-24 h-24 rounded-full flex items-center justify-center transition-all ${
-                  isRecording ? 'bg-red-100 dark:bg-red-900/30 animate-pulse' : 'bg-muted/20'
-                }`}>
-                  <Button
-                    variant="ghost"
-                    size="lg"
-                    onClick={handleAudioRecord}
-                    className={`w-16 h-16 rounded-full ${
-                      isRecording ? 'text-red-500 hover:text-red-600' : 'text-green-500 hover:text-green-600'
-                    }`}
-                  >
-                    {isRecording ? <Pause className="w-8 h-8" /> : <Mic className="w-8 h-8" />}
-                  </Button>
-                </div>
-                <div className="text-center">
-                  <p className="text-sm font-medium">
-                    {isRecording ? 'Recording...' : 'Tap to start recording'}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {isRecording ? 'Tap again to stop' : 'Share your thoughts with voice'}
-                  </p>
-                </div>
+      {/* Create New Entry */}
+      <div className="bg-background border border-border/30 rounded-lg p-6">
+        <div className="text-center space-y-4">
+          <h3 className="text-lg font-medium">Create New Entry</h3>
+          <p className="text-sm text-muted-foreground">Choose how you'd like to journal today</p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Button 
+              variant="outline" 
+              className="gap-2 h-12 px-6"
+              onClick={() => window.location.href = '/journal/text'}
+            >
+              <FileText className="w-5 h-5" />
+              <div className="text-left">
+                <div className="font-medium">Text Entry</div>
+                <div className="text-xs text-muted-foreground">Write your thoughts</div>
               </div>
-            </TabsContent>
-
-            <TabsContent value="video" className="mt-0 space-y-4">
-              <Input
-                placeholder="Video journal title..."
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="text-lg font-medium border-0 focus:ring-0 px-2"
-              />
-              <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                <div className={`w-32 h-24 rounded-lg flex items-center justify-center transition-all border-2 border-dashed ${
-                  isVideoRecording ? 'border-red-300 bg-red-50 dark:bg-red-900/20 animate-pulse' : 'border-muted-foreground/30 bg-muted/10'
-                }`}>
-                  <Button
-                    variant="ghost"
-                    size="lg"
-                    onClick={handleVideoRecord}
-                    className={`${
-                      isVideoRecording ? 'text-red-500 hover:text-red-600' : 'text-blue-500 hover:text-blue-600'
-                    }`}
-                  >
-                    {isVideoRecording ? <Pause className="w-8 h-8" /> : <Video className="w-8 h-8" />}
-                  </Button>
-                </div>
-                <div className="text-center">
-                  <p className="text-sm font-medium">
-                    {isVideoRecording ? 'Recording video...' : 'Tap to start video recording'}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {isVideoRecording ? 'Tap again to stop' : 'Capture your thoughts on camera'}
-                  </p>
-                </div>
+            </Button>
+            <Button 
+              variant="outline" 
+              className="gap-2 h-12 px-6"
+              onClick={() => window.location.href = '/journal/audio'}
+            >
+              <Mic className="w-5 h-5" />
+              <div className="text-left">
+                <div className="font-medium">Audio Journal</div>
+                <div className="text-xs text-muted-foreground">Record your voice</div>
               </div>
-            </TabsContent>
-        
-        {/* Media Attachments */}
-        {attachedFiles.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium text-muted-foreground">Attachments</h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {attachedFiles.map((file, index) => (
-                <div key={index} className="flex items-center gap-2 p-2 bg-muted/20 rounded-lg">
-                  {file.type === 'video' && <Video className="w-4 h-4 text-blue-500" />}
-                  {file.type === 'audio' && <Mic className="w-4 h-4 text-green-500" />}
-                  {file.type === 'image' && <Camera className="w-4 h-4 text-purple-500" />}
-                  <span className="text-sm flex-1 truncate">{file.name}</span>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => removeAttachment(index)}
-                    className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
-                  >
-                    ×
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-            {/* Media Previews */}
-            {recordedAudio && (
-              <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                <Volume2 className="w-4 h-4 text-green-500" />
-                <span className="text-sm flex-1">Audio recording ready</span>
-                <Button variant="ghost" size="sm" className="h-6 gap-1">
-                  <Play className="w-3 h-3" />
-                  Play
-                </Button>
+            </Button>
+            <Button 
+              variant="outline" 
+              className="gap-2 h-12 px-6"
+              onClick={() => window.location.href = '/journal/video'}
+            >
+              <Video className="w-5 h-5" />
+              <div className="text-left">
+                <div className="font-medium">Video Journal</div>
+                <div className="text-xs text-muted-foreground">Capture on camera</div>
               </div>
-            )}
-
-            {recordedVideo && (
-              <div className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                <Video className="w-4 h-4 text-blue-500" />
-                <span className="text-sm flex-1">Video recording ready</span>
-                <Button variant="ghost" size="sm" className="h-6 gap-1">
-                  <Play className="w-3 h-3" />
-                  Preview
-                </Button>
-              </div>
-            )}
-
-        <div className="flex items-center justify-between pt-4 border-t border-border/30">
-          <div className="flex items-center gap-2">
-            <div className="text-sm text-muted-foreground">
-              {entry.length} characters
-            </div>
-            
-            {/* Media Options */}
-            <div className="flex items-center gap-1">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => setShowMediaOptions(!showMediaOptions)}
-                className="h-7 px-2 text-muted-foreground hover:text-foreground"
-              >
-                <Upload className="w-3 h-3" />
-              </Button>
-              
-              {showMediaOptions && (
-                <div className="flex items-center gap-1 ml-1">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => handleFileUpload('video')}
-                    className="h-7 px-2 text-blue-500 hover:text-blue-600"
-                    title="Add Video"
-                  >
-                    <Video className="w-3 h-3" />
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={handleAudioRecord}
-                    className={`h-7 px-2 ${isRecording ? 'text-red-500 hover:text-red-600' : 'text-green-500 hover:text-green-600'}`}
-                    title={isRecording ? "Stop Recording" : "Record Audio"}
-                  >
-                    {isRecording ? <Pause className="w-3 h-3" /> : <Mic className="w-3 h-3" />}
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => handleFileUpload('image')}
-                    className="h-7 px-2 text-purple-500 hover:text-purple-600"
-                    title="Add Image"
-                  >
-                    <Camera className="w-3 h-3" />
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => handleFileUpload('audio')}
-                    className="h-7 px-2 text-orange-500 hover:text-orange-600"
-                    title="Upload Audio"
-                  >
-                    <Upload className="w-3 h-3" />
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
-          
-            <Button variant="default" size="sm" className="gap-2">
-              <Save className="w-4 h-4" />
-              Save Entry
             </Button>
           </div>
         </div>
-        </Tabs>
       </div>
 
       {/* Journal Entries */}
