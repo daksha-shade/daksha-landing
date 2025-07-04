@@ -17,12 +17,12 @@ export default function HeroSection() {
         <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-foreground mb-4 leading-tight font-serif">
           Daksha
         </h1>
-        
+
         {/* Subtitle */}
         <h2 className="text-xl sm:text-2xl font-medium text-muted-foreground mb-8 font-inter">
           Your Mind, Organized. Your Life, Enhanced.
         </h2>
-        
+
         {/* Key Value Props */}
         <div className=" mb-8 max-w-2xl mx-auto">
           <div className="flex flex-wrap justify-center gap-4 text-sm font-medium">
@@ -43,14 +43,14 @@ export default function HeroSection() {
 
         {/* Main Description */}
         <p className="text-lg text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed font-inter">
-          The only app you'll ever need for your thoughts, memories, and ideas. 
+          The only app you'll ever need for your thoughts, memories, and ideas.
           <br className="hidden sm:block" />
           A journaling-first, AI-powered life OS that grows with you.
         </p>
-        
+
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-          <Button 
+          <Button
             href="https://tally.so/r/wLN5e2"
             target="_blank"
             rel="noopener noreferrer"
@@ -59,8 +59,8 @@ export default function HeroSection() {
           >
             Join the Waitlist
           </Button>
-          <Button 
-            href="https://mvp.daksha.live"
+          <Button
+            href="/app"
             target="_blank"
             rel="noopener noreferrer"
             variant="notion"

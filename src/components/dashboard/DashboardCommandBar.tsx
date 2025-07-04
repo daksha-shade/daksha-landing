@@ -45,9 +45,21 @@ export default function DashboardCommandBar() {
       }
     }
 
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      if (isOpen && !target.closest('.command-bar-content')) {
+        setIsOpen(false)
+        setSearch('')
+      }
+    }
+
     document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [])
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isOpen])
 
   if (!isOpen) {
     return (
@@ -73,7 +85,7 @@ export default function DashboardCommandBar() {
   return (
     <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm">
       <div className="fixed top-1/4 left-1/2 transform -translate-x-1/2 w-full max-w-2xl mx-auto p-4">
-        <div className="bg-background border border-border rounded-lg shadow-2xl overflow-hidden">
+        <div className="command-bar-content bg-background border border-border rounded-lg shadow-2xl overflow-hidden">
           {/* Search Input */}
           <div className="flex items-center border-b border-border px-4">
             <Search className="w-4 h-4 text-muted-foreground mr-3" />

@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from 'react'
+import { usePathname } from 'next/navigation'
+import Link from 'next/link'
 import { 
   BookOpen, 
   Brain, 
@@ -14,15 +16,16 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 const navigationItems = [
-  { icon: BookOpen, label: 'Journal', active: true },
-  { icon: Brain, label: 'Mind' },
-  { icon: Target, label: 'Goals' },
-  { icon: MessageCircle, label: 'Chat' },
-  { icon: Archive, label: 'Archive' },
+  { icon: BookOpen, label: 'Journal', href: '/journal' },
+  { icon: Brain, label: 'Mind', href: '/mind' },
+  { icon: Target, label: 'Goals', href: '/goals' },
+  { icon: MessageCircle, label: 'Chat', href: '/chat' },
+  { icon: Archive, label: 'Archive', href: '/archive' },
 ]
 
 export default function DashboardSidebar() {
   const [collapsed, setCollapsed] = useState(false)
+  const pathname = usePathname()
 
   return (
     <aside className={cn(
@@ -31,24 +34,28 @@ export default function DashboardSidebar() {
     )}>
       {/* Navigation */}
       <div className="p-4 space-y-2">
-        {navigationItems.map((item, index) => (
-          <Button
-            key={index}
-            variant={item.active ? "secondary" : "ghost"}
-            className={cn(
-              "w-full justify-start gap-3 h-10 font-medium transition-all text-sm",
-              collapsed && "justify-center px-2"
-            )}
-          >
-            <item.icon className="w-4 h-4 flex-shrink-0" />
-            {!collapsed && (
-              <span className="flex-1 text-left">{item.label}</span>
-            )}
-          </Button>
-        ))}
+        {navigationItems.map((item, index) => {
+          const isActive = pathname === item.href
+          return (
+            <Link key={index} href={item.href}>
+              <Button
+                variant={isActive ? "secondary" : "notion"}
+                className={cn(
+                  "w-full justify-start gap-3 h-10 font-medium transition-all text-sm",
+                  collapsed && "justify-center px-2"
+                )}
+              >
+                <item.icon className="w-4 h-4 flex-shrink-0" />
+                {!collapsed && (
+                  <span className="flex-1 text-left">{item.label}</span>
+                )}
+              </Button>
+            </Link>
+          )
+        })}
         
         {!collapsed && (
-          <Button variant="ghost" className="w-full justify-start gap-3 h-10 text-muted-foreground text-sm mt-4">
+          <Button variant="notion" className="w-full justify-start gap-3 h-10 text-muted-foreground text-sm mt-4">
             <Plus className="w-4 h-4" />
             <span>New</span>
           </Button>

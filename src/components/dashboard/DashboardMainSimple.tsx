@@ -39,7 +39,7 @@ export default function DashboardMainSimple() {
             <Square className="w-4 h-4 text-muted-foreground" />
             <span className="text-muted-foreground">Reflect on yesterday</span>
           </div>
-          <Button variant="outline" className="gap-2 h-9">
+          <Button variant="notion" className="gap-2 h-9">
             <Edit3 className="w-4 h-4" />
             Write Journal Entry
           </Button>
@@ -72,7 +72,7 @@ export default function DashboardMainSimple() {
               onChange={(e) => setDakshaInput(e.target.value)}
               className="flex-1 border-border/50 focus:border-border"
             />
-            <Button size="icon" variant="outline">
+            <Button size="icon" variant="notion">
               <Send className="w-4 h-4" />
             </Button>
           </div>
@@ -82,16 +82,16 @@ export default function DashboardMainSimple() {
       {/* Quick Shortcuts */}
       <div className="border-t border-border/30 pt-6">
         <div className="flex items-center gap-6 text-sm">
-          <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
+          <Button variant="notion" size="sm" className="gap-2">
             Journal
           </Button>
-          <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
+          <Button variant="notion" size="sm" className="gap-2">
             Mind
           </Button>
-          <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
+          <Button variant="notion" size="sm" className="gap-2">
             Goals
           </Button>
-          <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
+          <Button variant="notion" size="sm" className="gap-2">
             Chat
           </Button>
         </div>

@@ -29,7 +29,7 @@ export default function Footer() {
                   </a>
                 </li>
                 <li>
-                  <a href="https://mvp.daksha.live" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <a href="/app" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                     MVP
                   </a>
                 </li>

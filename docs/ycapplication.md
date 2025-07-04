@@ -15,7 +15,7 @@ https://daksha.live
 Demo Video
 None uploaded
 Please provide a link to the product, if any.
-https://mvp.daksha.live
+/app
 Unanswered
 What is your company going to make? Please describe your product and what it does or will do.
 Daksha is a journaling-first, emotionally intelligent AI companion that evolves into a personal OS (MindOS). It begins by helping users reflect and plan their lives, then grows into a proactive agent that understands their goals, habits, and values—ultimately becoming their second brain and personal AI assistant. Unlike mental health chatbots, Daksha is built as a Jarvis-like AI for personal growth, productivity, and life management. It's the future of HUMAN-AI relationship.

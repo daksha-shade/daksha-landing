@@ -30,7 +30,7 @@ export default function Header() {
             <a href="#about" className="px-2 py-1 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
               About
             </a>
-            <a href="https://mvp.daksha.live" target="_blank" rel="noopener noreferrer" className="px-2 py-1 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
+            <a href="/app" target="_blank" rel="noopener noreferrer" className="px-2 py-1 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
               MVP
             </a>
           </nav>
@@ -38,7 +38,7 @@ export default function Header() {
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-2">
             <ThemeToggle />
-            <Button 
+            <Button
               href="https://tally.so/r/wLN5e2"
               target="_blank"
               rel="noopener noreferrer"
@@ -74,10 +74,10 @@ export default function Header() {
               <a href="#about" className="px-2 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
                 About
               </a>
-              <a href="https://mvp.daksha.live" target="_blank" rel="noopener noreferrer" className="px-2 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
+              <a href="/app" target="_blank" rel="noopener noreferrer" className="px-2 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
                 MVP
               </a>
-              <Button 
+              <Button
                 href="https://tally.so/r/wLN5e2"
                 target="_blank"
                 rel="noopener noreferrer"

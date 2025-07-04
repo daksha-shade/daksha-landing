@@ -12,7 +12,7 @@ export default function CTASection() {
           Daksha is more than a product. It&apos;s a philosophy. We&apos;re building a tool that respects your mind and enhances your life.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button 
+          <Button
             href="https://tally.so/r/wLN5e2"
             target="_blank"
             rel="noopener noreferrer"
@@ -22,8 +22,8 @@ export default function CTASection() {
             <ArrowRight className="w-4 h-4 mr-2" />
             Join the Waitlist
           </Button>
-          <Button 
-            href="https://mvp.daksha.live"
+          <Button
+            href="/app"
             target="_blank"
             rel="noopener noreferrer"
             variant="notion"
