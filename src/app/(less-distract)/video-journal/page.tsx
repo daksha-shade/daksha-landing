@@ -179,9 +179,9 @@ export default function FullScreenVideoJournalPage() {
               variant="ghost"
               size="lg"
               onClick={flipCamera}
-              className="w-12 h-12 rounded-full bg-white/30 hover:bg-white/50 text-white border border-white/60 shadow"
+              className="w-12 h-12 rounded-full bg-black/40 hover:bg-black/60 text-white border border-white/20"
             >
-              <RotateCcw className="w-6 h-6 text-white" />
+              <RotateCcw className="w-5 h-5" />
             </Button>
           )}
 
@@ -190,17 +190,11 @@ export default function FullScreenVideoJournalPage() {
             variant="ghost"
             size="lg"
             onClick={toggleMute}
-            className={`w-12 h-12 rounded-full border border-white/60 shadow ${
-              isMuted
-          ? 'bg-red-500/90 hover:bg-red-600 text-white'
-          : 'bg-white/30 hover:bg-white/50 text-white'
+            className={`w-12 h-12 rounded-full border border-white/20 text-white ${
+              isMuted ? 'bg-red-500/60 hover:bg-red-500/80' : 'bg-black/40 hover:bg-black/60'
             }`}
           >
-            {isMuted ? (
-              <MicOff className="w-6 h-6 text-white" />
-            ) : (
-              <Mic className="w-6 h-6 text-white" />
-            )}
+            {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
           </Button>
         </div>
       </div>
