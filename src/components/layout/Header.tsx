@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { Menu, X } from 'lucide-react';
+import { Button } from '../ui/Button';
 import ThemeToggle from '../ui/ThemeToggle';
 
 export default function Header() {
@@ -36,14 +38,14 @@ export default function Header() {
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-2">
             <ThemeToggle />
-            <a 
+            <Button 
               href="https://tally.so/r/wLN5e2"
               target="_blank"
               rel="noopener noreferrer"
-              className="notion-button notion-button-primary text-xs px-3 py-1.5"
+              size="sm"
             >
               Join Waitlist
-            </a>
+            </Button>
           </div>
 
           {/* Mobile menu button */}
@@ -53,13 +55,11 @@ export default function Header() {
               className="p-1 hover:bg-accent rounded-sm transition-colors"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                {isMenuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
+              {isMenuOpen ? (
+                <X className="w-4 h-4 text-muted-foreground" />
+              ) : (
+                <Menu className="w-4 h-4 text-muted-foreground" />
+              )}
             </button>
           </div>
         </div>
@@ -77,14 +77,15 @@ export default function Header() {
               <a href="https://mvp.daksha.live" target="_blank" rel="noopener noreferrer" className="px-2 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
                 MVP
               </a>
-              <a 
+              <Button 
                 href="https://tally.so/r/wLN5e2"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-2 notion-button notion-button-primary text-xs justify-center"
+                size="sm"
+                className="mt-2 w-full justify-center"
               >
                 Join Waitlist
-              </a>
+              </Button>
             </div>
           </div>
         )}
