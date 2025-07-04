@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
-import { Button } from '../ui/Button';
+import { Button } from '../ui/button';
 import ThemeToggle from '../ui/ThemeToggle';
 
 export default function Header() {

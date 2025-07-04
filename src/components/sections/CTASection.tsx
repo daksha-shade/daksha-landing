@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/Button"
+import { Button } from "@/components/ui/button"
 import { ArrowRight, Eye } from "lucide-react"
 
 export default function CTASection() {
@@ -9,7 +9,7 @@ export default function CTASection() {
           Join the Movement
         </h2>
         <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed font-inter">
-          Daksha is more than a product. It's a philosophy. We're building a tool that respects your mind and enhances your life.
+          Daksha is more than a product. It&apos;s a philosophy. We&apos;re building a tool that respects your mind and enhances your life.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button 

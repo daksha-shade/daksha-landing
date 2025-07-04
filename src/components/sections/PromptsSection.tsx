@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/Button"
+import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { 
   PenTool, 
@@ -110,7 +110,7 @@ export default function PromptsSection() {
             </h2>
           </div>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed font-inter">
-            Try these prompts to see Daksha's capabilities
+            Try these prompts to see Daksha&apos;s capabilities
           </p>
         </div>
 
@@ -143,7 +143,7 @@ export default function PromptsSection() {
                   >
                     <div className="flex items-start justify-between gap-3">
                       <p className="text-sm text-muted-foreground group-hover:text-foreground transition-colors font-inter leading-relaxed">
-                        "{prompt}"
+                        &ldquo;{prompt}&rdquo;
                       </p>
                       <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                         {copiedPrompt === prompt ? (
