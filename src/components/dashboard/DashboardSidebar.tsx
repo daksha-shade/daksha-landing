@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-// import { useUser } from '@stackauth/nextjs'
+import { useUser } from '@stackframe/stack'
 import { 
   BookOpen, 
   Brain, 
@@ -32,9 +32,13 @@ export default function DashboardSidebar() {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const pathname = usePathname()
-  // Temporary mock user data - replace with actual StackAuth when available
-  const user = { displayName: 'Shaswat Raj', primaryEmail: 'shaswat@daksha.live' }
-  const signOut = () => console.log('Sign out clicked')
+  const user = useUser()
+  
+  const signOut = async () => {
+    if (user) {
+      await user.signOut()
+    }
+  }
 
   // Update CSS variable for main content margin
   React.useEffect(() => {
