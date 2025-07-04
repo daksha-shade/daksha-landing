@@ -26,9 +26,10 @@ export default function DashboardLayout({
         <DashboardSidebar />
         
         {/* Main Content */}
-        <main className="flex-1 min-h-[calc(100vh-4rem)] bg-white dark:bg-[#1f1f1f] transition-all duration-300 md:ml-64" style={{ marginLeft: 'var(--sidebar-width, 256px)' }}>
-          <div className="md:hidden h-16"></div> {/* Spacer for mobile */}
-          {children}
+        <main className="flex-1 min-h-[calc(100vh-4rem)] bg-white dark:bg-[#1f1f1f] transition-all duration-300 md:ml-0" style={{ marginLeft: 'var(--sidebar-width, 0px)' }}>
+          <div className="px-4 md:px-8 py-4">
+            {children}
+          </div>
         </main>
       </div>
       

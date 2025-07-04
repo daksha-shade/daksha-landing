@@ -42,7 +42,26 @@ export default function DashboardSidebar() {
 
   // Update CSS variable for main content margin
   React.useEffect(() => {
-    document.documentElement.style.setProperty('--sidebar-width', collapsed ? '64px' : '256px')
+    // Only set margin on desktop
+    if (window.innerWidth >= 768) {
+      document.documentElement.style.setProperty('--sidebar-width', collapsed ? '64px' : '256px')
+    } else {
+      document.documentElement.style.setProperty('--sidebar-width', '0px')
+    }
+  }, [collapsed])
+
+  // Handle window resize
+  React.useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        document.documentElement.style.setProperty('--sidebar-width', collapsed ? '64px' : '256px')
+      } else {
+        document.documentElement.style.setProperty('--sidebar-width', '0px')
+      }
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
   }, [collapsed])
 
   const SidebarContent = () => (
@@ -148,7 +167,7 @@ export default function DashboardSidebar() {
         variant="ghost"
         size="sm"
         onClick={() => setMobileOpen(true)}
-        className="fixed top-4 left-4 z-50 md:hidden"
+        className="fixed top-5 left-4 z-50 md:hidden bg-white/80 backdrop-blur-sm border border-border/20 shadow-sm"
       >
         <Menu className="w-4 h-4" />
       </Button>
