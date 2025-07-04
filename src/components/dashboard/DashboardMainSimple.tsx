@@ -5,18 +5,15 @@ import {
   Brain, 
   Edit3,
   Send,
-  CheckSquare,
   Square
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import TalkToDakshaModal from './TalkToDakshaModal'
+import FullScreenVoiceInput from './FullScreenVoiceInput'
 
 export default function DashboardMainSimple() {
-  const [journalEntry, setJournalEntry] = useState("")
   const [dakshaInput, setDakshaInput] = useState("")
-  const [showDakshaModal, setShowDakshaModal] = useState(false)
+  const [showVoiceInput, setShowVoiceInput] = useState(false)
 
   return (
     <div className="notion-page py-12 space-y-8">
@@ -73,12 +70,12 @@ export default function DashboardMainSimple() {
               value={dakshaInput}
               onChange={(e) => setDakshaInput(e.target.value)}
               className="flex-1 border-border/50 focus:border-border"
-              onFocus={() => setShowDakshaModal(true)}
+              onFocus={() => setShowVoiceInput(true)}
             />
             <Button 
               size="icon" 
               variant="notion"
-              onClick={() => setShowDakshaModal(true)}
+              onClick={() => setShowVoiceInput(true)}
             >
               <Send className="w-4 h-4" />
             </Button>
@@ -86,7 +83,7 @@ export default function DashboardMainSimple() {
           <Button 
             variant="notion" 
             className="mt-3 gap-2"
-            onClick={() => setShowDakshaModal(true)}
+            onClick={() => setShowVoiceInput(true)}
           >
             <Brain className="w-4 h-4" />
             Talk to Daksha
@@ -112,10 +109,10 @@ export default function DashboardMainSimple() {
         </div>
       </div>
 
-      {/* Talk to Daksha Modal */}
-      <TalkToDakshaModal 
-        isOpen={showDakshaModal}
-        onClose={() => setShowDakshaModal(false)}
+      {/* Full Screen Voice Input */}
+      <FullScreenVoiceInput 
+        isOpen={showVoiceInput}
+        onClose={() => setShowVoiceInput(false)}
       />
     </div>
   )
