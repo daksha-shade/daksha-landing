@@ -62,7 +62,7 @@ export default function Footer() {
         {/* Bottom */}
         <div className="border-t border-border mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm text-muted-foreground font-inter">
-            © 2024 Daksha. Built by Shaswat Raj.
+            © 2025 Daksha. Built by Shaswat Raj.
           </p>
           <div className="flex space-x-4 mt-4 md:mt-0">
             <span className="text-sm text-muted-foreground">320+ early adopters</span>
