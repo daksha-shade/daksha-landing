@@ -5,13 +5,13 @@ import { Grid3X3, Plus, Check, X, Settings, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { 
-  Calendar, 
-  Mail, 
-  Camera, 
-  Music, 
-  FileText, 
-  Cloud, 
+import {
+  Calendar,
+  Mail,
+  Camera,
+  Music,
+  FileText,
+  Cloud,
   Smartphone,
   MessageSquare,
   Video,
@@ -43,7 +43,7 @@ const externalApps = [
   { icon: Mail, label: 'Gmail', connected: true, color: 'text-red-500', description: 'Import important emails and conversations', category: 'communication' },
   { icon: Camera, label: 'Google Photos', connected: false, color: 'text-green-500', description: 'Automatically organize and reflect on your photos', category: 'media' },
   { icon: Music, label: 'Spotify', connected: true, color: 'text-green-600', description: 'Track your music mood and listening patterns', category: 'media' },
-  { icon: FileText, label: 'Notion', connected: false, color: 'text-gray-600', description: 'Import your notes and databases', category: 'productivity' },
+  { icon: FileText, label: 'Notion', connected: false, color: 'text-gray-600', description: 'Import and export your notes and databases', category: 'productivity' },
   { icon: Cloud, label: 'Google Drive', connected: true, color: 'text-blue-600', description: 'Access and organize your documents', category: 'storage' },
   { icon: Smartphone, label: 'Apple Health', connected: false, color: 'text-red-600', description: 'Track wellness data and health insights', category: 'health' },
   { icon: MessageSquare, label: 'Slack', connected: false, color: 'text-purple-500', description: 'Import work conversations and team updates', category: 'communication' },
@@ -58,19 +58,19 @@ export default function AppsPage() {
   const [filter, setFilter] = useState<'all' | 'connected' | 'available'>('all')
 
   const allApps = [...dakshaApps, ...externalApps]
-  
+
   const filteredDakshaApps = dakshaApps.filter(app => {
     const matchesSearch = app.label.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesFilter = filter === 'all' || 
-      (filter === 'connected' && app.connected) || 
+    const matchesFilter = filter === 'all' ||
+      (filter === 'connected' && app.connected) ||
       (filter === 'available' && !app.connected)
     return matchesSearch && matchesFilter
   })
 
   const filteredExternalApps = externalApps.filter(app => {
     const matchesSearch = app.label.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesFilter = filter === 'all' || 
-      (filter === 'connected' && app.connected) || 
+    const matchesFilter = filter === 'all' ||
+      (filter === 'connected' && app.connected) ||
       (filter === 'available' && !app.connected)
     return matchesSearch && matchesFilter
   })
@@ -98,13 +98,7 @@ export default function AppsPage() {
         </div>
       </div>
 
-      {/* Description */}
-      <div className="bg-muted/20 rounded-lg p-4">
-        <p className="text-sm text-muted-foreground">
-          Connect your favorite apps to Daksha AI agent to create a unified view of your digital life. 
-          Your data stays secure and is only used to provide personalized insights and assistance.
-        </p>
-      </div>
+
 
       {/* Search and Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
@@ -115,22 +109,22 @@ export default function AppsPage() {
           className="flex-1"
         />
         <div className="flex gap-2">
-          <Button 
-            variant={filter === 'all' ? 'default' : 'outline'} 
+          <Button
+            variant={filter === 'all' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setFilter('all')}
           >
             All
           </Button>
-          <Button 
-            variant={filter === 'connected' ? 'default' : 'outline'} 
+          <Button
+            variant={filter === 'connected' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setFilter('connected')}
           >
             Connected
           </Button>
-          <Button 
-            variant={filter === 'available' ? 'default' : 'outline'} 
+          <Button
+            variant={filter === 'available' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setFilter('available')}
           >
@@ -151,7 +145,7 @@ export default function AppsPage() {
               <p className="text-sm text-muted-foreground">Built-in apps designed for your personal AI ecosystem</p>
             </div>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {filteredDakshaApps.map((app, index) => (
               <div key={index} className="bg-background border border-border/30 rounded-xl p-5 hover:shadow-md hover:border-border/50 transition-all duration-200 group">
@@ -176,11 +170,11 @@ export default function AppsPage() {
                     </Button>
                   )}
                 </div>
-                
+
                 <p className="text-sm text-muted-foreground mb-4 line-clamp-2 leading-relaxed">
                   {app.description}
                 </p>
-                
+
                 <div className="flex gap-2">
                   {app.connected ? (
                     <Button variant="outline" size="sm" className="flex-1">
@@ -212,7 +206,7 @@ export default function AppsPage() {
               <p className="text-sm text-muted-foreground">Third-party integrations to enhance your Daksha experience</p>
             </div>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {filteredExternalApps.map((app, index) => (
               <div key={index} className="bg-background border border-border/30 rounded-xl p-5 hover:shadow-md hover:border-border/50 transition-all duration-200 group">
@@ -237,15 +231,15 @@ export default function AppsPage() {
                     </Button>
                   )}
                 </div>
-                
+
                 <p className="text-sm text-muted-foreground mb-4 line-clamp-2 leading-relaxed">
                   {app.description}
                 </p>
-                
+
                 <div className="flex gap-2">
-                  <Button 
-                    variant={app.connected ? "outline" : "default"} 
-                    size="sm" 
+                  <Button
+                    variant={app.connected ? "outline" : "default"}
+                    size="sm"
                     className="flex-1"
                     onClick={() => toggleConnection(index)}
                   >
@@ -280,6 +274,15 @@ export default function AppsPage() {
           <p className="text-muted-foreground">Try adjusting your search or filter criteria.</p>
         </div>
       )}
+
+
+      {/* Description */}
+      <div className="bg-muted/20 rounded-lg p-4">
+        <p className="text-sm text-muted-foreground">
+          Connect your favorite apps to Daksha AI agent to create a unified view of your digital life.
+          Your data stays secure and is only used to provide personalized insights and assistance.
+        </p>
+      </div>
     </div>
   )
 }

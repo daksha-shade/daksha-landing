@@ -1,10 +1,11 @@
 "use client"
 
-import { Search, Settings, User, Command } from 'lucide-react'
+import { Search, Settings,   Command } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import ThemeToggle from '@/components/ui/ThemeToggle'
 import { useState } from 'react'
+import { UserButton } from '@stackframe/stack'
 
 export default function DashboardHeader() {
   const [searchFocused, setSearchFocused] = useState(false)
@@ -44,8 +45,12 @@ export default function DashboardHeader() {
           <Button variant="ghost" size="icon" className="hover:bg-accent hidden sm:flex">
             <Settings className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="hover:bg-accent">
-            <User className="w-4 h-4" />
+          <Button variant="ghost"
+          asChild
+          size="icon" className="hover:bg-accent">
+            <UserButton
+              showUserInfo={false}
+            />
           </Button>
         </div>
       </div>
