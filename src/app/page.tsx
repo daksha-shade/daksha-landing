@@ -58,15 +58,15 @@ export default function Home() {
                 <h3 className="text-lg font-semibold mb-3 font-inter">🧠 Think Freely, Remember Forever</h3>
                 <p className="notion-text">Capture notes, thoughts, dreams, and journal entries. Daksha remembers, reflects, and connects them intelligently.</p>
               </div>
-              <div className="bg-card p-6 rounded-lg border border-border card-hover card-hover-right">
+              <div className="bg-card p-6 rounded-lg border border-border card-hover">
                 <h3 className="text-lg font-semibold mb-3 font-inter">📷 Unlimited Memories</h3>
                 <p className="notion-text">Store unlimited photos, videos, documents, and voice notes with AI-organized search, auto-tagging, and life timelines.</p>
               </div>
-              <div className="bg-card p-6 rounded-lg border border-border card-hover card-hover-bottom">
+              <div className="bg-card p-6 rounded-lg border border-border card-hover">
                 <h3 className="text-lg font-semibold mb-3 font-inter">🧩 Replace Multiple Apps</h3>
                 <p className="notion-text">Forget app-switching. Daksha replaces Google Photos, Drive, Notion, Obsidian, Day One, ChatGPT, Replika, Todoist, and more...</p>
               </div>
-              <div className="bg-card p-6 rounded-lg border border-border card-glow">
+              <div className="bg-card p-6 rounded-lg border border-border card-hover">
                 <h3 className="text-lg font-semibold mb-3 font-inter">🪄 AI That Gets You</h3>
                 <p className="notion-text">Your AI evolves with your thoughts. Ask it anything about your past, your ideas, your journal, or your goals — it knows your context.</p>
               </div>
@@ -80,21 +80,21 @@ export default function Home() {
             <h2 className="notion-title font-serif text-center mb-12">
               🔍 Features at a Glance
             </h2>
-            <div className="bg-card rounded-lg border border-border overflow-hidden card-hover">
+            <div className="bg-card rounded-lg border border-border overflow-hidden">
               <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-border">
                 <div className="p-6 card-hover">
                   <h3 className="font-semibold mb-2 font-inter">✍️ Intelligent Journaling</h3>
                   <p className="notion-text text-sm">Write freely. Daksha reflects and summarizes beautifully.</p>
                 </div>
-                <div className="p-6 card-hover card-hover-right">
+                <div className="p-6 card-hover">
                   <h3 className="font-semibold mb-2 font-inter">📂 Unlimited Cloud Storage</h3>
                   <p className="notion-text text-sm">Store videos, photos, docs, voice notes. Forever.</p>
                 </div>
-                <div className="p-6 card-hover card-hover-bottom">
+                <div className="p-6 card-hover">
                   <h3 className="font-semibold mb-2 font-inter">🧠 Memory Graph</h3>
                   <p className="notion-text text-sm">Your own second brain. See connections between past thoughts.</p>
                 </div>
-                <div className="p-6 card-glow">
+                <div className="p-6 card-hover">
                   <h3 className="font-semibold mb-2 font-inter">💬 Smart Conversations</h3>
                   <p className="notion-text text-sm">Ask Daksha about your past, future plans, or ideas.</p>
                 </div>
@@ -102,7 +102,7 @@ export default function Home() {
                   <h3 className="font-semibold mb-2 font-inter">📆 Timeline View</h3>
                   <p className="notion-text text-sm">A visual graph of your life across memories and entries.</p>
                 </div>
-                <div className="p-6 card-hover card-hover-right">
+                <div className="p-6 card-hover">
                   <h3 className="font-semibold mb-2 font-inter">🛠️ Plugin System</h3>
                   <p className="notion-text text-sm">Extend Daksha with apps you love (coming soon).</p>
                 </div>
@@ -121,13 +121,13 @@ export default function Home() {
               <div className="bg-card p-6 rounded-lg border border-border card-hover">
                 <p className="notion-text">A startup founder journaling his roadmap, reviewing past decisions with AI insight</p>
               </div>
-              <div className="bg-card p-6 rounded-lg border border-border card-hover card-hover-right">
+              <div className="bg-card p-6 rounded-lg border border-border card-hover">
                 <p className="notion-text">A student storing all notes, voice memos, and emotional entries in one place</p>
               </div>
-              <div className="bg-card p-6 rounded-lg border border-border card-glow">
+              <div className="bg-card p-6 rounded-lg border border-border card-hover">
                 <p className="notion-text">A creator auto-organizing photos, thoughts, and voice notes into storyboards</p>
               </div>
-              <div className="bg-card p-6 rounded-lg border border-border card-hover card-hover-bottom">
+              <div className="bg-card p-6 rounded-lg border border-border card-hover">
                 <p className="notion-text">A traveler storing unlimited media & journaling experiences day by day</p>
               </div>
             </div>
@@ -159,7 +159,7 @@ export default function Home() {
                 <p className="notion-text italic mb-4">"This feels like the future of personal knowledge management."</p>
                 <p className="text-sm text-muted-foreground">— Early Beta Tester</p>
               </div>
-              <div className="bg-card p-6 rounded-lg border border-border card-glow">
+              <div className="bg-card p-6 rounded-lg border border-border card-hover">
                 <p className="notion-text italic mb-4">"Daksha helped me reflect deeper and stay organized. Better than 5 apps I used daily."</p>
                 <p className="text-sm text-muted-foreground">— YC Applicant Reviewer</p>
               </div>
