@@ -74,7 +74,7 @@ export default function ChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  const simulateProcess = (userMessage: string) => {
+  const simulateProcess = () => {
     const processes: ProcessStep[] = [
       { id: '1', name: 'Processing user input', status: 'running', timestamp: new Date(), details: 'Analyzing message content and intent' },
       { id: '2', name: 'Accessing journal entries', status: 'pending', timestamp: new Date(), details: 'Retrieving relevant past entries' },
@@ -117,7 +117,7 @@ export default function ChatPage() {
         timestamp: new Date()
       }
       setMessages([...messages, userMessage])
-      simulateProcess(newMessage)
+      simulateProcess()
       setNewMessage("")
 
       // Simulate bot response
@@ -141,7 +141,7 @@ export default function ChatPage() {
       timestamp: new Date()
     }
     setMessages([...messages, userMessage])
-    simulateProcess(prompt.prompt)
+    simulateProcess()
 
     setTimeout(() => {
       const botMessage = {

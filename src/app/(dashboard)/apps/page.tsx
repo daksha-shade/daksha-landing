@@ -21,7 +21,6 @@ import {
   StickyNote,
   Target,
   Brain,
-  Clock,
   HardDrive,
   Users,
   Timer

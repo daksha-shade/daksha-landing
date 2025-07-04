@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { ArrowLeft, Save, Video, Pause, CircleStop, RotateCcw, Mic, MicOff, Settings } from 'lucide-react'
+import { ArrowLeft, Save, Video, Pause, CircleStop, RotateCcw, Mic, MicOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
