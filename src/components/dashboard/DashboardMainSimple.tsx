@@ -17,10 +17,10 @@ export default function DashboardMainSimple() {
   const [dakshaInput, setDakshaInput] = useState("")
 
   return (
-    <div className="p-8 max-w-4xl mx-auto space-y-8">
+    <div className="notion-page py-12 space-y-8">
       {/* Greeting */}
       <div className="space-y-2">
-        <h1 className="text-2xl font-serif text-foreground">
+        <h1 className="notion-title font-serif text-foreground">
           Hello, Shaswat
         </h1>
       </div>

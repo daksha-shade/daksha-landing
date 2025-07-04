@@ -34,12 +34,12 @@ export default function GoalsPage() {
   ]
 
   return (
-    <div className="max-w-4xl mx-auto p-8 space-y-6">
+    <div className="notion-page py-12 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Target className="w-6 h-6 text-green-500" />
-          <h1 className="text-2xl font-serif font-semibold">Goals</h1>
+          <h1 className="notion-title font-serif">Goals</h1>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="notion" size="sm" className="gap-2">

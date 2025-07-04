@@ -29,7 +29,7 @@ export default function DashboardSidebar() {
 
   return (
     <aside className={cn(
-      "border-r border-border/30 bg-background/50 transition-all duration-300 flex flex-col",
+      "border-r border-border/20 bg-[#fafafa] dark:bg-[#1a1a1a] transition-all duration-300 flex flex-col",
       collapsed ? "w-16" : "w-64"
     )}>
       {/* Navigation */}

@@ -11,12 +11,12 @@ export default function JournalPage() {
   const [title, setTitle] = useState("")
 
   return (
-    <div className="max-w-4xl mx-auto p-8 space-y-6">
+    <div className="notion-page py-12 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Edit3 className="w-6 h-6 text-primary" />
-          <h1 className="text-2xl font-serif font-semibold">Journal</h1>
+          <h1 className="notion-title font-serif">Journal</h1>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="notion" size="sm" className="gap-2">
@@ -36,13 +36,13 @@ export default function JournalPage() {
           placeholder="Entry title..."
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="text-lg font-medium border-0 focus:ring-0 px-0"
+          className="text-lg font-medium border-0 focus:ring-0 px-2"
         />
         <Textarea
           placeholder="What's on your mind today?"
           value={entry}
           onChange={(e) => setEntry(e.target.value)}
-          className="min-h-[300px] border-0 focus:ring-0 resize-none text-base leading-relaxed px-0"
+          className="min-h-[300px] border-0 focus:ring-0 resize-none text-base leading-relaxed px-2"
         />
         <div className="flex items-center justify-between pt-4 border-t border-border/30">
           <div className="text-sm text-muted-foreground">
