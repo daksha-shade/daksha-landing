@@ -30,7 +30,7 @@ const featureGrid = [
   {
     icon: Plug,
     title: "Plugin System",
-    description: "Extend Daksha with apps you love (coming soon)."
+    description: "Extend Daksha with apps you love"
   }
 ]
 

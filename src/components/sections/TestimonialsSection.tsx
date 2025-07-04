@@ -8,7 +8,7 @@ const testimonials = [
   },
   {
     quote: "Daksha helped me reflect deeper and stay organized. Better than 5 apps I used daily.",
-    author: "YC Applicant Reviewer"
+    author: "Anonymous Student"
   }
 ]
 
