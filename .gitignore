@@ -44,3 +44,7 @@ next-env.d.ts
 sw*
 workbox-*
 wrangler.jsonc
+wrangler*
+
+# Secrets setup script (contains sensitive data)
+setup-secrets.sh

@@ -23,12 +23,14 @@ import {
   Music,
   FileText,
   Cloud,
-  Smartphone
+  Smartphone,
+  Activity
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 const navigationItems = [
+  { icon: Activity, label: 'Dashboard', href: '/app' },
   { icon: BookOpen, label: 'Journal', href: '/journal' },
   { icon: Brain, label: 'Mind', href: '/mind' },
   { icon: Target, label: 'Goals', href: '/goals' },

@@ -17,6 +17,11 @@
 	},
 	"observability": {
 		"enabled": true
+	},
+	"vars": {
+		"NEXT_PUBLIC_STACK_PROJECT_ID": "c9123b1a-dad2-4a2b-8eb1-ed667e58d076",
+		"NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY": "pck_06dyrfqh6g91rre5wyczqvcjyrp16bgkvm97bvhe4yfm0",
+		"LIVEKIT_URL": "wss://daksha-fuq54ytc.livekit.cloud"
 	}
 	/**
 	 * Smart Placement

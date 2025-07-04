@@ -61,7 +61,7 @@ export default function HeroSection() {
           </Button>
           <Button
             href="/app"
-            target="_blank"
+            // target="_blank"
             rel="noopener noreferrer"
             variant="notion"
             size="lg"
