@@ -3,6 +3,7 @@
 import { Search, Settings, User, Command } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import ThemeToggle from '@/components/ui/ThemeToggle'
 import { useState } from 'react'
 
 export default function DashboardHeader() {
@@ -39,6 +40,7 @@ export default function DashboardHeader() {
 
         {/* Actions - Responsive */}
         <div className="flex items-center gap-1 md:gap-2">
+          <ThemeToggle />
           <Button variant="ghost" size="icon" className="hover:bg-accent hidden sm:flex">
             <Settings className="w-4 h-4" />
           </Button>

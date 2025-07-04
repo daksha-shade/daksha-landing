@@ -16,6 +16,7 @@ export default function ThemeToggle() {
     if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
       setIsDark(true);
       document.documentElement.setAttribute('data-theme', 'dark');
+      document.documentElement.classList.add('dark');
     }
   }, []);
 
@@ -25,8 +26,10 @@ export default function ThemeToggle() {
     
     if (newTheme === 'dark') {
       document.documentElement.setAttribute('data-theme', 'dark');
+      document.documentElement.classList.add('dark');
     } else {
       document.documentElement.removeAttribute('data-theme');
+      document.documentElement.classList.remove('dark');
     }
     
     localStorage.setItem('theme', newTheme);
