@@ -1,6 +1,6 @@
 import DashboardHeader from '@/components/dashboard/DashboardHeader'
 import DashboardSidebar from '@/components/dashboard/DashboardSidebar'
-import DashboardMain from '@/components/dashboard/DashboardMain'
+import DashboardMainSimple from '@/components/dashboard/DashboardMainSimple'
 import DashboardCommandBar from '@/components/dashboard/DashboardCommandBar'
 
 export default function DashboardPage() {
@@ -16,7 +16,7 @@ export default function DashboardPage() {
         
         {/* Main Content */}
         <main className="flex-1 min-h-[calc(100vh-4rem)]">
-          <DashboardMain />
+          <DashboardMainSimple />
         </main>
       </div>
       
