@@ -26,7 +26,7 @@ export default function DashboardLayout({
         <DashboardSidebar />
         
         {/* Main Content */}
-        <main className="flex-1 min-h-[calc(100vh-4rem)] bg-white dark:bg-[#1f1f1f]">
+        <main className="flex-1 min-h-[calc(100vh-4rem)] bg-white dark:bg-[#1f1f1f] transition-all duration-300" style={{ marginLeft: 'var(--sidebar-width, 256px)' }}>
           {children}
         </main>
       </div>

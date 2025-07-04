@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { MessageCircle, Send, Brain, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { AIVoiceInput } from '@/components/ui/ai-voice-input'
 
 export default function ChatPage() {
   const [message, setMessage] = useState("")
@@ -73,6 +74,15 @@ export default function ChatPage() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Voice Input */}
+        <div className="border-t border-border/30 p-4 bg-[#fafafa] dark:bg-[#1a1a1a]">
+          <AIVoiceInput 
+            onStart={() => console.log('Voice recording started')}
+            onStop={(duration) => console.log('Voice recording stopped, duration:', duration)}
+            className="py-2"
+          />
         </div>
 
         {/* Input */}

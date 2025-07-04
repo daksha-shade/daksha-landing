@@ -11,10 +11,12 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import TalkToDakshaModal from './TalkToDakshaModal'
 
 export default function DashboardMainSimple() {
   const [journalEntry, setJournalEntry] = useState("")
   const [dakshaInput, setDakshaInput] = useState("")
+  const [showDakshaModal, setShowDakshaModal] = useState(false)
 
   return (
     <div className="notion-page py-12 space-y-8">
@@ -71,11 +73,24 @@ export default function DashboardMainSimple() {
               value={dakshaInput}
               onChange={(e) => setDakshaInput(e.target.value)}
               className="flex-1 border-border/50 focus:border-border"
+              onFocus={() => setShowDakshaModal(true)}
             />
-            <Button size="icon" variant="notion">
+            <Button 
+              size="icon" 
+              variant="notion"
+              onClick={() => setShowDakshaModal(true)}
+            >
               <Send className="w-4 h-4" />
             </Button>
           </div>
+          <Button 
+            variant="notion" 
+            className="mt-3 gap-2"
+            onClick={() => setShowDakshaModal(true)}
+          >
+            <Brain className="w-4 h-4" />
+            Talk to Daksha
+          </Button>
         </div>
       </div>
 
@@ -96,6 +111,12 @@ export default function DashboardMainSimple() {
           </Button>
         </div>
       </div>
+
+      {/* Talk to Daksha Modal */}
+      <TalkToDakshaModal 
+        isOpen={showDakshaModal}
+        onClose={() => setShowDakshaModal(false)}
+      />
     </div>
   )
 }

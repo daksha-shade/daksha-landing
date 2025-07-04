@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { 
@@ -27,9 +27,14 @@ export default function DashboardSidebar() {
   const [collapsed, setCollapsed] = useState(false)
   const pathname = usePathname()
 
+  // Update CSS variable for main content margin
+  React.useEffect(() => {
+    document.documentElement.style.setProperty('--sidebar-width', collapsed ? '64px' : '256px')
+  }, [collapsed])
+
   return (
     <aside className={cn(
-      "border-r border-border/20 bg-[#fafafa] dark:bg-[#1a1a1a] transition-all duration-300 flex flex-col",
+      "border-r border-border/20 bg-[#fafafa] dark:bg-[#1a1a1a] transition-all duration-300 flex flex-col fixed left-0 top-16 h-[calc(100vh-4rem)] z-40",
       collapsed ? "w-16" : "w-64"
     )}>
       {/* Navigation */}
