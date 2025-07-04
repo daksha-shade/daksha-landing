@@ -22,7 +22,7 @@ export default function DashboardCommandBar() {
 
   return (
     <>
-      <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50">
+      <div className="fixed bottom-8 right-1/8 transform -translate-x-1/8 z-50">
         <div className="bg-white/95 dark:bg-[#1f1f1f]/95 backdrop-blur border border-border/20 rounded-full shadow-lg px-6 py-3">
           <Button
             variant="ghost"
@@ -33,7 +33,7 @@ export default function DashboardCommandBar() {
             <Brain className="w-4 h-4" />
             <span className="text-sm">Talk to Daksha...</span>
             <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted/50 px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
-              ⌘K
+              ⌘C
             </kbd>
           </Button>
         </div>
