@@ -33,7 +33,7 @@ export default function Home() {
                 rel="noopener noreferrer"
                 className="notion-button notion-button-primary px-6 py-3 text-sm"
               >
-                Join the Waitlist 🚀
+                Join the Waitlist 
               </a>
               <a
                 href="https://mvp.daksha.live"
@@ -41,7 +41,7 @@ export default function Home() {
                 rel="noopener noreferrer"
                 className="notion-button px-6 py-3 text-sm"
               >
-                Watch Demo 🎥
+                Watch Demo 
               </a>
             </div>
           </div>
