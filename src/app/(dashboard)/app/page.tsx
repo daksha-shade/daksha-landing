@@ -2,13 +2,14 @@
 
 import { useUser } from '@stackframe/stack'
 import DashboardMainSimple from '@/components/dashboard/DashboardMainSimple'
-import { Button } from '@/components/ui/button'
+import { redirect } from 'next/navigation'
 
 export default function DashboardPage() {
   const user = useUser()
 
   // Show loading state while checking authentication
   if (user === null) {
+    redirect('/handler/sign-in');
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center space-y-4">
@@ -19,32 +20,10 @@ export default function DashboardPage() {
     )
   }
 
-  // Show sign in prompt if user is not authenticated
+  // Redirect to sign in if user is not authenticated
   if (user === undefined) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-center space-y-6 max-w-md">
-          <div className="space-y-2">
-            <h1 className="text-2xl font-serif font-semibold">Welcome to Daksha</h1>
-            <p className="text-muted-foreground">
-              Your AI-powered life OS for journaling, reflection, and personal growth.
-            </p>
-          </div>
-          <div className="space-y-3">
-            <Button 
-              onClick={() => window.location.href = '/sign-in'}
-              className="w-full"
-              size="lg"
-            >
-              Sign In to Continue
-            </Button>
-            <p className="text-xs text-muted-foreground">
-              New to Daksha? Signing in will create your account automatically.
-            </p>
-          </div>
-        </div>
-      </div>
-    )
+    window.location.href = '/handler/sign-in'
+    return null
   }
 
   return <DashboardMainSimple />

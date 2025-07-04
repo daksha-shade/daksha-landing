@@ -17,44 +17,10 @@ export default function DashboardMainSimple() {
   const [dakshaInput, setDakshaInput] = useState("")
   const [showVoiceInput, setShowVoiceInput] = useState(false)
 
-  // Show loading state while user data is being fetched
-  if (user === null) {
-    return (
-      <div className="notion-page py-12 space-y-8">
-        <div className="space-y-2">
-          <div className="h-8 bg-muted animate-pulse rounded-md w-48"></div>
-        </div>
-        <div className="space-y-4">
-          <div className="h-6 bg-muted animate-pulse rounded-md w-32"></div>
-          <div className="space-y-3 pl-6">
-            <div className="h-4 bg-muted animate-pulse rounded-md w-64"></div>
-            <div className="h-4 bg-muted animate-pulse rounded-md w-48"></div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // Redirect to sign in if user is not authenticated
-  if (user === undefined) {
-    return (
-      <div className="notion-page py-12 space-y-8">
-        <div className="space-y-4 text-center">
-          <h1 className="notion-title font-serif text-foreground">
-            Welcome to Daksha
-          </h1>
-          <p className="text-muted-foreground">
-            Please sign in to access your dashboard.
-          </p>
-          <Button 
-            onClick={() => window.location.href = '/sign-in'}
-            className="mt-4"
-          >
-            Sign In
-          </Button>
-        </div>
-      </div>
-    )
+  // This component should only render when user is authenticated
+  // Authentication check is handled at the page level
+  if (!user) {
+    return null
   }
 
   const displayName = user.displayName || user.primaryEmail?.split('@')[0] || 'there'
