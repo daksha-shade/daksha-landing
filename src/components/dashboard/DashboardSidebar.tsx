@@ -15,7 +15,15 @@ import {
   User,
   Settings,
   LogOut,
-  Menu
+  Menu,
+  Grid3X3,
+  Calendar,
+  Mail,
+  Camera,
+  Music,
+  FileText,
+  Cloud,
+  Smartphone
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -25,7 +33,18 @@ const navigationItems = [
   { icon: Brain, label: 'Mind', href: '/mind' },
   { icon: Target, label: 'Goals', href: '/goals' },
   { icon: MessageCircle, label: 'Chat', href: '/chat' },
+  { icon: Grid3X3, label: 'Apps', href: '/apps' },
   { icon: Archive, label: 'Archive', href: '/archive' },
+]
+
+const connectedApps = [
+  { icon: Calendar, label: 'Google Calendar', connected: true, color: 'text-blue-500' },
+  { icon: Mail, label: 'Gmail', connected: true, color: 'text-red-500' },
+  { icon: Camera, label: 'Google Photos', connected: false, color: 'text-green-500' },
+  { icon: Music, label: 'Spotify', connected: true, color: 'text-green-600' },
+  { icon: FileText, label: 'Notion', connected: false, color: 'text-gray-600' },
+  { icon: Cloud, label: 'Google Drive', connected: true, color: 'text-blue-600' },
+  { icon: Smartphone, label: 'Apple Health', connected: false, color: 'text-red-600' },
 ]
 
 export default function DashboardSidebar() {
@@ -33,6 +52,7 @@ export default function DashboardSidebar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const pathname = usePathname()
   const user = useUser()
+  const [showApps, setShowApps] = useState(false)
   
   const signOut = async () => {
     if (user) {
@@ -106,7 +126,7 @@ export default function DashboardSidebar() {
         </div>
         
         {!collapsed && (
-          <div className="mt-6">
+          <div className="mt-6 space-y-4">
             <Button 
               variant="ghost" 
               className="w-full justify-start gap-3 h-9 text-muted-foreground hover:text-foreground hover:bg-accent/50"
@@ -114,6 +134,49 @@ export default function DashboardSidebar() {
               <Plus className="w-4 h-4" />
               <span>New</span>
             </Button>
+
+            {/* Connected Apps Section */}
+            <div className="space-y-2">
+              <div
+              className="flex items-center gap-2 px-3 cursor-pointer select-none"
+              onClick={() => setShowApps(prev => !prev)}
+              >
+              <Grid3X3 className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm font-medium text-muted-foreground">Connected Apps</span>
+              <ChevronLeft
+                className={cn(
+                "w-4 h-4 ml-auto transition-transform",
+                showApps ? "-rotate-90" : "rotate-0"
+                )}
+              />
+              </div>
+              {showApps && (
+              <div className="space-y-1">
+                {connectedApps.slice(0, 4).map((app, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-accent/30 cursor-pointer transition-all group"
+                >
+                  <div className="flex items-center gap-2">
+                  <app.icon className={`w-3 h-3 ${app.color}`} />
+                  <span className="text-xs text-muted-foreground group-hover:text-foreground">{app.label}</span>
+                  </div>
+                  <div className={`w-1.5 h-1.5 rounded-full ${app.connected ? 'bg-green-500' : 'bg-gray-400'}`} />
+                </div>
+                ))}
+                <Link href="/apps">
+                <Button 
+                  onClick={() => console.log('Connect more apps')} 
+                  variant="ghost" 
+                  className="w-full justify-start gap-2 h-7 text-xs text-muted-foreground hover:text-foreground hover:bg-accent/50 mt-2"
+                >
+                  <Plus className="w-3 h-3" />
+                  <span>Connect more apps</span>
+                </Button>
+                </Link>
+              </div>
+              )}
+            </div>
           </div>
         )}
       </div>

@@ -16,7 +16,7 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className={`${inter.variable} ${crimsonText.variable} min-h-screen bg-[#fefefe] dark:bg-[#191919]`}>
+    <div className={`${inter.variable} ${crimsonText.variable} min-h-screen bg-transparent dark:bg-transparent text-[#1f1f1f] dark:text-white transition-colors duration-300`}>
       {/* Header */}
       <DashboardHeader />
       
