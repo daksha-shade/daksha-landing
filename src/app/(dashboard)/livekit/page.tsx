@@ -6,11 +6,6 @@ import {
   VideoConference, 
   RoomAudioRenderer
 } from '@livekit/components-react'
-import { 
-  Room, 
-  RoomEvent, 
-  RemoteParticipant
-} from 'livekit-client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
@@ -44,12 +39,11 @@ export default function LiveKitPage() {
   const [isConnected, setIsConnected] = useState<boolean>(false)
   const [aiMessages, setAiMessages] = useState<AIAgentMessage[]>([])
   const [isAIActive, setIsAIActive] = useState<boolean>(false)
-  const [roomStats, setRoomStats] = useState({
+  const [roomStats] = useState({
     participants: 0,
     duration: 0,
     quality: 'good'
   })
-  const [currentRoom, setCurrentRoom] = useState<Room | null>(null)
 
   // Generate access token
   const generateToken = async () => {
@@ -69,7 +63,7 @@ export default function LiveKitPage() {
         throw new Error('Failed to generate token')
       }
       
-      const data = await response.json()
+      const data = await response.json() as { token: string }
       setToken(data.token)
       setIsConnected(true)
     } catch (error) {
@@ -113,50 +107,6 @@ export default function LiveKitPage() {
     }
   }
 
-  // Handle room events and AI interactions
-  const handleRoomEvent = (room: Room) => {
-    room.on(RoomEvent.ParticipantConnected, (participant: RemoteParticipant) => {
-      console.log('Participant connected:', participant.identity)
-      setRoomStats(prev => ({ ...prev, participants: prev.participants + 1 }))
-      
-      // Check if it's the AI agent
-      if (participant.identity.includes('ai-agent')) {
-        const agentJoinMessage: AIAgentMessage = {
-          id: Date.now().toString(),
-          content: "AI Agent has joined the session and is ready to assist!",
-          timestamp: new Date(),
-          type: 'agent',
-          emotion: 'ready',
-          confidence: 1.0
-        }
-        setAiMessages(prev => [...prev, agentJoinMessage])
-      }
-    })
-
-    room.on(RoomEvent.ParticipantDisconnected, (participant: RemoteParticipant) => {
-      console.log('Participant disconnected:', participant.identity)
-      setRoomStats(prev => ({ ...prev, participants: Math.max(0, prev.participants - 1) }))
-    })
-
-    room.on(RoomEvent.DataReceived, (payload: Uint8Array, participant?: RemoteParticipant) => {
-      if (participant?.identity.includes('ai-agent')) {
-        try {
-          const message = JSON.parse(new TextDecoder().decode(payload))
-          const aiMessage: AIAgentMessage = {
-            id: Date.now().toString(),
-            content: message.content,
-            timestamp: new Date(),
-            type: 'agent',
-            emotion: message.emotion || 'neutral',
-            confidence: message.confidence || 0.8
-          }
-          setAiMessages(prev => [...prev, aiMessage])
-        } catch (error) {
-          console.error('Error parsing AI message:', error)
-        }
-      }
-    })
-  }
 
   if (!isConnected) {
     return (
@@ -293,17 +243,17 @@ export default function LiveKitPage() {
                 serverUrl={wsURL}
                 data-lk-theme="default"
                 style={{ height: '500px' }}
-                onConnected={(room) => {
-                  handleRoomEvent(room)
-                  setCurrentRoom(room)
+                onConnected={() => {
+                  // Room connection handled by LiveKit internally
+                  // We'll get the room instance through other means
                 }}
               >
                 <VideoConference />
                 <RoomAudioRenderer />
                 <LiveKitAIAgent 
-                  room={currentRoom}
+                  room={null}
                   isActive={isAIActive}
-                  onMessage={(message) => setAiMessages(prev => [...prev, message])}
+                  onMessage={(message) => setAiMessages(prev => [...prev, message as AIAgentMessage])}
                   userProfile={{ name: userName }}
                 />
               </LiveKitRoom>

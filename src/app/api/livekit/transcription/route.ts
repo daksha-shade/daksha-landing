@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
   try {
-    const { audioData, participantId, roomName } = await request.json()
+    const { audioData, participantId, roomName } = await request.json() as { audioData: unknown; participantId: string; roomName: string }
 
     if (!audioData || !participantId || !roomName) {
       return NextResponse.json(
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     // 3. Generate AI insights based on the conversation
     // 4. Store relevant information in the user's journal/memory
 
-    const mockTranscription = await processAudioWithAI(audioData, participantId)
+    const mockTranscription = await processAudioWithAI()
 
     return NextResponse.json({
       transcription: mockTranscription.text,
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function processAudioWithAI(_audioData: unknown, _participantId: string) {
+async function processAudioWithAI() {
   // Simulate AI processing
   const mockResponses = [
     {

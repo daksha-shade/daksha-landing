@@ -3,7 +3,7 @@ import { AccessToken } from 'livekit-server-sdk'
 
 export async function POST(request: NextRequest) {
   try {
-    const { roomName, participantName } = await request.json()
+    const { roomName, participantName } = await request.json() as { roomName: string; participantName: string }
 
     if (!roomName || !participantName) {
       return NextResponse.json(

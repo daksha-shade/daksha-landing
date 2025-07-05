@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Room } from 'livekit-client'
 import { DakshaAIAgent, AIAgentCapabilities } from '@/lib/ai-agent'
 
@@ -15,7 +15,7 @@ export function LiveKitAIAgent({ room, isActive, onMessage, userProfile }: LiveK
   const [agent, setAgent] = useState<DakshaAIAgent | null>(null)
   const [, setIsInitialized] = useState(false)
 
-  const initializeAgent = async () => {
+  const initializeAgent = useCallback(async () => {
     try {
       const capabilities: AIAgentCapabilities = {
         emotionalAnalysis: true,
@@ -54,7 +54,7 @@ export function LiveKitAIAgent({ room, isActive, onMessage, userProfile }: LiveK
         confidence: 0.8
       })
     }
-  }
+  }, [room, userProfile, onMessage])
 
   useEffect(() => {
     if (isActive && room && !agent) {

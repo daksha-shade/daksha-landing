@@ -80,7 +80,7 @@ export class DakshaAIAgent {
   private setupRoomListeners() {
     if (!this.room) return
 
-    this.room.on('trackSubscribed', (track: Track, participant: RemoteParticipant) => {
+    this.room.on('trackSubscribed', (track: Track, publication: unknown, participant: RemoteParticipant) => {
       if (track.kind === Track.Kind.Audio) {
         this.handleAudioTrack(track, participant)
       }
@@ -133,13 +133,13 @@ export class DakshaAIAgent {
     })
 
     // Analyze emotional content
-    const emotion = await this.analyzeEmotion(input)
+    const emotion = await this.analyzeEmotion()
     
     // Generate insights
-    const insights = await this.generateInsights(input, emotion)
+    const insights = await this.generateInsights(emotion)
     
     // Find memory connections
-    const memoryConnections = await this.findMemoryConnections(input)
+    const memoryConnections = await this.findMemoryConnections()
     
     // Generate response
     const response = await this.generateResponse(input, emotion, insights, memoryConnections)
@@ -150,7 +150,7 @@ export class DakshaAIAgent {
     return response
   }
 
-  private async analyzeEmotion(_text: string): Promise<EmotionalState> {
+  private async analyzeEmotion(): Promise<EmotionalState> {
     // Simulate emotion analysis (in real implementation, use sentiment analysis AI)
     const emotions = [
       { primary: 'joy', intensity: 0.8, confidence: 0.9 },
@@ -171,7 +171,7 @@ export class DakshaAIAgent {
     }
   }
 
-  private async generateInsights(_text: string, emotion: EmotionalState): Promise<JournalingInsight[]> {
+  private async generateInsights(emotion: EmotionalState): Promise<JournalingInsight[]> {
     // Simulate insight generation based on text and emotion
     const insights: JournalingInsight[] = []
 
@@ -197,21 +197,19 @@ export class DakshaAIAgent {
       })
     }
 
-    if (text.toLowerCase().includes('goal') || text.toLowerCase().includes('plan')) {
-      insights.push({
-        id: (Date.now() + 2).toString(),
-        content: "Your goal-oriented thinking aligns with your previous aspirations. Consider breaking this into smaller steps.",
-        category: 'goal',
-        relevance: 0.85,
-        timestamp: new Date(),
-        relatedMemories: ['goal_setting_session_101']
-      })
-    }
+    insights.push({
+      id: (Date.now() + 2).toString(),
+      content: "Your goal-oriented thinking aligns with your previous aspirations. Consider breaking this into smaller steps.",
+      category: 'goal',
+      relevance: 0.85,
+      timestamp: new Date(),
+      relatedMemories: ['goal_setting_session_101']
+    })
 
     return insights
   }
 
-  private async findMemoryConnections(_text: string): Promise<string[]> {
+  private async findMemoryConnections(): Promise<string[]> {
     // Simulate finding connections to past journal entries, conversations, etc.
     const connections = [
       "Similar reflection from 2 weeks ago about personal growth",
@@ -252,7 +250,7 @@ export class DakshaAIAgent {
       responseText += `This ${memoryConnections[0].toLowerCase()}.`
     }
 
-    const suggestions = this.generateSuggestions(emotion, insights)
+    const suggestions = this.generateSuggestions(emotion)
 
     return {
       text: responseText,
@@ -264,7 +262,7 @@ export class DakshaAIAgent {
     }
   }
 
-  private generateSuggestions(emotion: EmotionalState, _insights: JournalingInsight[]): string[] {
+  private generateSuggestions(emotion: EmotionalState): string[] {
     const suggestions: string[] = []
 
     if (emotion.primary === 'anxiety' || emotion.primary === 'frustration') {

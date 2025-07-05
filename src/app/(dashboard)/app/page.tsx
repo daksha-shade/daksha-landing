@@ -7,6 +7,7 @@ import { useState } from 'react'
 import { 
   BookOpen, 
   Brain, 
+  Bot,
   Target, 
   MessageCircle, 
   Grid3X3,
