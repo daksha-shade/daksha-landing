@@ -325,7 +325,7 @@ export default function JournalPage() {
             <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-200 via-purple-200 to-transparent dark:from-blue-800 dark:via-purple-800" />
             
             <div className="space-y-6">
-              {visibleEntries.map((entry, index) => (
+              {visibleEntries.map((entry) => (
                 <div key={entry.id} className="relative">
                   <div className="flex gap-4">
                     {/* Enhanced Timeline Dot */}

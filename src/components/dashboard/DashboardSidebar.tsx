@@ -90,7 +90,7 @@ export default function DashboardSidebar() {
   const SidebarContent = () => (
     <>
       {/* User Profile Section */}
-      {!collapsed && user && (
+      {/* {!collapsed && user && (
         <div className="p-4 border-b border-border/10">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
@@ -102,7 +102,7 @@ export default function DashboardSidebar() {
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Navigation */}
       <div className="flex-1 p-3">
@@ -187,6 +187,23 @@ export default function DashboardSidebar() {
       {/* Bottom Section */}
       <div className="p-3 border-t border-border/10">
         {!collapsed && user && (
+          <div className="flex items-center gap-3 mb-3 px-1">
+            
+            <div className="flex-1 min-w-0 ml-4">
+              <p className="text-xs font-medium truncate">{user.displayName || 'User'}</p>
+              <p className="text-[11px] text-muted-foreground truncate">{user.primaryEmail}</p>
+            </div>
+            <button
+              onClick={signOut}
+              className="ml-2 p-1 rounded hover:bg-accent/50 transition-colors"
+              title="Sign Out"
+            >
+              <LogOut className="w-4 h-4 text-muted-foreground hover:text-foreground" />
+            </button>
+          </div>
+        )}
+        {/* Settings and Sign Out */}
+        {!collapsed && user && (
           <div className="space-y-1 mb-3">
             <Button
               variant="ghost"
@@ -195,14 +212,7 @@ export default function DashboardSidebar() {
               <Settings className="w-4 h-4" />
               <span>Settings</span>
             </Button>
-            <Button
-              variant="ghost"
-              onClick={() => signOut()}
-              className="w-full justify-start gap-3 h-9 text-muted-foreground hover:text-foreground hover:bg-accent/50"
-            >
-              <LogOut className="w-4 h-4" />
-              <span>Sign Out</span>
-            </Button>
+            
           </div>
         )}
 
