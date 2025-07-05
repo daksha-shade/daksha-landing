@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from 'react'
-import { Edit3, Search, Video, Mic, FileText, Clock, Filter, Grid, List, Plus, Volume2, Image as ImageIcon } from 'lucide-react'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { Edit3, Search, Video, Mic, FileText, Clock, Filter, Grid, List, Plus, Volume2, Image as ImageIcon, ChevronDown, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -23,6 +23,9 @@ type JournalEntry = {
 export default function JournalPage() {
   const [viewMode, setViewMode] = useState<'timeline' | 'grid'>('timeline')
   const [filterType, setFilterType] = useState<'all' | 'text' | 'audio' | 'video' | 'mixed'>('all')
+  const [displayedEntries, setDisplayedEntries] = useState(5) // Start with 5 entries
+  const [isLoading, setIsLoading] = useState(false)
+  const loadMoreRef = useRef<HTMLDivElement>(null)
 
   // Mock journal entries with different types
   const [journalEntries] = useState<JournalEntry[]>([
@@ -38,44 +41,111 @@ export default function JournalPage() {
     {
       id: '2',
       type: 'audio',
-      title: 'Voice Note: YC Application Ideas',
-      audioUrl: 'mock-audio-url',
-      timestamp: new Date('2024-01-15T14:20:00'),
-      duration: 180,
+      title: 'Voice Note - Project Ideas',
+      content: 'Recorded some thoughts about the new features we could implement...',
+      timestamp: new Date('2024-01-14T14:20:00'),
       mood: 'focused',
-      tags: ['yc', 'application', 'ideas']
+      tags: ['ideas', 'voice-note'],
+      duration: 180
     },
     {
       id: '3',
       type: 'video',
-      title: 'Demo Recording',
-      videoUrl: 'mock-video-url',
-      timestamp: new Date('2024-01-14T16:45:00'),
-      duration: 300,
-      mood: 'excited',
-      tags: ['demo', 'product', 'features']
+      title: 'Daily Standup Reflection',
+      content: 'Quick video recap of today\'s standup and my thoughts on the sprint progress...',
+      timestamp: new Date('2024-01-14T09:15:00'),
+      mood: 'thoughtful',
+      tags: ['standup', 'sprint'],
+      duration: 120
     },
     {
       id: '4',
-      type: 'mixed',
-      title: 'Weekend Planning Session',
-      content: 'Planning out the weekend priorities. Need to focus on the pitch deck and user testing.',
-      attachments: [
-        { type: 'image', name: 'whiteboard-sketch.jpg', url: 'mock-image-url' },
-        { type: 'audio', name: 'brainstorm-session.mp3', url: 'mock-audio-url' }
-      ],
-      timestamp: new Date('2024-01-14T10:15:00'),
-      mood: 'thoughtful',
-      tags: ['planning', 'weekend', 'priorities']
+      type: 'text',
+      title: 'Weekend Planning',
+      content: 'Thinking about what I want to accomplish this weekend. Need to balance work and personal time...',
+      timestamp: new Date('2024-01-13T18:45:00'),
+      mood: 'contemplative',
+      tags: ['weekend', 'planning']
     },
     {
       id: '5',
+      type: 'mixed',
+      title: 'Learning Session Notes',
+      content: 'Watched a great tutorial on React patterns. Took some notes and recorded my thoughts...',
+      timestamp: new Date('2024-01-13T16:30:00'),
+      mood: 'excited',
+      tags: ['learning', 'react'],
+      attachments: [
+        { type: 'video', name: 'tutorial-notes.mp4', url: '#' },
+        { type: 'image', name: 'code-snippet.png', url: '#' }
+      ]
+    },
+    {
+      id: '6',
       type: 'text',
       title: 'Late Night Thoughts',
-      content: 'Been thinking about the competitive landscape. How do we differentiate Daksha from existing solutions?',
-      timestamp: new Date('2024-01-13T23:30:00'),
+      content: 'Can\'t sleep, so writing down some random thoughts about life and work balance...',
+      timestamp: new Date('2024-01-12T23:30:00'),
       mood: 'contemplative',
-      tags: ['competition', 'strategy', 'differentiation']
+      tags: ['late-night', 'thoughts']
+    },
+    {
+      id: '7',
+      type: 'audio',
+      title: 'Morning Meditation Reflection',
+      content: 'Recorded my thoughts after a 20-minute meditation session...',
+      timestamp: new Date('2024-01-12T07:00:00'),
+      mood: 'energetic',
+      tags: ['meditation', 'morning'],
+      duration: 300
+    },
+    {
+      id: '8',
+      type: 'video',
+      title: 'Cooking Experiment',
+      content: 'Tried a new recipe today and documented the process...',
+      timestamp: new Date('2024-01-11T19:30:00'),
+      mood: 'excited',
+      tags: ['cooking', 'experiment'],
+      duration: 240
+    },
+    {
+      id: '9',
+      type: 'text',
+      title: 'Book Review - Atomic Habits',
+      content: 'Just finished reading Atomic Habits. Some key takeaways and how I plan to apply them...',
+      timestamp: new Date('2024-01-11T15:20:00'),
+      mood: 'thoughtful',
+      tags: ['books', 'habits', 'review']
+    },
+    {
+      id: '10',
+      type: 'audio',
+      title: 'Walk and Talk',
+      content: 'Recorded my thoughts during a walk in the park...',
+      timestamp: new Date('2024-01-10T17:45:00'),
+      mood: 'energetic',
+      tags: ['walk', 'nature'],
+      duration: 420
+    },
+    {
+      id: '11',
+      type: 'text',
+      title: 'Goal Setting for Q1',
+      content: 'Setting my goals for the first quarter. Want to be more intentional about my growth...',
+      timestamp: new Date('2024-01-10T10:00:00'),
+      mood: 'focused',
+      tags: ['goals', 'planning', 'q1']
+    },
+    {
+      id: '12',
+      type: 'video',
+      title: 'Team Retrospective Thoughts',
+      content: 'Sharing my thoughts on our team retrospective and areas for improvement...',
+      timestamp: new Date('2024-01-09T16:30:00'),
+      mood: 'thoughtful',
+      tags: ['team', 'retrospective'],
+      duration: 180
     }
   ])
 
@@ -83,6 +153,25 @@ export default function JournalPage() {
     if (filterType === 'all') return true
     return entry.type === filterType
   })
+
+  const visibleEntries = filteredEntries.slice(0, displayedEntries)
+  const hasMoreEntries = displayedEntries < filteredEntries.length
+
+  const loadMore = useCallback(() => {
+    if (isLoading || !hasMoreEntries) return
+    
+    setIsLoading(true)
+    // Simulate loading delay
+    setTimeout(() => {
+      setDisplayedEntries(prev => Math.min(prev + 3, filteredEntries.length))
+      setIsLoading(false)
+    }, 800)
+  }, [isLoading, hasMoreEntries, filteredEntries.length])
+
+  // Reset displayed entries when filter changes
+  useEffect(() => {
+    setDisplayedEntries(5)
+  }, [filterType])
 
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
@@ -167,7 +256,7 @@ export default function JournalPage() {
           ))}
         </div>
         <div className="ml-auto text-sm text-muted-foreground">
-          {filteredEntries.length} entries
+          {visibleEntries.length} of {filteredEntries.length} entries
         </div> {/* Create New Entry */}
         <div className="flex justify-center">
           <Dialog>
@@ -231,23 +320,27 @@ export default function JournalPage() {
         <h2 className="text-lg font-medium">Your Journal</h2>
 
         {viewMode === 'timeline' ? (
-          <div className="space-y-6">
-            {filteredEntries.map((entry, index) => (
-              <div key={entry.id} className="relative">
-                {/* Timeline Line */}
-                {index !== filteredEntries.length - 1 && (
-                  <div className="absolute left-6 top-12 w-0.5 h-full bg-border/30" />
-                )}
-
-                <div className="flex gap-4">
-                  {/* Timeline Dot */}
-                  <div className="flex flex-col items-center">
-                    <div className={`w-3 h-3 rounded-full border-2 border-background ${entry.type === 'text' ? 'bg-blue-500' :
-                        entry.type === 'audio' ? 'bg-green-500' :
-                          entry.type === 'video' ? 'bg-red-500' :
-                            'bg-purple-500'
+          <div className="relative">
+            {/* Main Timeline Line */}
+            <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-200 via-purple-200 to-transparent dark:from-blue-800 dark:via-purple-800" />
+            
+            <div className="space-y-6">
+              {visibleEntries.map((entry, index) => (
+                <div key={entry.id} className="relative">
+                  <div className="flex gap-4">
+                    {/* Enhanced Timeline Dot */}
+                    <div className="relative flex flex-col items-center z-10">
+                      <div className={`w-4 h-4 rounded-full border-3 border-background shadow-lg ${
+                        entry.type === 'text' ? 'bg-blue-500 ring-2 ring-blue-200 dark:ring-blue-800' :
+                        entry.type === 'audio' ? 'bg-green-500 ring-2 ring-green-200 dark:ring-green-800' :
+                        entry.type === 'video' ? 'bg-red-500 ring-2 ring-red-200 dark:ring-red-800' :
+                        'bg-purple-500 ring-2 ring-purple-200 dark:ring-purple-800'
                       }`} />
-                  </div>
+                      {/* Date marker line */}
+                      <div className="absolute -left-8 top-1 text-xs text-muted-foreground font-mono bg-background px-1 rounded">
+                        {formatDate(entry.timestamp)}
+                      </div>
+                    </div>
 
                   {/* Entry Content */}
                   <div className="flex-1 pb-6">
@@ -269,7 +362,7 @@ export default function JournalPage() {
                         </div>
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <Clock className="w-3 h-3" />
-                          {formatDate(entry.timestamp)}
+                          {entry.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </div>
                       </div>
 
@@ -319,10 +412,47 @@ export default function JournalPage() {
                 </div>
               </div>
             ))}
+            
+            {/* Load More Section */}
+            {hasMoreEntries && (
+              <div className="relative flex justify-center pt-8">
+                <div className="absolute left-6 top-0 w-0.5 h-8 bg-gradient-to-b from-purple-200 to-transparent dark:from-purple-800" />
+                <Button 
+                  onClick={loadMore}
+                  disabled={isLoading}
+                  variant="outline"
+                  className="gap-2 bg-background/80 backdrop-blur-sm border-dashed hover:border-solid transition-all"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Loading more entries...
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="w-4 h-4" />
+                      Load {Math.min(3, filteredEntries.length - displayedEntries)} more entries
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
+            
+            {!hasMoreEntries && visibleEntries.length > 5 && (
+              <div className="relative flex justify-center pt-8">
+                <div className="absolute left-6 top-0 w-0.5 h-8 bg-gradient-to-b from-purple-200 to-transparent dark:from-purple-800" />
+                <div className="text-center">
+                  <div className="w-3 h-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 mx-auto mb-2" />
+                  <p className="text-sm text-muted-foreground">You've reached the beginning of your journal</p>
+                </div>
+              </div>
+            )}
+          </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredEntries.map((entry) => (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {visibleEntries.map((entry) => (
               <div key={entry.id} className="bg-background border border-border/30 rounded-lg p-4 hover:shadow-sm transition-all cursor-pointer">
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-2">
@@ -371,6 +501,31 @@ export default function JournalPage() {
                 </div>
               </div>
             ))}
+            </div>
+            
+            {/* Load More for Grid View */}
+            {hasMoreEntries && (
+              <div className="flex justify-center pt-6">
+                <Button 
+                  onClick={loadMore}
+                  disabled={isLoading}
+                  variant="outline"
+                  className="gap-2"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Loading more entries...
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="w-4 h-4" />
+                      Load {Math.min(3, filteredEntries.length - displayedEntries)} more entries
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
           </div>
         )}
 
