@@ -38,6 +38,7 @@ const navigationItems = [
   { icon: MessageCircle, label: 'Chat', href: '/chat' },
   { icon: Grid3X3, label: 'Apps', href: '/apps' },
   { icon: Archive, label: 'Archive', href: '/archive' },
+  { icon: Settings, label: 'Settings', href: '/settings' },
 ]
 
 const connectedApps = [

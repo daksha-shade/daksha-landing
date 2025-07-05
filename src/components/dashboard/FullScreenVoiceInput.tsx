@@ -8,9 +8,18 @@ import { AIVoiceInput } from '@/components/ui/ai-voice-input'
 interface FullScreenVoiceInputProps {
   isOpen: boolean
   onClose: () => void
+  onStartRecording?: () => void
+  onStopRecording?: () => void
+  isRecording?: boolean
 }
 
-export default function FullScreenVoiceInput({ isOpen, onClose }: FullScreenVoiceInputProps) {
+export default function FullScreenVoiceInput({ 
+  isOpen, 
+  onClose, 
+  onStartRecording, 
+  onStopRecording, 
+  isRecording = false 
+}: FullScreenVoiceInputProps) {
   const [isListening, setIsListening] = useState(false)
 
   useEffect(() => {
@@ -26,11 +35,13 @@ export default function FullScreenVoiceInput({ isOpen, onClose }: FullScreenVoic
 
   const handleVoiceStart = () => {
     setIsListening(true)
+    onStartRecording?.()
     console.log('Voice recording started')
   }
 
   const handleVoiceStop = (duration: number) => {
     setIsListening(false)
+    onStopRecording?.()
     console.log('Voice recording stopped, duration:', duration)
     // Here you would process the voice input and potentially close the modal
     // setTimeout(() => onClose(), 1000) // Auto-close after processing
@@ -49,7 +60,7 @@ export default function FullScreenVoiceInput({ isOpen, onClose }: FullScreenVoic
           <div>
             <h1 className="text-lg font-serif font-semibold">Talk to Daksha</h1>
             <p className="text-sm text-muted-foreground">
-              {isListening ? 'Listening...' : 'Click the microphone to start speaking'}
+              {isRecording || isListening ? 'Listening...' : 'Click the microphone to start speaking'}
             </p>
           </div>
         </div>
