@@ -168,7 +168,7 @@ export default function ChatPage() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Quick Prompts Sidebar */}
         <div className="lg:col-span-1 space-y-6">
-          <Card>
+          <Card className="animate-in slide-in-from-left-4 fade-in duration-500 delay-150">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Zap className="w-5 h-5 text-yellow-500" />
@@ -199,33 +199,12 @@ export default function ChatPage() {
               </Button>
             </CardContent>
           </Card>
-
-          {/* Chat Stats */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Activity className="w-5 h-5 text-blue-500" />
-                Today's Chat
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="text-center p-4 rounded-lg bg-blue-50 dark:bg-blue-950/20">
-                <MessageCircle className="w-8 h-8 text-blue-500 mx-auto mb-2" />
-                <p className="font-medium text-blue-700 dark:text-blue-300">Messages</p>
-                <p className="text-sm text-blue-600 dark:text-blue-400">{messages.length} exchanged</p>
-              </div>
-              <div className="text-center p-4 rounded-lg bg-green-50 dark:bg-green-950/20">
-                <Clock className="w-8 h-8 text-green-500 mx-auto mb-2" />
-                <p className="font-medium text-green-700 dark:text-green-300">Session Time</p>
-                <p className="text-sm text-green-600 dark:text-green-400">12 minutes</p>
-              </div>
-            </CardContent>
-          </Card>
+ 
         </div>
 
         {/* Main Chat Area */}
         <div className="lg:col-span-3">
-          <Card className="h-[700px] flex flex-col">
+          <Card className="h-[700px] flex flex-col animate-in slide-in-from-bottom-4 fade-in duration-500">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2">

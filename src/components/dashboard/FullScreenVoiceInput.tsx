@@ -50,7 +50,7 @@ export default function FullScreenVoiceInput({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-[100] bg-white dark:bg-[#1f1f1f] flex flex-col">
+    <div className="fixed inset-0 z-[100] bg-white dark:bg-[#1f1f1f] flex flex-col animate-in fade-in duration-300">
       {/* Header */}
       <div className="flex items-center justify-between p-6 border-b border-border/10">
         <div className="flex items-center gap-3">

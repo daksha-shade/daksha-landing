@@ -439,7 +439,7 @@ export default function SettingsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Settings Navigation */}
         <div className="lg:col-span-1">
-          <Card>
+          <Card className="animate-in slide-in-from-left-4 fade-in duration-500">
             <CardHeader>
               <CardTitle>Settings</CardTitle>
             </CardHeader>
@@ -464,7 +464,7 @@ export default function SettingsPage() {
 
         {/* Settings Content */}
         <div className="lg:col-span-3">
-          <Card>
+          <Card className="animate-in slide-in-from-right-4 fade-in duration-500 delay-150">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 {(() => {

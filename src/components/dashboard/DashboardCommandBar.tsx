@@ -53,17 +53,33 @@ export default function DashboardCommandBar() {
   }
 
   const handleMinimize = () => {
-    setIsExpanded(false)
-    if (isRecording) {
-      setIsMinimized(true)
+    // Add closing animation class before state change
+    const expandedDiv = document.querySelector('[data-expanded="true"]')
+    if (expandedDiv) {
+      expandedDiv.classList.add('animate-out', 'slide-out-to-bottom-2', 'fade-out', 'duration-200')
     }
+    
+    setTimeout(() => {
+      setIsExpanded(false)
+      if (isRecording) {
+        setIsMinimized(true)
+      }
+    }, 200)
   }
 
   const handleClose = () => {
-    setIsExpanded(false)
-    setIsMinimized(false)
-    setIsRecording(false)
-    setRecordingDuration(0)
+    // Add closing animation class before state change
+    const expandedDiv = document.querySelector('[data-expanded="true"]')
+    if (expandedDiv) {
+      expandedDiv.classList.add('animate-out', 'slide-out-to-bottom-2', 'fade-out', 'duration-200')
+    }
+    
+    setTimeout(() => {
+      setIsExpanded(false)
+      setIsMinimized(false)
+      setIsRecording(false)
+      setRecordingDuration(0)
+    }, 200)
   }
 
   const handleStartRecording = () => {
@@ -124,7 +140,7 @@ export default function DashboardCommandBar() {
             </div>
           ) : (
             /* Expanded State */
-            <div className="space-y-4 animate-in slide-in-from-bottom-2 duration-300">
+            <div className="space-y-4 animate-in slide-in-from-bottom-2 fade-in duration-300" data-expanded="true">
               {/* Header */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
