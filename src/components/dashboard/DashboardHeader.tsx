@@ -11,7 +11,7 @@ export default function DashboardHeader() {
   const [searchFocused, setSearchFocused] = useState(false)
 
   return (
-    <header className="h-16 border-b border-border/20 bg-white/80 dark:bg-[#1f1f1f]/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-[#1f1f1f]/60 sticky top-0 z-50">
+    <header className="h-16 border-b border-border/20 bg-white/80 dark:bg-[#1f1f1f]/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-[#1f1f1f]/60 fixed top-0 left-0 right-0 z-50">
       <div className="flex items-center justify-between h-full px-4 md:px-6">
         {/* Logo - Hidden on mobile to make space for menu button */}
         <div className="flex items-center gap-3 ml-12 md:ml-0">

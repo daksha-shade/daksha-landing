@@ -244,7 +244,7 @@ export default function DashboardSidebar() {
         variant="ghost"
         size="sm"
         onClick={() => setMobileOpen(true)}
-        className="fixed top-5 left-4 z-50 md:hidden bg-white/80 backdrop-blur-sm border border-border/20 shadow-sm"
+        className="fixed top-5 left-4 z-50 md:hidden backdrop-blur-sm border border-border/20 shadow-sm"
       >
         <Menu className="w-4 h-4" />
       </Button>
