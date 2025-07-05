@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Edit3, Search, Video, Mic, FileText, Clock, Filter, Grid, List, Plus, Volume2, Image as ImageIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 
 type JournalEntry = {
   id: string
@@ -12,7 +13,7 @@ type JournalEntry = {
   content?: string
   audioUrl?: string
   videoUrl?: string
-  attachments?: Array<{type: 'video' | 'audio' | 'image', name: string, url: string}>
+  attachments?: Array<{ type: 'video' | 'audio' | 'image', name: string, url: string }>
   timestamp: Date
   mood?: string
   tags?: string[]
@@ -92,7 +93,7 @@ export default function JournalPage() {
   const formatDate = (date: Date) => {
     const now = new Date()
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60)
-    
+
     if (diffInHours < 24) {
       return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     } else if (diffInHours < 48) {
@@ -123,18 +124,18 @@ export default function JournalPage() {
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <div className="flex items-center gap-1">
-            <Button 
-              variant={viewMode === 'timeline' ? 'default' : 'outline'} 
-              size="sm" 
+            <Button
+              variant={viewMode === 'timeline' ? 'default' : 'outline'}
+              size="sm"
               onClick={() => setViewMode('timeline')}
               className="gap-1"
             >
               <List className="w-3 h-3" />
               Timeline
             </Button>
-            <Button 
-              variant={viewMode === 'grid' ? 'default' : 'outline'} 
-              size="sm" 
+            <Button
+              variant={viewMode === 'grid' ? 'default' : 'outline'}
+              size="sm"
               onClick={() => setViewMode('grid')}
               className="gap-1"
             >
@@ -167,56 +168,68 @@ export default function JournalPage() {
         </div>
         <div className="ml-auto text-sm text-muted-foreground">
           {filteredEntries.length} entries
+        </div> {/* Create New Entry */}
+        <div className="flex justify-center">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button className="gap-2 h-8  ">
+                <Plus className="w-5 h-5" />
+                Create New Entry
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Create New Entry</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground text-center">Choose how you'd like to journal today</p>
+                <div className="space-y-3">
+                  <Button
+                    variant="outline"
+                    className="w-full gap-3 h-14 justify-start"
+                    onClick={() => window.location.href = '/journal/text'}
+                  >
+                    <FileText className="w-5 h-5" />
+                    <div className="text-left">
+                      <div className="font-medium">Text Entry</div>
+                      <div className="text-xs text-muted-foreground">Write your thoughts</div>
+                    </div>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full gap-3 h-14 justify-start"
+                    onClick={() => window.location.href = '/journal/audio'}
+                  >
+                    <Mic className="w-5 h-5" />
+                    <div className="text-left">
+                      <div className="font-medium">Audio Journal</div>
+                      <div className="text-xs text-muted-foreground">Record your voice</div>
+                    </div>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full gap-3 h-14 justify-start"
+                    onClick={() => window.location.href = '/journal/video'}
+                  >
+                    <Video className="w-5 h-5" />
+                    <div className="text-left">
+                      <div className="font-medium">Video Journal</div>
+                      <div className="text-xs text-muted-foreground">Capture on camera</div>
+                    </div>
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
-      {/* Create New Entry */}
-      <div className="bg-background border border-border/30 rounded-lg p-6">
-        <div className="text-center space-y-4">
-          <h3 className="text-lg font-medium">Create New Entry</h3>
-          <p className="text-sm text-muted-foreground">Choose how you'd like to journal today</p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button 
-              variant="outline" 
-              className="gap-2 h-12 px-6"
-              onClick={() => window.location.href = '/journal/text'}
-            >
-              <FileText className="w-5 h-5" />
-              <div className="text-left">
-                <div className="font-medium">Text Entry</div>
-                <div className="text-xs text-muted-foreground">Write your thoughts</div>
-              </div>
-            </Button>
-            <Button 
-              variant="outline" 
-              className="gap-2 h-12 px-6"
-              onClick={() => window.location.href = '/journal/audio'}
-            >
-              <Mic className="w-5 h-5" />
-              <div className="text-left">
-                <div className="font-medium">Audio Journal</div>
-                <div className="text-xs text-muted-foreground">Record your voice</div>
-              </div>
-            </Button>
-            <Button 
-              variant="outline" 
-              className="gap-2 h-12 px-6"
-              onClick={() => window.location.href = '/journal/video'}
-            >
-              <Video className="w-5 h-5" />
-              <div className="text-left">
-                <div className="font-medium">Video Journal</div>
-                <div className="text-xs text-muted-foreground">Capture on camera</div>
-              </div>
-            </Button>
-          </div>
-        </div>
-      </div>
+
 
       {/* Journal Entries */}
       <div className="space-y-4">
         <h2 className="text-lg font-medium">Your Journal</h2>
-        
+
         {viewMode === 'timeline' ? (
           <div className="space-y-6">
             {filteredEntries.map((entry, index) => (
@@ -225,18 +238,17 @@ export default function JournalPage() {
                 {index !== filteredEntries.length - 1 && (
                   <div className="absolute left-6 top-12 w-0.5 h-full bg-border/30" />
                 )}
-                
+
                 <div className="flex gap-4">
                   {/* Timeline Dot */}
                   <div className="flex flex-col items-center">
-                    <div className={`w-3 h-3 rounded-full border-2 border-background ${
-                      entry.type === 'text' ? 'bg-blue-500' :
-                      entry.type === 'audio' ? 'bg-green-500' :
-                      entry.type === 'video' ? 'bg-red-500' :
-                      'bg-purple-500'
-                    }`} />
+                    <div className={`w-3 h-3 rounded-full border-2 border-background ${entry.type === 'text' ? 'bg-blue-500' :
+                        entry.type === 'audio' ? 'bg-green-500' :
+                          entry.type === 'video' ? 'bg-red-500' :
+                            'bg-purple-500'
+                      }`} />
                   </div>
-                  
+
                   {/* Entry Content */}
                   <div className="flex-1 pb-6">
                     <div className="bg-background border border-border/30 rounded-lg p-4 hover:shadow-sm transition-all cursor-pointer">
@@ -260,14 +272,14 @@ export default function JournalPage() {
                           {formatDate(entry.timestamp)}
                         </div>
                       </div>
-                      
+
                       {/* Content Preview */}
                       {entry.content && (
                         <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
                           {entry.content}
                         </p>
                       )}
-                      
+
                       {/* Audio/Video Duration */}
                       {entry.duration && (
                         <div className="flex items-center gap-1 mb-3">
@@ -277,7 +289,7 @@ export default function JournalPage() {
                           </span>
                         </div>
                       )}
-                      
+
                       {/* Attachments */}
                       {entry.attachments && entry.attachments.length > 0 && (
                         <div className="flex items-center gap-2 mb-3">
@@ -291,7 +303,7 @@ export default function JournalPage() {
                           ))}
                         </div>
                       )}
-                      
+
                       {/* Tags */}
                       {entry.tags && entry.tags.length > 0 && (
                         <div className="flex flex-wrap gap-1">
@@ -322,13 +334,13 @@ export default function JournalPage() {
                   </div>
                   <span className="text-xs text-muted-foreground">{formatDate(entry.timestamp)}</span>
                 </div>
-                
+
                 {entry.content && (
                   <p className="text-xs text-muted-foreground mb-2 line-clamp-3">
                     {entry.content}
                   </p>
                 )}
-                
+
                 {entry.duration && (
                   <div className="flex items-center gap-1 mb-2">
                     <Clock className="w-3 h-3 text-muted-foreground" />
@@ -337,7 +349,7 @@ export default function JournalPage() {
                     </span>
                   </div>
                 )}
-                
+
                 <div className="flex items-center justify-between">
                   {entry.mood && (
                     <Badge variant="secondary" className={`text-xs ${getMoodColor(entry.mood)}`}>
@@ -361,14 +373,14 @@ export default function JournalPage() {
             ))}
           </div>
         )}
-        
+
         {filteredEntries.length === 0 && (
           <div className="text-center py-12">
             <Edit3 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-medium mb-2">No entries found</h3>
             <p className="text-muted-foreground">
-              {filterType === 'all' 
-                ? 'Start journaling to see your entries here.' 
+              {filterType === 'all'
+                ? 'Start journaling to see your entries here.'
                 : `No ${filterType} entries found. Try a different filter.`
               }
             </p>
