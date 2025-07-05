@@ -1,153 +1,20 @@
 "use client"
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Edit3, Search, Video, Mic, FileText, Clock, Filter, Grid, List, Plus, Volume2, Image as ImageIcon, ChevronDown, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-
-type JournalEntry = {
-  id: string
-  type: 'text' | 'audio' | 'video' | 'mixed'
-  title: string
-  content?: string
-  audioUrl?: string
-  videoUrl?: string
-  attachments?: Array<{ type: 'video' | 'audio' | 'image', name: string, url: string }>
-  timestamp: Date
-  mood?: string
-  tags?: string[]
-  duration?: number // for audio/video in seconds
-}
+import { mockJournalEntries, getMoodColor, formatDuration, formatDate } from '@/lib/journal-data'
 
 export default function JournalPage() {
   const [viewMode, setViewMode] = useState<'timeline' | 'grid'>('timeline')
   const [filterType, setFilterType] = useState<'all' | 'text' | 'audio' | 'video' | 'mixed'>('all')
   const [displayedEntries, setDisplayedEntries] = useState(5) // Start with 5 entries
   const [isLoading, setIsLoading] = useState(false)
-  const loadMoreRef = useRef<HTMLDivElement>(null)
 
-  // Mock journal entries with different types
-  const [journalEntries] = useState<JournalEntry[]>([
-    {
-      id: '1',
-      type: 'text',
-      title: 'Morning Reflections',
-      content: 'Feeling energized about the Daksha project. Had some great insights during my walk about the user experience flow...',
-      timestamp: new Date('2024-01-15T08:30:00'),
-      mood: 'energetic',
-      tags: ['morning', 'insights', 'daksha']
-    },
-    {
-      id: '2',
-      type: 'audio',
-      title: 'Voice Note - Project Ideas',
-      content: 'Recorded some thoughts about the new features we could implement...',
-      timestamp: new Date('2024-01-14T14:20:00'),
-      mood: 'focused',
-      tags: ['ideas', 'voice-note'],
-      duration: 180
-    },
-    {
-      id: '3',
-      type: 'video',
-      title: 'Daily Standup Reflection',
-      content: 'Quick video recap of today\'s standup and my thoughts on the sprint progress...',
-      timestamp: new Date('2024-01-14T09:15:00'),
-      mood: 'thoughtful',
-      tags: ['standup', 'sprint'],
-      duration: 120
-    },
-    {
-      id: '4',
-      type: 'text',
-      title: 'Weekend Planning',
-      content: 'Thinking about what I want to accomplish this weekend. Need to balance work and personal time...',
-      timestamp: new Date('2024-01-13T18:45:00'),
-      mood: 'contemplative',
-      tags: ['weekend', 'planning']
-    },
-    {
-      id: '5',
-      type: 'mixed',
-      title: 'Learning Session Notes',
-      content: 'Watched a great tutorial on React patterns. Took some notes and recorded my thoughts...',
-      timestamp: new Date('2024-01-13T16:30:00'),
-      mood: 'excited',
-      tags: ['learning', 'react'],
-      attachments: [
-        { type: 'video', name: 'tutorial-notes.mp4', url: '#' },
-        { type: 'image', name: 'code-snippet.png', url: '#' }
-      ]
-    },
-    {
-      id: '6',
-      type: 'text',
-      title: 'Late Night Thoughts',
-      content: 'Can\'t sleep, so writing down some random thoughts about life and work balance...',
-      timestamp: new Date('2024-01-12T23:30:00'),
-      mood: 'contemplative',
-      tags: ['late-night', 'thoughts']
-    },
-    {
-      id: '7',
-      type: 'audio',
-      title: 'Morning Meditation Reflection',
-      content: 'Recorded my thoughts after a 20-minute meditation session...',
-      timestamp: new Date('2024-01-12T07:00:00'),
-      mood: 'energetic',
-      tags: ['meditation', 'morning'],
-      duration: 300
-    },
-    {
-      id: '8',
-      type: 'video',
-      title: 'Cooking Experiment',
-      content: 'Tried a new recipe today and documented the process...',
-      timestamp: new Date('2024-01-11T19:30:00'),
-      mood: 'excited',
-      tags: ['cooking', 'experiment'],
-      duration: 240
-    },
-    {
-      id: '9',
-      type: 'text',
-      title: 'Book Review - Atomic Habits',
-      content: 'Just finished reading Atomic Habits. Some key takeaways and how I plan to apply them...',
-      timestamp: new Date('2024-01-11T15:20:00'),
-      mood: 'thoughtful',
-      tags: ['books', 'habits', 'review']
-    },
-    {
-      id: '10',
-      type: 'audio',
-      title: 'Walk and Talk',
-      content: 'Recorded my thoughts during a walk in the park...',
-      timestamp: new Date('2024-01-10T17:45:00'),
-      mood: 'energetic',
-      tags: ['walk', 'nature'],
-      duration: 420
-    },
-    {
-      id: '11',
-      type: 'text',
-      title: 'Goal Setting for Q1',
-      content: 'Setting my goals for the first quarter. Want to be more intentional about my growth...',
-      timestamp: new Date('2024-01-10T10:00:00'),
-      mood: 'focused',
-      tags: ['goals', 'planning', 'q1']
-    },
-    {
-      id: '12',
-      type: 'video',
-      title: 'Team Retrospective Thoughts',
-      content: 'Sharing my thoughts on our team retrospective and areas for improvement...',
-      timestamp: new Date('2024-01-09T16:30:00'),
-      mood: 'thoughtful',
-      tags: ['team', 'retrospective'],
-      duration: 180
-    }
-  ])
+  // Use shared journal entries
+  const journalEntries = mockJournalEntries
 
   const filteredEntries = journalEntries.filter(entry => {
     if (filterType === 'all') return true
@@ -173,35 +40,6 @@ export default function JournalPage() {
     setDisplayedEntries(5)
   }, [filterType])
 
-  const formatDuration = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins}:${secs.toString().padStart(2, '0')}`
-  }
-
-  const formatDate = (date: Date) => {
-    const now = new Date()
-    const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60)
-
-    if (diffInHours < 24) {
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    } else if (diffInHours < 48) {
-      return 'Yesterday'
-    } else {
-      return date.toLocaleDateString([], { month: 'short', day: 'numeric' })
-    }
-  }
-
-  const getMoodColor = (mood?: string) => {
-    switch (mood) {
-      case 'energetic': return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
-      case 'focused': return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
-      case 'excited': return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300'
-      case 'thoughtful': return 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
-      case 'contemplative': return 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300'
-      default: return 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300'
-    }
-  }
 
   return (
     <div className="notion-page py-6 space-y-6">
@@ -344,7 +182,10 @@ export default function JournalPage() {
 
                   {/* Entry Content */}
                   <div className="flex-1 pb-6">
-                    <div className="bg-background border border-border/30 rounded-lg p-4 hover:shadow-sm transition-all cursor-pointer">
+                    <div 
+                      className="bg-background border border-border/30 rounded-lg p-4 hover:shadow-sm transition-all cursor-pointer"
+                      onClick={() => window.location.href = `/journal/${entry.id}`}
+                    >
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center gap-2">
                           <h3 className="font-medium">{entry.title}</h3>
@@ -453,7 +294,11 @@ export default function JournalPage() {
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {visibleEntries.map((entry) => (
-              <div key={entry.id} className="bg-background border border-border/30 rounded-lg p-4 hover:shadow-sm transition-all cursor-pointer">
+              <div 
+                key={entry.id} 
+                className="bg-background border border-border/30 rounded-lg p-4 hover:shadow-sm transition-all cursor-pointer"
+                onClick={() => window.location.href = `/journal/${entry.id}`}
+              >
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <h3 className="font-medium text-sm">{entry.title}</h3>

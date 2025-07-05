@@ -14,17 +14,12 @@ import {
   Moon, 
   Sun, 
   Monitor,
-  Volume2,
-  VolumeX,
-  Eye,
-  EyeOff,
   Save,
   ArrowLeft
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
-import { Badge } from '@/components/ui/badge'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
@@ -77,7 +72,7 @@ export default function SettingsPage() {
     { id: 'data', label: 'Data & Storage', icon: Database },
   ]
 
-  const updateSetting = (key: string, value: any) => {
+  const updateSetting = (key: string, value: string | boolean | number) => {
     setSettings(prev => ({ ...prev, [key]: value }))
   }
 

@@ -12,7 +12,6 @@ import {
   Archive,
   Plus,
   ChevronLeft,
-  User,
   Settings,
   LogOut,
   Menu,
@@ -24,8 +23,7 @@ import {
   FileText,
   Cloud,
   Smartphone,
-  Activity,
-  Bot
+  Activity
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'

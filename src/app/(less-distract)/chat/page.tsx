@@ -1,19 +1,19 @@
 "use client"
 
 import { useState, useRef, useEffect } from 'react'
-import { Send, Bot, User, ArrowLeft, MessageCircle, Zap, Plus, Edit3, Activity, Clock } from 'lucide-react'
+import { Send, Bot, User, Mic, Paperclip, ArrowLeft, Zap, Activity, Clock, CheckCircle, AlertCircle, Loader } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 
-type Message = {
-  id: number
-  sender: 'user' | 'bot'
-  content: string
+type ProcessStep = {
+  id: string
+  name: string
+  status: 'pending' | 'running' | 'completed' | 'error'
   timestamp: Date
+  details?: string
 }
 
 type QuickPrompt = {
@@ -24,7 +24,7 @@ type QuickPrompt = {
 }
 
 export default function ChatPage() {
-  const [messages, setMessages] = useState<Message[]>([
+  const [messages, setMessages] = useState([
     {
       id: 1,
       sender: 'bot',
@@ -40,12 +40,24 @@ export default function ChatPage() {
     {
       id: 3,
       sender: 'bot',
-      content: "I understand that feeling overwhelmed is a common experience for entrepreneurs. Let's break this down together. What specific aspects of your startup journey are contributing most to this feeling?",
+      content: "I understand that feeling overwhelmed is a common experience for entrepreneurs. Let's break this down together. What specific aspects of your startup journey are contributing most to this feeling? Is it the uncertainty, the workload, or perhaps the pressure to succeed?",
       timestamp: new Date(Date.now() - 1000 * 60 * 2)
+    },
+    {
+      id: 4,
+      sender: 'user',
+      content: "It's mainly the uncertainty. I'm not sure if I'm making the right decisions, and every choice feels like it could make or break everything.",
+      timestamp: new Date(Date.now() - 1000 * 60 * 1)
+    },
+    {
+      id: 5,
+      sender: 'bot',
+      content: "That's a fascinating perspective! Let me help you explore that thought further. Based on your recent journal entries, I can see some patterns emerging...",
+      timestamp: new Date()
     }
   ])
   const [newMessage, setNewMessage] = useState("")
-  const [isTyping, setIsTyping] = useState(false)
+  const [currentProcesses, setCurrentProcesses] = useState<ProcessStep[]>([])
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const quickPrompts: QuickPrompt[] = [
@@ -62,59 +74,92 @@ export default function ChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  const handleSendMessage = async () => {
+  const simulateProcess = () => {
+    const processes: ProcessStep[] = [
+      { id: '1', name: 'Processing user input', status: 'running', timestamp: new Date(), details: 'Analyzing message content and intent' },
+      { id: '2', name: 'Accessing journal entries', status: 'pending', timestamp: new Date(), details: 'Retrieving relevant past entries' },
+      { id: '3', name: 'Analyzing patterns', status: 'pending', timestamp: new Date(), details: 'Identifying emotional and behavioral patterns' },
+      { id: '4', name: 'Generating insights', status: 'pending', timestamp: new Date(), details: 'Creating personalized response' },
+      { id: '5', name: 'Finalizing response', status: 'pending', timestamp: new Date(), details: 'Optimizing for clarity and helpfulness' }
+    ]
+
+    setCurrentProcesses(processes)
+
+    // Simulate process completion
+    processes.forEach((process, index) => {
+      setTimeout(() => {
+        setCurrentProcesses(prev => prev.map(p =>
+          p.id === process.id ? { ...p, status: 'completed' } : p
+        ))
+
+        if (index < processes.length - 1) {
+          setTimeout(() => {
+            setCurrentProcesses(prev => prev.map(p =>
+              p.id === processes[index + 1].id ? { ...p, status: 'running' } : p
+            ))
+          }, 200)
+        }
+      }, (index + 1) * 1000)
+    })
+
+    // Clear processes after completion
+    setTimeout(() => {
+      setCurrentProcesses([])
+    }, (processes.length + 2) * 1000)
+  }
+
+  const handleSendMessage = () => {
     if (newMessage.trim()) {
-      const userMessage: Message = {
+      const userMessage = {
         id: messages.length + 1,
-        sender: 'user',
+        sender: 'user' as const,
         content: newMessage,
         timestamp: new Date()
       }
-      
-      setMessages(prev => [...prev, userMessage])
+      setMessages([...messages, userMessage])
+      simulateProcess()
       setNewMessage("")
-      setIsTyping(true)
 
       // Simulate bot response
       setTimeout(() => {
-        const botMessage: Message = {
+        const botMessage = {
           id: messages.length + 2,
-          sender: 'bot',
-          content: "I understand what you're going through. Let me help you explore this further and provide some insights based on your thoughts.",
+          sender: 'bot' as const,
+          content: "I understand what you're going through. Let me help you explore this further...",
           timestamp: new Date()
         }
         setMessages(prev => [...prev, botMessage])
-        setIsTyping(false)
-      }, 2000)
+      }, 5000)
     }
   }
 
   const handleQuickPrompt = (prompt: QuickPrompt) => {
-    const userMessage: Message = {
+    const userMessage = {
       id: messages.length + 1,
-      sender: 'user',
+      sender: 'user' as const,
       content: prompt.prompt,
       timestamp: new Date()
     }
-    setMessages(prev => [...prev, userMessage])
-    setIsTyping(true)
+    setMessages([...messages, userMessage])
+    simulateProcess()
 
     setTimeout(() => {
-      const botMessage: Message = {
+      const botMessage = {
         id: messages.length + 2,
-        sender: 'bot',
+        sender: 'bot' as const,
         content: `Great question! Let me analyze your ${prompt.category} patterns and provide insights...`,
         timestamp: new Date()
       }
       setMessages(prev => [...prev, botMessage])
-      setIsTyping(false)
-    }, 2000)
+    }, 5000)
   }
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSendMessage()
+  const getProcessIcon = (status: ProcessStep['status']) => {
+    switch (status) {
+      case 'running': return <Loader className="w-3 h-3 animate-spin text-blue-500" />
+      case 'completed': return <CheckCircle className="w-3 h-3 text-green-500" />
+      case 'error': return <AlertCircle className="w-3 h-3 text-red-500" />
+      default: return <Clock className="w-3 h-3 text-gray-400" />
     }
   }
 
@@ -129,175 +174,172 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-6 py-8 space-y-8">
-      {/* Header Section - Notion Style */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+    <div className="fixed inset-0 bg-background flex flex-row-reverse">
+      {/* Technical Sidebar */}
+      <div className="w-80 border-r border-border/20 bg-muted/10 dark:bg-gray-950/50 flex flex-col">
+        {/* Sidebar Header */}
+        <div className="p-4 border-b border-border/20">
+          <div className="flex items-center gap-2 mb-3">
             <Link
               href="/apps"
-              className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-accent transition-colors"
+              className="flex items-center gap-2 px-2 py-1 rounded-md text-sm font-medium text-muted-foreground hover:text-primary hover:bg-accent transition-colors group"
             >
-              <ArrowLeft className="w-4 h-4" />
-              Back
+              <span className="flex items-center justify-center w-7 h-7 rounded-full bg-accent group-hover:bg-primary/10 transition-colors">
+                <ArrowLeft className="w-4 h-4 text-primary" />
+              </span>
+              <span className="hidden sm:inline">Back</span>
             </Link>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-accent/50 flex items-center justify-center">
-                <MessageCircle className="w-6 h-6 text-primary" />
-              </div>
-              <div>
-                <h1 className="notion-title font-serif text-foreground text-3xl">
-                  Chat with Daksha
-                </h1>
-                <p className="text-muted-foreground mt-1">
-                  Your AI companion for reflection and insights
-                </p>
-              </div>
-            </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Badge variant="secondary" className="gap-2">
-              <Activity className="w-3 h-3" />
-              Online
-            </Badge>
+          <div className="flex items-center gap-2">
+            <Activity className="w-5 h-5 text-primary" />
+            <h2 className="font-semibold">AI Agent Console</h2>
           </div>
         </div>
-      </div>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Quick Prompts Sidebar */}
-        <div className="lg:col-span-1 space-y-6">
-          <Card className="animate-in slide-in-from-left-4 fade-in duration-500 delay-150">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="w-5 h-5 text-yellow-500" />
-                Quick Prompts
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {quickPrompts.map((prompt) => (
-                <button
-                  key={prompt.id}
-                  onClick={() => handleQuickPrompt(prompt)}
-                  className="w-full text-left p-3 rounded-lg bg-accent/30 hover:bg-accent/50 border border-dashed border-border hover:border-solid transition-all group"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium">{prompt.title}</span>
-                    <Badge variant="secondary" className={`text-xs ${getCategoryColor(prompt.category)}`}>
-                      {prompt.category}
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-muted-foreground line-clamp-2 group-hover:text-foreground transition-colors">
-                    {prompt.prompt}
-                  </p>
-                </button>
-              ))}
-              <Button className="w-full gap-2" variant="outline">
-                <Plus className="w-4 h-4" />
-                Add Custom Prompt
-              </Button>
-            </CardContent>
-          </Card>
- 
-        </div>
-
-        {/* Main Chat Area */}
-        <div className="lg:col-span-3">
-          <Card className="h-[700px] flex flex-col animate-in slide-in-from-bottom-4 fade-in duration-500">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <Bot className="w-5 h-5 text-primary" />
-                  Conversation
-                </CardTitle>
-                <Button variant="ghost" size="sm" className="gap-2">
-                  <Edit3 className="w-4 h-4" />
-                  Clear Chat
-                </Button>
-              </div>
-            </CardHeader>
-            
-            {/* Messages Area */}
-            <CardContent className="flex-1 overflow-y-auto space-y-6">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex gap-4 ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  {message.sender === 'bot' && (
-                    <Avatar className="w-10 h-10 flex-shrink-0">
-                      <AvatarFallback className="bg-primary text-primary-foreground">
-                        <Bot className="w-5 h-5" />
-                      </AvatarFallback>
-                    </Avatar>
-                  )}
-                  
-                  <div
-                    className={`max-w-[80%] rounded-lg p-4 ${
-                      message.sender === 'user'
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-accent/50'
-                    }`}
-                  >
-                    <p className="text-sm leading-relaxed">{message.content}</p>
-                    <p className="text-xs opacity-70 mt-2">
-                      {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </p>
-                  </div>
-
-                  {message.sender === 'user' && (
-                    <Avatar className="w-10 h-10 flex-shrink-0">
-                      <AvatarFallback>
-                        <User className="w-5 h-5" />
-                      </AvatarFallback>
-                    </Avatar>
-                  )}
+        {/* Quick Prompts Section */}
+        <div className="p-4 border-b border-border/20">
+          <div className="flex items-center gap-2 mb-3">
+            <Zap className="w-4 h-4 text-yellow-500" />
+            <h3 className="font-medium text-sm">Quick Prompts</h3>
+          </div>
+          <div className="space-y-2">
+            {quickPrompts.map((prompt) => (
+              <button
+                key={prompt.id}
+                onClick={() => handleQuickPrompt(prompt)}
+                className="w-full text-left p-2 rounded-lg bg-background/50 hover:bg-background border border-border/30 hover:border-border/50 transition-all group"
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-medium">{prompt.title}</span>
+                  <Badge variant="secondary" className={`text-xs ${getCategoryColor(prompt.category)}`}>
+                    {prompt.category}
+                  </Badge>
                 </div>
-              ))}
+                <p className="text-xs text-muted-foreground line-clamp-2 group-hover:text-foreground transition-colors">
+                  {prompt.prompt}
+                </p>
+              </button>
+            ))}
+          </div>
+        </div>
 
-              {/* Typing Indicator */}
-              {isTyping && (
-                <div className="flex gap-4 justify-start">
-                  <Avatar className="w-10 h-10 flex-shrink-0">
-                    <AvatarFallback className="bg-primary text-primary-foreground">
-                      <Bot className="w-5 h-5" />
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="bg-accent/50 rounded-lg p-4">
-                    <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                      <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+        {/* Process Timeline */}
+        <div className="flex-1 p-4 overflow-y-auto">
+          <div className="flex items-center gap-2 mb-3">
+            <Activity className="w-4 h-4 text-blue-500" />
+            <h3 className="font-medium text-sm">Process Timeline</h3>
+          </div>
+
+          {currentProcesses.length > 0 ? (
+            <div className="space-y-3">
+              {currentProcesses.map((process, index) => (
+                <div key={process.id} className="relative">
+                  {index < currentProcesses.length - 1 && (
+                    <div className="absolute left-2 top-6 w-px h-8 bg-border/30" />
+                  )}
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 mt-1">
+                      {getProcessIcon(process.status)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs font-medium">{process.name}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {process.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                        </span>
+                      </div>
+                      {process.details && (
+                        <p className="text-xs text-muted-foreground">{process.details}</p>
+                      )}
                     </div>
                   </div>
                 </div>
-              )}
-              
-              <div ref={messagesEndRef} />
-            </CardContent>
-
-            {/* Input Area */}
-            <div className="border-t border-border/20 p-6">
-              <div className="flex gap-3">
-                <Input
-                  placeholder="Type your message..."
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  className="flex-1"
-                  disabled={isTyping}
-                />
-                <Button 
-                  onClick={handleSendMessage} 
-                  disabled={!newMessage.trim() || isTyping}
-                  className="px-6"
-                >
-                  <Send className="w-4 h-4" />
-                </Button>
-              </div>
+              ))}
             </div>
-          </Card>
+          ) : (
+            <div className="text-center py-8">
+              <Activity className="w-8 h-8 text-muted-foreground/50 mx-auto mb-2" />
+              <p className="text-xs text-muted-foreground">No active processes</p>
+              <p className="text-xs text-muted-foreground/70">Send a message to see AI processing</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col">
+        {/* Chat Header */}
+        <div className="p-4 border-b border-border/20 bg-background/80 backdrop-blur-sm">
+          <div className="flex items-center gap-3">
+            <Avatar className="w-10 h-10">
+              <AvatarFallback className="bg-primary text-primary-foreground">
+                <Bot className="w-5 h-5" />
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <h1 className="font-semibold">Daksha AI Agent</h1>
+              <p className="text-sm text-muted-foreground">Your personal AI companion</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Messages Container */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={`flex gap-3 ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+            >
+              {message.sender === 'bot' && (
+                <Avatar className="w-8 h-8">
+                  <AvatarFallback className="bg-primary text-primary-foreground">
+                    <Bot className="w-4 h-4" />
+                  </AvatarFallback>
+                </Avatar>
+              )}
+              <div
+                className={`max-w-[70%] rounded-lg p-3 ${message.sender === 'user'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted'
+                  }`}
+              >
+                <p className="text-sm leading-relaxed">{message.content}</p>
+                <p className="text-xs opacity-70 mt-2">
+                  {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </p>
+              </div>
+              {message.sender === 'user' && (
+                <Avatar className="w-8 h-8">
+                  <AvatarFallback>
+                    <User className="w-4 h-4" />
+                  </AvatarFallback>
+                </Avatar>
+              )}
+            </div>
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Input Area */}
+        <div className="border-t border-border/20 p-4 bg-background/80 backdrop-blur-sm">
+          <div className="flex gap-2">
+            <Button variant="ghost" size="icon" className="flex-shrink-0">
+              <Paperclip className="w-4 h-4" />
+            </Button>
+            <Input
+              placeholder="Type your message..."
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+              className="flex-1"
+            />
+            <Button variant="ghost" size="icon" className="flex-shrink-0">
+              <Mic className="w-4 h-4" />
+            </Button>
+            <Button onClick={handleSendMessage} size="icon" className="flex-shrink-0">
+              <Send className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       </div>
     </div>

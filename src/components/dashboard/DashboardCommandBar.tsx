@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Brain, Mic, MicOff, X, Minimize2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -13,6 +13,21 @@ export default function DashboardCommandBar() {
   const [isMinimized, setIsMinimized] = useState(false)
   const [recordingDuration, setRecordingDuration] = useState(0)
   const recordingIntervalRef = useRef<NodeJS.Timeout>()
+
+  const handleMinimize = useCallback(() => {
+    // Add closing animation class before state change
+    const expandedDiv = document.querySelector('[data-expanded="true"]')
+    if (expandedDiv) {
+      expandedDiv.classList.add('animate-out', 'slide-out-to-bottom-2', 'fade-out', 'duration-200')
+    }
+    
+    setTimeout(() => {
+      setIsExpanded(false)
+      if (isRecording) {
+        setIsMinimized(true)
+      }
+    }, 200)
+  }, [isRecording])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -27,7 +42,7 @@ export default function DashboardCommandBar() {
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [isExpanded])
+  }, [isExpanded, handleMinimize])
 
   useEffect(() => {
     if (isRecording) {
@@ -50,21 +65,6 @@ export default function DashboardCommandBar() {
   const handleExpand = () => {
     setIsExpanded(true)
     setIsMinimized(false)
-  }
-
-  const handleMinimize = () => {
-    // Add closing animation class before state change
-    const expandedDiv = document.querySelector('[data-expanded="true"]')
-    if (expandedDiv) {
-      expandedDiv.classList.add('animate-out', 'slide-out-to-bottom-2', 'fade-out', 'duration-200')
-    }
-    
-    setTimeout(() => {
-      setIsExpanded(false)
-      if (isRecording) {
-        setIsMinimized(true)
-      }
-    }, 200)
   }
 
   const handleClose = () => {

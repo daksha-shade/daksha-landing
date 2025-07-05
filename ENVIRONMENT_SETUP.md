@@ -21,6 +21,7 @@ cp wrangler.jsonc.template wrangler.jsonc
 Edit `wrangler.jsonc` and replace the placeholder values with your actual credentials:
 - `YOUR_STACK_PROJECT_ID`
 - `YOUR_STACK_PUBLISHABLE_CLIENT_KEY`
+- `YOUR_LIVEKIT_URL`
 
 ### 2. Set up Cloudflare Secrets
 
@@ -29,6 +30,12 @@ For sensitive data like API keys and secrets, use Cloudflare secrets instead of 
 ```bash
 # Set Stack secret server key
 npx wrangler secret put STACK_SECRET_SERVER_KEY
+
+# Set LiveKit API key
+npx wrangler secret put LIVEKIT_API_KEY
+
+# Set LiveKit API secret
+npx wrangler secret put LIVEKIT_API_SECRET
 ```
 
 ### 3. Deploy
@@ -44,9 +51,12 @@ npm run deploy
 ### Public Variables (safe in wrangler.jsonc)
 - `NEXT_PUBLIC_STACK_PROJECT_ID` - Public project ID
 - `NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY` - Public client key
+- `LIVEKIT_URL` - WebSocket URL (not sensitive)
 
 ### Secrets (use Cloudflare secrets)
 - `STACK_SECRET_SERVER_KEY` - Server-side secret key
+- `LIVEKIT_API_KEY` - API key for LiveKit
+- `LIVEKIT_API_SECRET` - API secret for LiveKit
 
 ## Security Notes
 
