@@ -1,8 +1,10 @@
 "use client"
 
 import { useState, useRef, useEffect } from 'react'
-import { ArrowLeft, Save, Bold, Italic, List, Quote, Hash, Calendar } from 'lucide-react'
+import { ArrowLeft, Save, Bold, Italic, List, Quote, Hash, Calendar, MessageCircle, Send } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 
 export default function NotionStyleTextEditor() {
   const [title, setTitle] = useState("")
@@ -10,6 +12,9 @@ export default function NotionStyleTextEditor() {
   const [showPlaceholder, setShowPlaceholder] = useState(true)
   const [wordCount, setWordCount] = useState(0)
   const [isTyping, setIsTyping] = useState(false)
+  const [aiQuestion, setAiQuestion] = useState("")
+  const [aiResponse, setAiResponse] = useState("")
+  const [isProcessingAI, setIsProcessingAI] = useState(false)
   const contentRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLInputElement>(null)
 
@@ -100,6 +105,17 @@ export default function NotionStyleTextEditor() {
   const handleSave = () => {
     console.log({ title, content, wordCount })
     window.location.href = '/journal'
+  }
+
+  const handleAIQuestion = async () => {
+    if (!aiQuestion.trim()) return
+    
+    setIsProcessingAI(true)
+    // Simulate AI processing
+    setTimeout(() => {
+      setAiResponse(`Based on your text entry about "${title}", here's my analysis: ${aiQuestion} - This is a simulated AI response. In a real implementation, this would analyze your text content and provide contextual insights and suggestions.`)
+      setIsProcessingAI(false)
+    }, 2000)
   }
 
   const getCurrentDate = () => {
@@ -269,6 +285,49 @@ export default function NotionStyleTextEditor() {
             <span>-</span>
             <span>{wordCount} words</span>
           </div>
+
+          {/* AI Chat Section */}
+          {content.trim().length > 10 && (
+            <div className="mt-8">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <MessageCircle className="w-5 h-5" />
+                    Ask AI about your text
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Ask something about your journal entry..."
+                      value={aiQuestion}
+                      onChange={(e) => setAiQuestion(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleAIQuestion()}
+                    />
+                    <Button 
+                      onClick={handleAIQuestion}
+                      disabled={isProcessingAI || !aiQuestion.trim()}
+                      size="sm"
+                    >
+                      <Send className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  
+                  {aiResponse && (
+                    <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                      <p className="text-sm leading-relaxed">{aiResponse}</p>
+                    </div>
+                  )}
+                  
+                  {isProcessingAI && (
+                    <div className="p-4 bg-muted/20 rounded-lg">
+                      <p className="text-sm text-muted-foreground">AI is analyzing your text...</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </div>
       </div>
     </div>

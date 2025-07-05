@@ -1,9 +1,10 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { ArrowLeft, Save, Mic, Pause, CircleStop } from 'lucide-react'
+import { ArrowLeft, Save, Mic, Pause, CircleStop, FileText, MessageCircle, Send } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 
 export default function AudioJournalPage() {
   const [title, setTitle] = useState("")
@@ -11,6 +12,11 @@ export default function AudioJournalPage() {
   const [isPaused, setIsPaused] = useState(false)
   const [recordingTime, setRecordingTime] = useState(0)
   const [hasRecording, setHasRecording] = useState(false)
+  const [transcript, setTranscript] = useState("")
+  const [showTranscript, setShowTranscript] = useState(false)
+  const [aiQuestion, setAiQuestion] = useState("")
+  const [aiResponse, setAiResponse] = useState("")
+  const [isProcessingAI, setIsProcessingAI] = useState(false)
 
   // Timer effect
   useEffect(() => {
@@ -44,11 +50,26 @@ export default function AudioJournalPage() {
     setIsRecording(false)
     setIsPaused(false)
     setHasRecording(true)
+    // Simulate transcript generation
+    setTimeout(() => {
+      setTranscript("This is a sample transcript of your audio recording. In a real implementation, this would be generated using speech-to-text technology like OpenAI Whisper or similar services.")
+    }, 1000)
   }
 
   const handleSave = () => {
-    console.log({ title, recordingTime, hasRecording })
+    console.log({ title, recordingTime, hasRecording, transcript })
     window.location.href = '/journal'
+  }
+
+  const handleAIQuestion = async () => {
+    if (!aiQuestion.trim()) return
+    
+    setIsProcessingAI(true)
+    // Simulate AI processing
+    setTimeout(() => {
+      setAiResponse(`Based on your audio recording about "${title}", here's my analysis: ${aiQuestion} - This is a simulated AI response. In a real implementation, this would analyze your audio content and provide contextual insights.`)
+      setIsProcessingAI(false)
+    }, 2000)
   }
 
   return (
@@ -143,6 +164,80 @@ export default function AudioJournalPage() {
                 </Button>
               )}
             </div>
+
+            {/* Transcript and AI Section */}
+            {hasRecording && (
+              <div className="space-y-6 mt-8">
+                {/* Transcript */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <FileText className="w-5 h-5" />
+                      Transcript
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {transcript ? (
+                      <div className="space-y-3">
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowTranscript(!showTranscript)}
+                          className="w-full"
+                        >
+                          {showTranscript ? 'Hide' : 'Show'} Transcript
+                        </Button>
+                        {showTranscript && (
+                          <div className="p-4 bg-muted/20 rounded-lg">
+                            <p className="text-sm leading-relaxed">{transcript}</p>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground text-sm">Generating transcript...</p>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* AI Chat */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <MessageCircle className="w-5 h-5" />
+                      Ask AI about your recording
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Ask something about your audio recording..."
+                        value={aiQuestion}
+                        onChange={(e) => setAiQuestion(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && handleAIQuestion()}
+                      />
+                      <Button 
+                        onClick={handleAIQuestion}
+                        disabled={isProcessingAI || !aiQuestion.trim()}
+                        size="sm"
+                      >
+                        <Send className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    
+                    {aiResponse && (
+                      <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                        <p className="text-sm leading-relaxed">{aiResponse}</p>
+                      </div>
+                    )}
+                    
+                    {isProcessingAI && (
+                      <div className="p-4 bg-muted/20 rounded-lg">
+                        <p className="text-sm text-muted-foreground">AI is analyzing your recording...</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            )}
           </div>
         </div>
       </div>

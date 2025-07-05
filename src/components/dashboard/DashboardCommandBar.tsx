@@ -12,7 +12,7 @@ export default function DashboardCommandBar() {
   const [isRecording, setIsRecording] = useState(false)
   const [isMinimized, setIsMinimized] = useState(false)
   const [recordingDuration, setRecordingDuration] = useState(0)
-  const recordingIntervalRef = useRef<NodeJS.Timeout>()
+  const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   const handleMinimize = useCallback(() => {
     // Add closing animation class before state change

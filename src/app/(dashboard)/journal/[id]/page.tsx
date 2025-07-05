@@ -8,16 +8,26 @@ import { Separator } from '@/components/ui/separator'
 import { useRouter } from 'next/navigation'
 import { getJournalEntryById, getMoodColor, formatDuration, formatFullDate, type JournalEntry } from '@/lib/journal-data'
 
-export default function JournalEntryPage({ params }: { params: { id: string } }) {
+export default function JournalEntryPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
   const [entry, setEntry] = useState<JournalEntry | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [id, setId] = useState<string | null>(null)
 
   useEffect(() => {
-    // Find the entry by ID
-    const foundEntry = getJournalEntryById(params.id)
-    setEntry(foundEntry || null)
-  }, [params.id])
+    // Resolve the params promise to get the id
+    params.then(resolvedParams => {
+      setId(resolvedParams.id)
+    })
+  }, [params])
+
+  useEffect(() => {
+    if (id) {
+      // Find the entry by ID
+      const foundEntry = getJournalEntryById(id)
+      setEntry(foundEntry || null)
+    }
+  }, [id])
 
   if (!entry) {
     return (

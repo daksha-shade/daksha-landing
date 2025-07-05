@@ -1,9 +1,10 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { ArrowLeft, Save, Video, Pause, CircleStop, RotateCcw, Mic, MicOff } from 'lucide-react'
+import { ArrowLeft, Save, Video, Pause, CircleStop, RotateCcw, Mic, MicOff, FileText, MessageCircle, Send } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 
 export default function FullScreenVideoJournalPage() {
   const [title, setTitle] = useState("")
@@ -14,6 +15,11 @@ export default function FullScreenVideoJournalPage() {
   const [cameraFacing, setCameraFacing] = useState<'user' | 'environment'>('user')
   const [isMuted, setIsMuted] = useState(false)
   const [showControls, setShowControls] = useState(true)
+  const [transcript, setTranscript] = useState("")
+  const [showTranscript, setShowTranscript] = useState(false)
+  const [aiQuestion, setAiQuestion] = useState("")
+  const [aiResponse, setAiResponse] = useState("")
+  const [isProcessingAI, setIsProcessingAI] = useState(false)
 
   // Timer effect
   useEffect(() => {
@@ -58,6 +64,10 @@ export default function FullScreenVideoJournalPage() {
     setIsRecording(false)
     setIsPaused(false)
     setHasRecording(true)
+    // Simulate transcript generation
+    setTimeout(() => {
+      setTranscript("This is a sample transcript of your video recording. In a real implementation, this would be generated using speech-to-text technology from the video's audio track.")
+    }, 1000)
     setShowControls(true)
   }
 
@@ -70,8 +80,19 @@ export default function FullScreenVideoJournalPage() {
   }
 
   const handleSave = () => {
-    console.log({ title, recordingTime, hasRecording, cameraFacing, isMuted })
+    console.log({ title, recordingTime, hasRecording, cameraFacing, isMuted, transcript })
     window.location.href = '/journal'
+  }
+
+  const handleAIQuestion = async () => {
+    if (!aiQuestion.trim()) return
+    
+    setIsProcessingAI(true)
+    // Simulate AI processing
+    setTimeout(() => {
+      setAiResponse(`Based on your video recording about "${title}", here's my analysis: ${aiQuestion} - This is a simulated AI response. In a real implementation, this would analyze both your video content and audio transcript to provide contextual insights.`)
+      setIsProcessingAI(false)
+    }, 2000)
   }
 
   const showControlsTemporarily = () => {
@@ -252,6 +273,82 @@ export default function FullScreenVideoJournalPage() {
           </div>
         </div>
       </div>
+
+      {/* Transcript and AI Section */}
+      {hasRecording && (
+        <div className="absolute bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border/20 p-4 space-y-4 max-h-80 overflow-y-auto">
+          {/* Transcript */}
+          <Card className="bg-background/80">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <FileText className="w-4 h-4" />
+                Transcript
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              {transcript ? (
+                <div className="space-y-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowTranscript(!showTranscript)}
+                    size="sm"
+                    className="w-full"
+                  >
+                    {showTranscript ? 'Hide' : 'Show'} Transcript
+                  </Button>
+                  {showTranscript && (
+                    <div className="p-3 bg-muted/20 rounded-lg">
+                      <p className="text-xs leading-relaxed">{transcript}</p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="text-muted-foreground text-xs">Generating transcript...</p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* AI Chat */}
+          <Card className="bg-background/80">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <MessageCircle className="w-4 h-4" />
+                Ask AI about your video
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0 space-y-3">
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Ask about your video..."
+                  value={aiQuestion}
+                  onChange={(e) => setAiQuestion(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleAIQuestion()}
+                  className="text-sm"
+                />
+                <Button 
+                  onClick={handleAIQuestion}
+                  disabled={isProcessingAI || !aiQuestion.trim()}
+                  size="sm"
+                >
+                  <Send className="w-3 h-3" />
+                </Button>
+              </div>
+              
+              {aiResponse && (
+                <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                  <p className="text-xs leading-relaxed">{aiResponse}</p>
+                </div>
+              )}
+              
+              {isProcessingAI && (
+                <div className="p-3 bg-muted/20 rounded-lg">
+                  <p className="text-xs text-muted-foreground">AI is analyzing your video...</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Tap to show controls overlay */}
       {isRecording && !showControls && (
