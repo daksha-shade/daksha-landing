@@ -67,7 +67,7 @@ export default function HeroSection() {
             size="lg"
             className="font-medium"
           >
-            Try MVP
+            Preview
           </Button>
         </div>
 

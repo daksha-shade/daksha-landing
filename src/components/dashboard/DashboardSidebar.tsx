@@ -34,7 +34,6 @@ const navigationItems = [
   { icon: Activity, label: 'Dashboard', href: '/app' },
   { icon: BookOpen, label: 'Journal', href: '/journal' },
   { icon: Brain, label: 'Mind', href: '/mind' },
-  { icon: Bot, label: 'Talk with Daksha', href: '/livekit' },
   { icon: Target, label: 'Goals', href: '/goals' },
   { icon: MessageCircle, label: 'Chat', href: '/chat' },
   { icon: Grid3X3, label: 'Apps', href: '/apps' },
