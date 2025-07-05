@@ -1,335 +1,384 @@
 "use client"
 
-import { useState } from 'react'
-import { 
-  LiveKitRoom, 
-  VideoConference, 
-  RoomAudioRenderer
-} from '@livekit/components-react'
+import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
-import { Badge } from '@/components/ui/badge'
 import { 
-  PhoneOff, 
-  Bot, 
-  Brain,
+  Mic, 
+  MicOff, 
+  VolumeX,
   MessageSquare,
-  Settings,
-  Users
+  X
 } from 'lucide-react'
-import '@livekit/components-styles'
-import '@/styles/livekit.css'
-import LiveKitAIAgent from '@/components/ai/LiveKitAIAgent'
 
-interface AIAgentMessage {
+interface ConversationMessage {
   id: string
   content: string
   timestamp: Date
-  type: 'user' | 'agent'
+  type: 'user' | 'daksha'
   emotion?: string
-  confidence?: number
+  isListening?: boolean
 }
 
-export default function LiveKitPage() {
-  const [token, setToken] = useState<string>('')
-  const [wsURL, setWsURL] = useState<string>(process.env.NEXT_PUBLIC_LIVEKIT_URL || 'wss://daksha-fuq54ytc.livekit.cloud')
-  const [roomName, setRoomName] = useState<string>('daksha-ai-session')
-  const [userName, setUserName] = useState<string>('User')
+export default function DakshaVoicePage() {
+  const [isListening, setIsListening] = useState<boolean>(false)
+  const [isSpeaking, setIsSpeaking] = useState<boolean>(false)
   const [isConnected, setIsConnected] = useState<boolean>(false)
-  const [aiMessages, setAiMessages] = useState<AIAgentMessage[]>([])
-  const [isAIActive, setIsAIActive] = useState<boolean>(false)
-  const [roomStats] = useState({
-    participants: 0,
-    duration: 0,
-    quality: 'good'
-  })
+  const [messages, setMessages] = useState<ConversationMessage[]>([])
+  const [showHistory, setShowHistory] = useState<boolean>(false)
+  const [currentTranscript, setCurrentTranscript] = useState<string>('')
+  const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'connecting' | 'connected'>('disconnected')
+  
+  const recognitionRef = useRef<unknown>(null)
+  const synthRef = useRef<SpeechSynthesis | null>(null)
 
-  // Generate access token
-  const generateToken = async () => {
+  // Initialize speech recognition and synthesis
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Initialize speech recognition
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+      if (SpeechRecognition) {
+        const recognition = new SpeechRecognition()
+        recognition.continuous = true
+        recognition.interimResults = true
+        recognition.lang = 'en-US'
+        
+        recognition.onstart = () => {
+          setIsListening(true)
+          setConnectionStatus('connected')
+        }
+        
+        recognition.onresult = (event) => {
+          let transcript = ''
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            transcript += event.results[i][0].transcript
+          }
+          setCurrentTranscript(transcript)
+          
+          // If final result, process with Daksha
+          if (event.results[event.results.length - 1].isFinal) {
+            processUserInput(transcript)
+            setCurrentTranscript('')
+          }
+        }
+        
+        recognition.onerror = (event) => {
+          console.error('Speech recognition error:', event.error)
+          setIsListening(false)
+          setConnectionStatus('disconnected')
+        }
+        
+        recognition.onend = () => {
+          setIsListening(false)
+        }
+        
+        recognitionRef.current = recognition
+      }
+      
+      // Initialize speech synthesis
+      synthRef.current = window.speechSynthesis
+    }
+  }, [])
+
+  // Process user input and get Daksha's response
+  const processUserInput = async (transcript: string) => {
+    if (!transcript.trim()) return
+    
+    // Add user message
+    const userMessage: ConversationMessage = {
+      id: Date.now().toString(),
+      content: transcript,
+      timestamp: new Date(),
+      type: 'user'
+    }
+    setMessages(prev => [...prev, userMessage])
+    
     try {
-      const response = await fetch('/api/livekit/token', {
+      // Call Daksha AI API (using Groq)
+      const response = await fetch('/api/daksha/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          roomName,
-          participantName: userName,
+          message: transcript,
+          conversationHistory: messages.slice(-5) // Last 5 messages for context
         }),
       })
       
       if (!response.ok) {
-        throw new Error('Failed to generate token')
+        throw new Error('Failed to get Daksha response')
       }
       
-      const data = await response.json() as { token: string }
-      setToken(data.token)
-      setIsConnected(true)
+      const data = await response.json() as { response: string; emotion?: string }
+      
+      // Add Daksha's response
+      const dakshaMessage: ConversationMessage = {
+        id: (Date.now() + 1).toString(),
+        content: data.response,
+        timestamp: new Date(),
+        type: 'daksha',
+        emotion: data.emotion
+      }
+      setMessages(prev => [...prev, dakshaMessage])
+      
+      // Speak Daksha's response
+      speakResponse(data.response)
+      
     } catch (error) {
-      console.error('Error generating token:', error)
+      console.error('Error processing input:', error)
+      const errorMessage: ConversationMessage = {
+        id: (Date.now() + 1).toString(),
+        content: "I'm having trouble connecting right now. Please try again.",
+        timestamp: new Date(),
+        type: 'daksha'
+      }
+      setMessages(prev => [...prev, errorMessage])
     }
   }
 
-  // AI Agent Integration
-  const activateAIAgent = async () => {
-    try {
-      setIsAIActive(true)
-      const response = await fetch('/api/livekit/ai-agent', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          roomName,
-          action: 'join',
-        }),
-      })
+  // Speak Daksha's response
+  const speakResponse = (text: string) => {
+    if (synthRef.current && text) {
+      setIsSpeaking(true)
+      const utterance = new SpeechSynthesisUtterance(text)
+      utterance.rate = 0.9
+      utterance.pitch = 1.1
+      utterance.volume = 0.8
       
-      if (!response.ok) {
-        throw new Error('Failed to activate AI agent')
+      utterance.onend = () => {
+        setIsSpeaking(false)
       }
       
-      // Add welcome message from AI
-      const welcomeMessage: AIAgentMessage = {
-        id: Date.now().toString(),
-        content: "Hello! I'm Daksha, your AI companion. I'm here to help you with journaling insights, emotional support, and life guidance. How can I assist you today?",
-        timestamp: new Date(),
-        type: 'agent',
-        emotion: 'welcoming',
-        confidence: 0.95
+      utterance.onerror = () => {
+        setIsSpeaking(false)
       }
       
-      setAiMessages(prev => [...prev, welcomeMessage])
-    } catch (error) {
-      console.error('Error activating AI agent:', error)
-      setIsAIActive(false)
+      synthRef.current.speak(utterance)
     }
+  }
+
+  // Start/stop listening
+  const toggleListening = () => {
+    if (recognitionRef.current) {
+      if (isListening) {
+        (recognitionRef.current as { stop: () => void }).stop()
+      } else {
+        (recognitionRef.current as { start: () => void }).start()
+      }
+    }
+  }
+
+  // Stop speaking
+  const stopSpeaking = () => {
+    if (synthRef.current) {
+      synthRef.current.cancel()
+      setIsSpeaking(false)
+    }
+  }
+
+  // Connect to Daksha
+  const connectToDaksha = async () => {
+    setConnectionStatus('connecting')
+    
+    // Add welcome message
+    const welcomeMessage: ConversationMessage = {
+      id: Date.now().toString(),
+      content: "Hello! I'm Daksha, your personal AI companion. I'm here to help you with journaling, emotional support, and life guidance. How are you feeling today?",
+      timestamp: new Date(),
+      type: 'daksha',
+      emotion: 'welcoming'
+    }
+    
+    setMessages([welcomeMessage])
+    setIsConnected(true)
+    setConnectionStatus('connected')
+    
+    // Speak welcome message
+    speakResponse(welcomeMessage.content)
   }
 
 
   if (!isConnected) {
     return (
-      <div className="notion-page py-12 space-y-6">
-        <div className="flex items-center gap-3 mb-8">
-          <Bot className="w-6 h-6 text-blue-500" />
-          <h1 className="notion-title font-serif">AI Voice Session</h1>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="w-5 h-5" />
-                Session Setup
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="text-sm font-medium mb-2 block">Room Name</label>
-                <Input
-                  value={roomName}
-                  onChange={(e) => setRoomName(e.target.value)}
-                  placeholder="Enter room name"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-2 block">Your Name</label>
-                <Input
-                  value={userName}
-                  onChange={(e) => setUserName(e.target.value)}
-                  placeholder="Enter your name"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-2 block">LiveKit Server URL</label>
-                <Input
-                  value={wsURL}
-                  onChange={(e) => setWsURL(e.target.value)}
-                  placeholder="wss://your-livekit-server.com"
-                />
-              </div>
-              <Button 
-                onClick={generateToken} 
-                className="w-full"
-                disabled={!roomName || !userName}
-              >
-                Join AI Session
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Brain className="w-5 h-5" />
-                AI Features
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
-                  <Bot className="w-5 h-5 text-blue-500" />
-                  <div>
-                    <p className="font-medium text-blue-900 dark:text-blue-100">Daksha AI Agent</p>
-                    <p className="text-sm text-blue-700 dark:text-blue-300">Real-time emotional intelligence and journaling insights</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-950/20 rounded-lg">
-                  <MessageSquare className="w-5 h-5 text-green-500" />
-                  <div>
-                    <p className="font-medium text-green-900 dark:text-green-100">Live Transcription</p>
-                    <p className="text-sm text-green-700 dark:text-green-300">Automatic speech-to-text with emotion detection</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-3 p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg">
-                  <Brain className="w-5 h-5 text-purple-500" />
-                  <div>
-                    <p className="font-medium text-purple-900 dark:text-purple-100">Memory Integration</p>
-                    <p className="text-sm text-purple-700 dark:text-purple-300">Connects with your journal and mind palace</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+      <div className="fixed inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
+        <div className="text-center space-y-8 max-w-md mx-auto px-6">
+          <div className="w-24 h-24 mx-auto bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center">
+              <span className="text-2xl font-serif font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                D
+              </span>
+            </div>
+          </div>
+          
+          <div className="space-y-4">
+            <h1 className="text-3xl font-serif font-bold text-gray-900 dark:text-white">
+              Talk with Daksha
+            </h1>
+            <p className="text-gray-600 dark:text-gray-300 text-lg">
+              Your personal AI companion for journaling, emotional support, and life guidance
+            </p>
+          </div>
+          
+          <Button 
+            onClick={connectToDaksha}
+            size="lg"
+            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+            disabled={connectionStatus === 'connecting'}
+          >
+            {connectionStatus === 'connecting' ? 'Connecting...' : 'Start Conversation'}
+          </Button>
+          
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Click to begin your voice conversation with Daksha
+          </p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="notion-page py-12 space-y-6">
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-3">
-          <Bot className="w-6 h-6 text-blue-500" />
-          <h1 className="notion-title font-serif">AI Voice Session</h1>
-          <Badge variant="outline" className="ml-2">
-            <Users className="w-3 h-3 mr-1" />
-            {roomStats.participants} participants
-          </Badge>
+    <div className="fixed inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      {/* Chat History Sidebar */}
+      <div className={`fixed left-0 top-0 h-full w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 z-20 ${
+        showHistory ? 'translate-x-0' : '-translate-x-full'
+      }`}>
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between">
+            <h2 className="font-semibold text-gray-900 dark:text-white">Conversation</h2>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowHistory(false)}
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            onClick={activateAIAgent}
-            disabled={isAIActive}
-            variant={isAIActive ? "default" : "outline"}
-            size="sm"
-          >
-            <Bot className="w-4 h-4 mr-2" />
-            {isAIActive ? 'AI Active' : 'Activate AI'}
-          </Button>
-          <Button
-            onClick={() => setIsConnected(false)}
-            variant="destructive"
-            size="sm"
-          >
-            <PhoneOff className="w-4 h-4 mr-2" />
-            Leave
-          </Button>
+        
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={`p-3 rounded-lg ${
+                message.type === 'daksha'
+                  ? 'bg-blue-50 dark:bg-blue-950/20 border-l-4 border-blue-500'
+                  : 'bg-gray-50 dark:bg-gray-950/20 border-l-4 border-gray-300'
+              }`}
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                  {message.type === 'daksha' ? 'Daksha' : 'You'}
+                </span>
+                <span className="text-xs text-gray-500">
+                  {message.timestamp.toLocaleTimeString()}
+                </span>
+              </div>
+              <p className="text-sm text-gray-800 dark:text-gray-200">{message.content}</p>
+            </div>
+          ))}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Video Conference Area */}
-        <div className="lg:col-span-2">
-          <Card>
-            <CardContent className="p-0">
-              <LiveKitRoom
-                video={true}
-                audio={true}
-                token={token}
-                serverUrl={wsURL}
-                data-lk-theme="default"
-                style={{ height: '500px' }}
-                onConnected={() => {
-                  // Room connection handled by LiveKit internally
-                  // We'll get the room instance through other means
-                }}
+      {/* Main Voice Interface */}
+      <div className="flex flex-col items-center justify-center h-full relative">
+        {/* History Toggle Button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setShowHistory(true)}
+          className="absolute top-6 left-6 z-10"
+        >
+          <MessageSquare className="w-4 h-4 mr-2" />
+          History
+        </Button>
+
+        {/* Disconnect Button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setIsConnected(false)}
+          className="absolute top-6 right-6 z-10 text-red-600 hover:text-red-700"
+        >
+          <X className="w-4 h-4 mr-2" />
+          End
+        </Button>
+
+        {/* Central Voice Interface */}
+        <div className="text-center space-y-8 max-w-2xl mx-auto px-6">
+          {/* Daksha Avatar */}
+          <div className="relative">
+            <div className={`w-32 h-32 mx-auto bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center transition-all duration-300 ${
+              isSpeaking ? 'scale-110 shadow-2xl' : isListening ? 'scale-105 shadow-xl' : 'shadow-lg'
+            }`}>
+              <div className="w-24 h-24 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center">
+                <span className="text-4xl font-serif font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  D
+                </span>
+              </div>
+            </div>
+            
+            {/* Status Indicator */}
+            <div className={`absolute -bottom-2 left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-full text-xs font-medium ${
+              isSpeaking ? 'bg-green-500 text-white' : 
+              isListening ? 'bg-blue-500 text-white' : 
+              'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
+            }`}>
+              {isSpeaking ? 'Speaking...' : isListening ? 'Listening...' : 'Ready'}
+            </div>
+          </div>
+
+          {/* Current Transcript */}
+          {currentTranscript && (
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-lg border border-gray-200 dark:border-gray-700">
+              <p className="text-gray-800 dark:text-gray-200 italic">"{currentTranscript}"</p>
+            </div>
+          )}
+
+          {/* Last Daksha Message */}
+          {messages.length > 0 && messages[messages.length - 1].type === 'daksha' && (
+            <div className="bg-blue-50 dark:bg-blue-950/20 rounded-lg p-6 shadow-lg border border-blue-200 dark:border-blue-800">
+              <p className="text-blue-900 dark:text-blue-100 text-lg">
+                {messages[messages.length - 1].content}
+              </p>
+            </div>
+          )}
+
+          {/* Voice Controls */}
+          <div className="flex items-center justify-center gap-6">
+            <Button
+              onClick={toggleListening}
+              size="lg"
+              variant={isListening ? "default" : "outline"}
+              className={`w-16 h-16 rounded-full ${
+                isListening 
+                  ? 'bg-red-500 hover:bg-red-600 text-white' 
+                  : 'bg-blue-500 hover:bg-blue-600 text-white'
+              }`}
+            >
+              {isListening ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
+            </Button>
+
+            {isSpeaking && (
+              <Button
+                onClick={stopSpeaking}
+                size="lg"
+                variant="outline"
+                className="w-16 h-16 rounded-full"
               >
-                <VideoConference />
-                <RoomAudioRenderer />
-                <LiveKitAIAgent 
-                  room={null}
-                  isActive={isAIActive}
-                  onMessage={(message) => setAiMessages(prev => [...prev, message as AIAgentMessage])}
-                  userProfile={{ name: userName }}
-                />
-              </LiveKitRoom>
-            </CardContent>
-          </Card>
-        </div>
+                <VolumeX className="w-6 h-6" />
+              </Button>
+            )}
+          </div>
 
-        {/* AI Chat Panel */}
-        <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MessageSquare className="w-5 h-5" />
-                AI Insights
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3 max-h-96 overflow-y-auto">
-                {aiMessages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`p-3 rounded-lg ${
-                      message.type === 'agent'
-                        ? 'bg-blue-50 dark:bg-blue-950/20 border-l-4 border-blue-500'
-                        : 'bg-gray-50 dark:bg-gray-950/20 border-l-4 border-gray-500'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 mb-1">
-                      {message.type === 'agent' ? (
-                        <Bot className="w-4 h-4 text-blue-500" />
-                      ) : (
-                        <Users className="w-4 h-4 text-gray-500" />
-                      )}
-                      <span className="text-xs font-medium">
-                        {message.type === 'agent' ? 'Daksha AI' : 'You'}
-                      </span>
-                      {message.emotion && (
-                        <Badge variant="secondary" className="text-xs">
-                          {message.emotion}
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="text-sm">{message.content}</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {message.timestamp.toLocaleTimeString()}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Brain className="w-5 h-5" />
-                Session Stats
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-sm">Participants:</span>
-                <span className="font-medium">{roomStats.participants}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm">AI Status:</span>
-                <Badge variant={isAIActive ? "default" : "secondary"}>
-                  {isAIActive ? "Active" : "Inactive"}
-                </Badge>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm">Connection:</span>
-                <Badge variant="default">Connected</Badge>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Instructions */}
+          <div className="text-center space-y-2">
+            <p className="text-gray-600 dark:text-gray-300">
+              {isListening ? 'Speak now...' : 'Click the microphone to start talking'}
+            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Daksha is here to listen and help with your thoughts and feelings
+            </p>
+          </div>
         </div>
       </div>
     </div>

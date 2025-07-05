@@ -66,7 +66,7 @@ export default function MainDashboardPage() {
   const quickActions = [
     { icon: BookOpen, label: 'Journal', href: '/journal', color: 'text-blue-500', description: 'Write your thoughts' },
     { icon: Brain, label: 'Mind', href: '/mind', color: 'text-purple-500', description: 'Organize memories' },
-    { icon: Bot, label: 'AI Voice', href: '/livekit', color: 'text-blue-500', description: 'Live AI conversation' },
+    { icon: Bot, label: 'Talk with Daksha', href: '/livekit', color: 'text-blue-500', description: 'Voice conversation with your AI companion' },
     { icon: Target, label: 'Goals', href: '/goals', color: 'text-green-500', description: 'Track progress' },
     { icon: MessageCircle, label: 'Chat', href: '/chat', color: 'text-orange-500', description: 'Talk to Daksha' },
     { icon: Grid3X3, label: 'Apps', href: '/apps', color: 'text-indigo-500', description: 'Connected services' },
