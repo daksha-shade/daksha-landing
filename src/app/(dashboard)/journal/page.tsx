@@ -168,14 +168,14 @@ export default function JournalPage() {
                   <div className="flex gap-4">
                     {/* Enhanced Timeline Dot */}
                     <div className="relative flex flex-col items-center z-10">
-                      <div className={`w-4 h-4 rounded-full border-3 border-background shadow-lg ${
+                      <div className={`w-4 h-4 rounded-full -mb-4 border-3 border-background shadow-lg ${
                         entry.type === 'text' ? 'bg-blue-500 ring-2 ring-blue-200 dark:ring-blue-800' :
                         entry.type === 'audio' ? 'bg-green-500 ring-2 ring-green-200 dark:ring-green-800' :
                         entry.type === 'video' ? 'bg-red-500 ring-2 ring-red-200 dark:ring-red-800' :
                         'bg-purple-500 ring-2 ring-purple-200 dark:ring-purple-800'
                       }`} />
                       {/* Date marker line */}
-                      <div className="absolute -left-8 top-1 text-xs text-muted-foreground font-mono bg-background px-1 rounded">
+                      <div className="absolute -left-18 top-1 text-xs text-muted-foreground font-mono bg-background px-1 rounded">
                         {formatDate(entry.timestamp)}
                       </div>
                     </div>

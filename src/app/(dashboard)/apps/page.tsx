@@ -25,31 +25,32 @@ import {
   Users,
   Timer
 } from 'lucide-react'
+import Link from 'next/link'
 
 const dakshaApps = [
-  { icon: StickyNote, label: 'Notes', connected: true, color: 'text-yellow-500', description: 'Quick notes and thoughts with AI organization', category: 'productivity' },
-  { icon: Calendar, label: 'Scheduler', connected: true, color: 'text-blue-500', description: 'AI-powered scheduling and time management', category: 'productivity' },
-  { icon: Target, label: 'Goals', connected: true, color: 'text-green-500', description: 'Set, track, and achieve your personal goals', category: 'productivity' },
-  { icon: Brain, label: 'Mind', connected: true, color: 'text-purple-500', description: 'Memory palace and thought organization', category: 'intelligence' },
-  { icon: MessageSquare, label: 'Chat', connected: true, color: 'text-blue-600', description: 'Conversational AI assistant for daily tasks', category: 'intelligence' },
-  { icon: Timer, label: 'Timelines', connected: true, color: 'text-indigo-500', description: 'Visual life timeline and memory tracking', category: 'memory' },
-  { icon: HardDrive, label: 'Drive', connected: true, color: 'text-gray-600', description: 'Secure cloud storage with AI organization', category: 'storage' },
-  { icon: Users, label: 'Vani', connected: false, color: 'text-pink-500', description: 'Anonymous social community for authentic sharing', category: 'social' },
+  { icon: StickyNote, label: 'Notes', connected: true, color: 'text-yellow-500', description: 'Quick notes and thoughts with AI organization', category: 'productivity', link: '/apps/notes' },
+  { icon: Calendar, label: 'Scheduler', connected: true, color: 'text-blue-500', description: 'AI-powered scheduling and time management', category: 'productivity', link: '/apps/scheduler' },
+  { icon: Target, label: 'Goals', connected: true, color: 'text-green-500', description: 'Set, track, and achieve your personal goals', category: 'productivity', link: '/apps/goals' },
+  { icon: Brain, label: 'Mind', connected: true, color: 'text-purple-500', description: 'Memory palace and thought organization', category: 'intelligence', link: '/apps/mind' },
+  { icon: MessageSquare, label: 'Chat', connected: true, color: 'text-blue-600', description: 'Conversational AI assistant for daily tasks', category: 'intelligence', link: '/apps/chat' },
+  { icon: Timer, label: 'Timelines', connected: true, color: 'text-indigo-500', description: 'Visual life timeline and memory tracking', category: 'memory', link: '/apps/timelines' },
+  { icon: HardDrive, label: 'Drive', connected: true, color: 'text-gray-600', description: 'Secure cloud storage with AI organization', category: 'storage', link: '/apps/drive' },
+  { icon: Users, label: 'Vani', connected: false, color: 'text-pink-500', description: 'Anonymous social community for authentic sharing', category: 'social', link: 'https://vani.daksha.live' },
 ]
 
 const externalApps = [
-  { icon: Calendar, label: 'Google Calendar', connected: true, color: 'text-blue-500', description: 'Sync your calendar events with Daksha for better planning', category: 'productivity' },
-  { icon: Mail, label: 'Gmail', connected: true, color: 'text-red-500', description: 'Import important emails and conversations', category: 'communication' },
-  { icon: Camera, label: 'Google Photos', connected: false, color: 'text-green-500', description: 'Automatically organize and reflect on your photos', category: 'media' },
-  { icon: Music, label: 'Spotify', connected: true, color: 'text-green-600', description: 'Track your music mood and listening patterns', category: 'media' },
-  { icon: FileText, label: 'Notion', connected: false, color: 'text-gray-600', description: 'Import and export your notes and databases', category: 'productivity' },
-  { icon: Cloud, label: 'Google Drive', connected: true, color: 'text-blue-600', description: 'Access and organize your documents', category: 'storage' },
-  { icon: Smartphone, label: 'Apple Health', connected: false, color: 'text-red-600', description: 'Track wellness data and health insights', category: 'health' },
-  { icon: MessageSquare, label: 'Slack', connected: false, color: 'text-purple-500', description: 'Import work conversations and team updates', category: 'communication' },
-  { icon: Video, label: 'Zoom', connected: false, color: 'text-blue-400', description: 'Automatically transcribe and summarize meetings', category: 'communication' },
-  { icon: Github, label: 'GitHub', connected: true, color: 'text-gray-800', description: 'Track your coding activity and project progress', category: 'development' },
-  { icon: Twitter, label: 'Twitter/X', connected: false, color: 'text-blue-400', description: 'Analyze your social media interactions', category: 'social' },
-  { icon: Linkedin, label: 'LinkedIn', connected: false, color: 'text-blue-700', description: 'Track professional networking and career updates', category: 'social' },
+  { icon: Calendar, label: 'Google Calendar', connected: true, color: 'text-blue-500', description: 'Sync your calendar events with Daksha for better planning', category: 'productivity', link: '/apps/google-calendar' },
+  { icon: Mail, label: 'Gmail', connected: true, color: 'text-red-500', description: 'Import important emails and conversations', category: 'communication', link: '/apps/gmail' },
+  { icon: Camera, label: 'Google Photos', connected: false, color: 'text-green-500', description: 'Automatically organize and reflect on your photos', category: 'media', link: '/apps/google-photos' },
+  { icon: Music, label: 'Spotify', connected: true, color: 'text-green-600', description: 'Track your music mood and listening patterns', category: 'media', link: '/apps/spotify' },
+  { icon: FileText, label: 'Notion', connected: false, color: 'text-gray-600', description: 'Import and export your notes and databases', category: 'productivity', link: '/apps/notion' },
+  { icon: Cloud, label: 'Google Drive', connected: true, color: 'text-blue-600', description: 'Access and organize your documents', category: 'storage', link: '/apps/google-drive' },
+  { icon: Smartphone, label: 'Apple Health', connected: false, color: 'text-red-600', description: 'Track wellness data and health insights', category: 'health', link: '/apps/apple-health' },
+  { icon: MessageSquare, label: 'Slack', connected: false, color: 'text-purple-500', description: 'Import work conversations and team updates', category: 'communication', link: '/apps/slack' },
+  { icon: Video, label: 'Zoom', connected: false, color: 'text-blue-400', description: 'Automatically transcribe and summarize meetings', category: 'communication', link: '/apps/zoom' },
+  { icon: Github, label: 'GitHub', connected: true, color: 'text-gray-800', description: 'Track your coding activity and project progress', category: 'development', link: '/apps/github' },
+  { icon: Twitter, label: 'Twitter/X', connected: false, color: 'text-blue-400', description: 'Analyze your social media interactions', category: 'social', link: '/apps/twitter' },
+  { icon: Linkedin, label: 'LinkedIn', connected: false, color: 'text-blue-700', description: 'Track professional networking and career updates', category: 'social', link: '/apps/linkedin' },
 ]
 
 export default function AppsPage() {
@@ -177,8 +178,10 @@ export default function AppsPage() {
                 <div className="flex gap-2">
                   {app.connected ? (
                     <Button variant="outline" size="sm" className="flex-1">
-                      <ExternalLink className="w-3 h-3 mr-2" />
-                      Open App
+                      <Link href={app.link} className="flex-1 flex items-center justify-center">
+                        <ExternalLink className="w-3 h-3 mr-2" />
+                        Open App
+                      </Link>
                     </Button>
                   ) : (
                     <Button size="sm" className="flex-1">
