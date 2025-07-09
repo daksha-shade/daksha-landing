@@ -57,7 +57,7 @@ export default function MainDashboardPage() {
   ]
 
   return (
-    <div className="  py-8 space-y-8">
+    <div className=" py-8 space-y-8 min-h-screen  ">
       {/* Improved Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
@@ -104,28 +104,36 @@ export default function MainDashboardPage() {
       </div>
 
       {/* Main Content - Improved 2 Column Layout */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 h-[calc(100vh-200px)]">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
         {/* Left Column */}
         <div className="space-y-6">
           {/* Today's Tasks */}
-          <TodayPlanner 
-            tasks={mockTodayTasks}
-            onTaskToggle={(taskId) => {
-              console.log('Toggle task:', taskId)
-            }}
-          />
+          <div className="h-fit">
+            <TodayPlanner 
+              tasks={mockTodayTasks}
+              onTaskToggle={(taskId) => {
+                console.log('Toggle task:', taskId)
+              }}
+            />
+          </div>
           
           {/* Goals Progress */}
-          <GoalsProgress />
+          <div className="h-fit">
+            <GoalsProgress />
+          </div>
         </div>
 
         {/* Right Column */}
         <div className="space-y-6">
           {/* Memories Vault */}
-          <MemoriesVault memories={mockMemories.slice(0, 4)} />
+          <div className="h-fit">
+            <MemoriesVault memories={mockMemories.slice(0, 4)} />
+          </div>
           
           {/* Quick Thoughts */}
-          <ThoughtsApp />
+          <div className="h-fit">
+            <ThoughtsApp />
+          </div>
         </div>
       </div>
 
