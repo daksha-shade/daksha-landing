@@ -206,7 +206,7 @@ body {
 
 /* Notion-like styles */
 .notion-page {
-  max-width: 1200px;
+  /* max-width: 1200px; */
   margin: 0 auto;
   padding: 0 24px;
 }

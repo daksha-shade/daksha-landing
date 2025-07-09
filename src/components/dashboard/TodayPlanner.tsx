@@ -1,7 +1,6 @@
 "use client"
 
-import { useState } from 'react'
-import { Calendar, Clock, CheckCircle2, Circle, AlertCircle, ChevronRight, Plus } from 'lucide-react'
+import { Calendar, Clock, CheckCircle2, AlertCircle, ChevronRight, Plus } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -16,8 +15,6 @@ interface TodayPlannerProps {
 }
 
 export default function TodayPlanner({ tasks, onTaskToggle, className }: TodayPlannerProps) {
-  const [expandedTask, setExpandedTask] = useState<string | null>(null)
-
   const completedTasks = tasks.filter(task => task.completed)
   const pendingTasks = tasks.filter(task => !task.completed)
   const completionPercentage = tasks.length > 0 ? Math.round((completedTasks.length / tasks.length) * 100) : 0

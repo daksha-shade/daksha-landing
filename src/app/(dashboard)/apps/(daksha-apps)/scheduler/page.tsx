@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { 
   Calendar, 
   Clock, 
@@ -8,15 +8,10 @@ import {
   Brain, 
   ChevronLeft, 
   ChevronRight,
-  Filter,
-  Search,
-  Settings,
   Zap,
   Target,
   Users,
-  Video,
   Coffee,
-  Moon,
   Sun,
   Activity
 } from 'lucide-react'
@@ -40,13 +35,6 @@ interface Event {
   location?: string
   aiGenerated?: boolean
   energyLevel?: 'low' | 'medium' | 'high'
-}
-
-interface TimeBlock {
-  hour: number
-  events: Event[]
-  energyLevel: 'low' | 'medium' | 'high'
-  productivity: number
 }
 
 const SAMPLE_EVENTS: Event[] = [
@@ -86,11 +74,10 @@ const SAMPLE_EVENTS: Event[] = [
 
 export default function SchedulerPage() {
   const [events, setEvents] = useState<Event[]>(SAMPLE_EVENTS)
-  const [selectedDate, setSelectedDate] = useState(new Date())
+  const [selectedDate] = useState(new Date())
   const [viewMode, setViewMode] = useState<'day' | 'week' | 'month'>('day')
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isDakshaModalOpen, setIsDakshaModalOpen] = useState(false)
-  const [searchTerm, setSearchTerm] = useState('')
   const [dakshaPrompt, setDakshaPrompt] = useState('')
   const [isLoadingDaksha, setIsLoadingDaksha] = useState(false)
 
@@ -178,7 +165,7 @@ export default function SchedulerPage() {
         const suggestedEvent: Event = {
           id: Date.now().toString(),
           title: `AI Suggested: ${dakshaPrompt}`,
-          description: data.response,
+          description: (data as { response: string }).response,
           startTime: '14:00', // Default to high-energy afternoon slot
           endTime: '15:30',
           type: 'ai-suggested',

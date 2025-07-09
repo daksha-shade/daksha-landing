@@ -1,5 +1,4 @@
 "use client"
-
 import { useState } from 'react'
 import { 
   Settings, 
@@ -11,17 +10,13 @@ import {
   Database, 
   Download, 
   Trash2, 
-  Moon, 
-  Sun, 
-  Monitor,
   Save,
   ArrowLeft,
   FileText,
   Users,
   Baby,
   Plus,
-  Edit3,
-  Share2
+  Edit3
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -29,9 +24,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Separator } from '@/components/ui/separator'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 
 export default function SettingsPage() {

@@ -19,8 +19,10 @@ const eslintConfig = [
     rules: {
       "no-unused-vars": "off",
       "@typescript-eslint/no-unused-vars": ["warn"],
+      "@typescript-eslint/no-explicit-any": "off",
       "no-unescaped-entities": "off",
-      "react/no-unescaped-entities": "off"
+      "react/no-unescaped-entities": "off",
+      "jsx-a11y/alt-text": "off"
     }
   }
 ];

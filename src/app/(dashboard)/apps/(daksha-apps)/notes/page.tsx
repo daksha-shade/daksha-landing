@@ -1,26 +1,22 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { 
   Plus, 
   Search, 
-  Filter, 
   Grid, 
   List, 
   Edit3, 
   Trash2, 
   Star, 
   StarOff,
-  Calendar,
   Tag,
   Brain,
   Save,
-  X,
   Sparkles,
   FileText,
   Folder,
-  Clock,
-  ChevronDown
+  Clock
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'

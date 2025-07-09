@@ -1,4 +1,4 @@
-/* eslint-disable react/no-unescaped-entities */
+ 
 import { Button } from "@/components/ui/button"
 import { Brain, Sparkles, RotateCcw } from "lucide-react"
 
