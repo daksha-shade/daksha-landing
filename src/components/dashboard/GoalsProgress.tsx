@@ -2,7 +2,6 @@
 
 import { Target, TrendingUp, Calendar, CheckCircle2 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/Card'
-import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 
@@ -62,7 +61,6 @@ const mockGoals: Goal[] = [
 
 export default function GoalsProgress() {
   const totalGoals = mockGoals.length
-  const completedGoals = mockGoals.filter(goal => goal.status === 'completed').length
   const averageProgress = Math.round(mockGoals.reduce((sum, goal) => sum + goal.progress, 0) / totalGoals)
   const highPriorityGoals = mockGoals.filter(goal => goal.priority === 'high').length
 

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from 'react'
-import { Lightbulb, Plus, Search, Brain, Star, Clock, Tag, Edit3, Trash2 } from 'lucide-react'
+import { Lightbulb, Plus, Search, Brain, Star, Clock } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
