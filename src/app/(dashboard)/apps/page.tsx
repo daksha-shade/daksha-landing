@@ -23,11 +23,13 @@ import {
   Brain,
   HardDrive,
   Users,
-  Timer
+  Timer,
+  PenTool
 } from 'lucide-react'
 import Link from 'next/link'
 
 const dakshaApps = [
+  { icon: PenTool, label: 'WriteFlow', connected: true, color: 'text-emerald-500', description: 'AI writing assistant for emails, messages, and content across all platforms', category: 'productivity', link: '/apps/writeflow' },
   { icon: StickyNote, label: 'Notes', connected: true, color: 'text-yellow-500', description: 'Quick notes and thoughts with AI organization', category: 'productivity', link: '/apps/notes' },
   { icon: Calendar, label: 'Scheduler', connected: true, color: 'text-blue-500', description: 'AI-powered scheduling and time management', category: 'productivity', link: '/apps/scheduler' },
   { icon: Target, label: 'Goals', connected: true, color: 'text-green-500', description: 'Set, track, and achieve your personal goals', category: 'productivity', link: '/apps/goals' },
