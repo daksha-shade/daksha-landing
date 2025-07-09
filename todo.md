@@ -38,6 +38,7 @@ calender
 
 dashboard - show memories from memories vaulte - connected (google photos) and create showcase for that like google photos does for us - and show some plans from the planner like today you have a meeting shedules - this is the todo for your today - have you completed - get the most important tasks from goals app and show on desktop dashboard the percentage so that users can brainstorm and which thing to do - create a thougts apps where users can store there thoughts and ideas
 
+also add two things in the dashboard - one a thought of the day and a quote of the day - and a suggestion of the day - like you should do this today (like let's write a poem today and publish on vani) or you should do that today - like a personal assistant
 
 
 create an app import that will import your other apps data to daksha (photos, calender, forms and others)

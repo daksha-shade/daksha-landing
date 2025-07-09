@@ -26,6 +26,12 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/badge'
 import FullScreenVoiceInput from '@/components/dashboard/FullScreenVoiceInput'
+import MemoriesVault from '@/components/dashboard/MemoriesVault'
+import TodayPlanner from '@/components/dashboard/TodayPlanner'
+import GoalsProgress from '@/components/dashboard/GoalsProgress'
+import ThoughtsApp from '@/components/dashboard/ThoughtsApp'
+import DailyInspiration from '@/components/dashboard/DailyInspiration'
+import { mockMemories, mockTodayTasks } from '@/lib/dashboard-data'
 
 export default function MainDashboardPage() {
   const user = useUser()
@@ -130,6 +136,36 @@ export default function MainDashboardPage() {
             </div>
           </Card>
         ))}
+      </div>
+
+      {/* Daily Inspiration */}
+      <DailyInspiration />
+
+      {/* Main Dashboard Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Today's Planner */}
+          <TodayPlanner 
+            tasks={mockTodayTasks}
+            onTaskToggle={(taskId) => {
+              console.log('Toggle task:', taskId)
+              // Handle task toggle logic here
+            }}
+          />
+          
+          {/* Memories Vault */}
+          <MemoriesVault memories={mockMemories} />
+        </div>
+
+        {/* Right Column */}
+        <div className="space-y-6">
+          {/* Goals Progress */}
+          <GoalsProgress />
+          
+          {/* Thoughts App */}
+          <ThoughtsApp />
+        </div>
       </div>
 
       {/* Quick Actions */}
@@ -259,6 +295,7 @@ export default function MainDashboardPage() {
           </div>
         </div>
       </Card>
+ 
 
       {/* Full Screen Voice Input */}
       <FullScreenVoiceInput 
