@@ -154,94 +154,56 @@ export default function DailyInspiration({ className }: DailyInspirationProps) {
   }
 
   return (
-    <Card className={cn("h-full", className)}>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-semibold flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-yellow-500" />
+    <Card className={cn("", className)}>
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-medium flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-yellow-500" />
             Daily Inspiration
-          </CardTitle>
+          </h3>
           <Button
             variant="ghost"
             size="sm"
             onClick={refreshContent}
             disabled={isRefreshing}
-            className="gap-2"
+            className="h-8 w-8 p-0"
           >
-            <RefreshCw className={cn("w-4 h-4", isRefreshing && "animate-spin")} />
-            Refresh
+            <RefreshCw className={cn("w-3 h-3", isRefreshing && "animate-spin")} />
           </Button>
         </div>
-        <p className="text-sm text-muted-foreground">
-          Your daily dose of motivation and guidance
-        </p>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Quote of the Day */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Quote className="w-4 h-4 text-blue-500" />
-            <h3 className="font-medium text-sm">Quote of the Day</h3>
-            <Badge variant="outline" className={cn("text-xs", getCategoryColor(currentContent.quote.category))}>
-              {currentContent.quote.category}
-            </Badge>
-          </div>
-          <blockquote className="border-l-4 border-blue-500 pl-4 py-2 bg-blue-50/50 dark:bg-blue-950/20 rounded-r-lg">
-            <p className="text-sm italic text-foreground mb-2">
-              "{currentContent.quote.text}"
-            </p>
-            <cite className="text-xs text-muted-foreground">
-              — {currentContent.quote.author}
-            </cite>
-          </blockquote>
-        </div>
 
-        {/* Thought of the Day */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Brain className="w-4 h-4 text-purple-500" />
-            <h3 className="font-medium text-sm">Thought of the Day</h3>
-            <Badge variant="outline" className={cn("text-xs", getCategoryColor(currentContent.thought.category))}>
-              {currentContent.thought.category}
-            </Badge>
-          </div>
-          <div className="p-3 bg-purple-50/50 dark:bg-purple-950/20 rounded-lg border border-purple-200/50 dark:border-purple-800/50">
-            <p className="text-sm text-foreground">
-              {currentContent.thought.text}
-            </p>
-          </div>
-        </div>
-
-        {/* Suggestion of the Day */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Lightbulb className="w-4 h-4 text-green-500" />
-            <h3 className="font-medium text-sm">Suggestion of the Day</h3>
-            <Badge variant="outline" className={cn("text-xs", getCategoryColor(currentContent.suggestion.category))}>
-              {currentContent.suggestion.category}
-            </Badge>
-          </div>
-          <div className="p-4 bg-green-50/50 dark:bg-green-950/20 rounded-lg border border-green-200/50 dark:border-green-800/50">
-            <div className="flex items-start gap-3">
-              <span className="text-2xl">{currentContent.suggestion.icon}</span>
-              <div className="flex-1">
-                <p className="text-sm text-foreground mb-3">
-                  {currentContent.suggestion.text}
-                </p>
-                <Button size="sm" variant="outline" className="gap-2">
-                  <Heart className="w-3 h-3" />
-                  {currentContent.suggestion.action}
-                </Button>
-              </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {/* Quote */}
+          <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+            <div className="flex items-center gap-1 mb-2">
+              <Quote className="w-3 h-3 text-blue-500" />
+              <span className="text-xs font-medium">Quote</span>
             </div>
+            <blockquote className="text-xs italic mb-1">
+              "{currentContent.quote.text}"
+            </blockquote>
+            <cite className="text-xs text-muted-foreground">— {currentContent.quote.author}</cite>
           </div>
-        </div>
 
-        {/* Personal Assistant Note */}
-        <div className="pt-3 border-t border-border/30">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Sparkles className="w-3 h-3" />
-            <span>Daksha believes in you! ✨</span>
+          {/* Thought */}
+          <div className="p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg">
+            <div className="flex items-center gap-1 mb-2">
+              <Brain className="w-3 h-3 text-purple-500" />
+              <span className="text-xs font-medium">Thought</span>
+            </div>
+            <p className="text-xs">{currentContent.thought.text}</p>
+          </div>
+
+          {/* Suggestion */}
+          <div className="p-3 bg-green-50 dark:bg-green-950/20 rounded-lg">
+            <div className="flex items-center gap-1 mb-2">
+              <Lightbulb className="w-3 h-3 text-green-500" />
+              <span className="text-xs font-medium">Suggestion</span>
+            </div>
+            <p className="text-xs mb-2">{currentContent.suggestion.text}</p>
+            <Button size="sm" variant="outline" className="h-6 text-xs">
+              {currentContent.suggestion.action}
+            </Button>
           </div>
         </div>
       </CardContent>
