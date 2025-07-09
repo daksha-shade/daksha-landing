@@ -1,12 +1,10 @@
 "use client"
 
-import { useState } from 'react'
 import { 
   ArrowLeft, 
   Settings, 
   Bot, 
-  Activity, 
-  Database,
+  Activity,
   Eye,
   EyeOff
 } from 'lucide-react'

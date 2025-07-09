@@ -75,7 +75,7 @@ export default function ProcessingIndicator({ steps, currentStep }: ProcessingIn
             
             {/* Processing Steps */}
             <div className="space-y-3">
-              {steps.map((step, index) => {
+              {steps.map((step) => {
                 const StepIcon = stepIcons[step.id as keyof typeof stepIcons] || Clock
                 
                 return (

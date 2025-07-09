@@ -1,12 +1,11 @@
 "use client"
 
 import { useRef, useState } from 'react'
-import { Send, Paperclip, Mic, Image, FileText, Code, Smile } from 'lucide-react'
+import { Send, Paperclip, Mic, Image, FileText, Code } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { cn } from '@/lib/utils'
 
 interface ChatInputProps {
   value: string

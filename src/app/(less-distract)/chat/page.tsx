@@ -252,10 +252,10 @@ What would you like to explore today?`,
     }
   }
 
-  const generateAIResponse = (userInput: string): Message => {
+  const generateAIResponse = (_userInput: string): Message => {
     const responses = [
       {
-        content: `Based on your recent journal entries, I notice you've been focused on **${userInput.toLowerCase()}**. Here are some insights I've gathered from analyzing your patterns over the past week:
+        content: `Based on your recent journal entries, I notice you've been focused on **${_userInput.toLowerCase()}**. Here are some insights I've gathered from analyzing your patterns over the past week:
 
 ## Key Observations
 - Your **productivity peaks** around 10 AM based on your activity logs
