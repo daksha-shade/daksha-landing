@@ -6,7 +6,6 @@ import Link from 'next/link'
 import { useUser } from '@stackframe/stack'
 import {
   BookOpen,
-  Brain,
   Target,
   MessageCircle,
   Archive,

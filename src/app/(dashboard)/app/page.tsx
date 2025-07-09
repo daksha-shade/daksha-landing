@@ -14,7 +14,6 @@ import {
   Mic
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/Card'
 import FullScreenVoiceInput from '@/components/dashboard/FullScreenVoiceInput'
 import MemoriesVault from '@/components/dashboard/MemoriesVault'
 import TodayPlanner from '@/components/dashboard/TodayPlanner'
@@ -58,31 +57,54 @@ export default function MainDashboardPage() {
   ]
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 py-6 space-y-6">
-      {/* Simple Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">
+    <div className="  py-8 space-y-8">
+      {/* Improved Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="notion-title font-serif">
             Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}, {displayName}
           </h1>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-muted-foreground">
             {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
           </p>
         </div>
         <Button 
           onClick={() => setShowVoiceInput(true)}
-          className="gap-2"
+          className="gap-2 h-10"
+          size="default"
         >
           <Mic className="w-4 h-4" />
           Talk to Daksha
         </Button>
       </div>
 
-      {/* Daily Inspiration - Simplified */}
+      {/* Daily Inspiration */}
       <DailyInspiration />
 
-      {/* Main Content - 2 Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Quick Actions - Improved Layout */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-medium">Quick Actions</h2>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          {quickActions.map((action, index) => (
+            <Link key={index} href={action.href}>
+              <div className="bg-background border border-border/30 rounded-lg p-4 hover:shadow-sm hover:border-border/50 transition-all cursor-pointer group h-full">
+                <div className="text-center space-y-2.5">
+                  <div className="mx-auto w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
+                    <action.icon className={`w-4 h-4 ${action.color}`} />
+                  </div>
+                  <div className="space-y-0.5">
+                    <p className="font-medium text-xs">{action.label}</p>
+                    <p className="text-[10px] text-muted-foreground leading-tight">{action.description}</p>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* Main Content - Improved 2 Column Layout */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 h-[calc(100vh-200px)]">
         {/* Left Column */}
         <div className="space-y-6">
           {/* Today's Tasks */}
@@ -93,37 +115,18 @@ export default function MainDashboardPage() {
             }}
           />
           
-          {/* Goals Progress - Compact */}
+          {/* Goals Progress */}
           <GoalsProgress />
         </div>
 
         {/* Right Column */}
         <div className="space-y-6">
-          {/* Memories Vault - Simplified */}
+          {/* Memories Vault */}
           <MemoriesVault memories={mockMemories.slice(0, 4)} />
           
           {/* Quick Thoughts */}
           <ThoughtsApp />
         </div>
-      </div>
-
-      {/* Quick Actions - Simplified */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {quickActions.map((action, index) => (
-          <Link key={index} href={action.href}>
-            <Card className="p-4 hover:shadow-md transition-all cursor-pointer group">
-              <div className="text-center space-y-3">
-                <div className="mx-auto w-12 h-12 rounded-full bg-accent/50 flex items-center justify-center group-hover:bg-accent transition-colors">
-                  <action.icon className={`w-6 h-6 ${action.color}`} />
-                </div>
-                <div>
-                  <p className="font-medium text-sm">{action.label}</p>
-                  <p className="text-xs text-muted-foreground">{action.description}</p>
-                </div>
-              </div>
-            </Card>
-          </Link>
-        ))}
       </div>
 
       {/* Full Screen Voice Input */}
