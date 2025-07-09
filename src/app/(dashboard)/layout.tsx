@@ -16,7 +16,7 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className={`${inter.variable} ${crimsonText.variable} min-h-screen bg-transparent dark:bg-transparent text-[#1f1f1f] dark:text-white transition-colors duration-300`}>
+    <div className={`${inter.variable} ${crimsonText.variable} min-h-screen  bg-secondary  text-[#1f1f1f] dark:text-white  transition-colors duration-300`}>
       {/* Header */}
       <DashboardHeader />
       
@@ -26,7 +26,7 @@ export default function DashboardLayout({
         <DashboardSidebar />
         
         {/* Main Content */}
-        <main className="flex-1 min-h-[calc(100vh-4rem)] bg-white dark:bg-[#1f1f1f] transition-all duration-300 md:ml-0 pt-16" style={{ marginLeft: 'var(--sidebar-width, 0px)' }}>
+        <main className="flex-1 min-h-[calc(100vh-4rem)]   transition-all duration-300 md:ml-0 pt-16" style={{ marginLeft: 'var(--sidebar-width, 0px)' }}>
           <div className="px-4 md:px-8 py-4">
             {children}
           </div>
