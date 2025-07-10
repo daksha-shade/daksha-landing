@@ -86,7 +86,7 @@ export const mockMemories: Memory[] = [
     id: '3',
     type: 'journal',
     title: 'Breakthrough Moment',
-    content: 'Had an amazing insight about the user experience flow...',
+    content: 'Had an amazing insight about the user experience flow. The key is to reduce cognitive load while maintaining functionality. Users should feel empowered, not overwhelmed.',
     timestamp: new Date('2024-01-14T20:15:00'),
     tags: ['insight', 'ux', 'breakthrough'],
     aiDescription: 'Key realization about simplifying the user interface'
@@ -105,10 +105,80 @@ export const mockMemories: Memory[] = [
     id: '5',
     type: 'note',
     title: 'Project Ideas',
-    content: 'New feature concepts for Daksha: voice commands, smart notifications...',
+    content: 'New feature concepts for Daksha: voice commands, smart notifications, emotion tracking, memory palace visualization, cross-app insights.',
     timestamp: new Date('2024-01-13T16:20:00'),
     tags: ['ideas', 'features', 'innovation'],
     aiDescription: 'Creative brainstorming session with innovative ideas'
+  },
+  {
+    id: '6',
+    type: 'photo',
+    title: 'Coffee Shop Coding',
+    thumbnail: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=300&q=80',
+    timestamp: new Date('2024-01-13T10:30:00'),
+    tags: ['coding', 'productivity', 'coffee'],
+    location: 'Blue Bottle Coffee',
+    aiDescription: 'Productive coding session while enjoying great coffee'
+  },
+  {
+    id: '7',
+    type: 'video',
+    title: 'Product Demo Recording',
+    thumbnail: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80',
+    timestamp: new Date('2024-01-12T16:45:00'),
+    tags: ['demo', 'product', 'presentation'],
+    location: 'Home Office',
+    aiDescription: 'Recording product demo for potential investors'
+  },
+  {
+    id: '8',
+    type: 'journal',
+    title: 'Learning Reflection',
+    content: 'Today I learned about the importance of user feedback loops. Every feature should have a way to measure its impact on user satisfaction.',
+    timestamp: new Date('2024-01-12T22:00:00'),
+    tags: ['learning', 'feedback', 'growth'],
+    aiDescription: 'Important insights about product development and user-centric design'
+  },
+  {
+    id: '9',
+    type: 'photo',
+    title: 'Family Dinner',
+    thumbnail: 'https://images.unsplash.com/photo-1543353071-873f17a7a088?auto=format&fit=crop&w=300&q=80',
+    timestamp: new Date('2024-01-11T19:30:00'),
+    tags: ['family', 'dinner', 'celebration'],
+    location: 'Home',
+    people: ['Mom', 'Dad', 'Sister'],
+    aiDescription: 'Wonderful family dinner celebrating recent achievements'
+  },
+  {
+    id: '10',
+    type: 'note',
+    title: 'Book Quotes',
+    content: '"The best way to predict the future is to create it." - Peter Drucker. This resonates with our mission at Daksha.',
+    timestamp: new Date('2024-01-11T14:20:00'),
+    tags: ['quotes', 'inspiration', 'books'],
+    aiDescription: 'Inspiring quotes that align with personal and professional goals'
+  },
+  {
+    id: '11',
+    type: 'video',
+    title: 'Meditation Session',
+    thumbnail: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=300&q=80',
+    timestamp: new Date('2024-01-10T07:00:00'),
+    tags: ['meditation', 'mindfulness', 'wellness'],
+    location: 'Garden',
+    aiDescription: 'Morning meditation session to start the day with clarity'
+  },
+  {
+    id: '12',
+    type: 'photo',
+    title: 'Whiteboard Brainstorm',
+    thumbnail: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?auto=format&fit=crop&w=300&q=80',
+    timestamp: new Date('2024-01-09T15:15:00'),
+    tags: ['brainstorm', 'ideas', 'planning'],
+    location: 'Office',
+    people: ['Team'],
+    aiDescription: 'Collaborative brainstorming session for new feature concepts'
   }
 ]
 

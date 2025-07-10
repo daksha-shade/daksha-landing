@@ -53,7 +53,7 @@ export default function MainDashboardPage() {
     { icon: Target, label: 'Goals', href: '/goals', color: 'text-green-500', description: 'Track progress' },
     { icon: MessageCircle, label: 'Chat', href: '/chat', color: 'text-orange-500', description: 'Talk to Daksha' },
     { icon: Grid3X3, label: 'Apps', href: '/apps', color: 'text-indigo-500', description: 'Connected services' },
-    { icon: Archive, label: 'Archive', href: '/archive', color: 'text-gray-500', description: 'Past entries' },
+    { icon: Archive, label: 'Memories', href: '/memories', color: 'text-pink-500', description: 'Your memory vault' },
   ]
 
   return (

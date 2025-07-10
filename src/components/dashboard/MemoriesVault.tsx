@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Memory } from '@/lib/dashboard-data'
 import { cn } from '@/lib/utils'
+import Link from 'next/link'
 
 interface MemoriesVaultProps {
   memories: Memory[]
@@ -91,10 +92,17 @@ export default function MemoriesVault({ memories = [
             <Heart className="w-5 h-5 text-red-500" />
             Memories Vault
           </CardTitle>
-          <Button variant="ghost" size="sm" className="text-muted-foreground">
-            View All
-            <ChevronRight className="w-4 h-4 ml-1" />
-          </Button>
+            <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="text-muted-foreground"
+            >
+            <Link href="/memories">
+              View All
+              <ChevronRight className="w-4 h-4 ml-1" />
+            </Link>
+            </Button>
         </div>
         <p className="text-sm text-muted-foreground">
           Your life's beautiful moments, organized by AI
