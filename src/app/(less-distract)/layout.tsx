@@ -4,7 +4,7 @@ export default function LessDistractLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen  transition-colors duration-300">
       {children}
     </div>
   )
