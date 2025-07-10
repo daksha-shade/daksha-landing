@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/badge'
+import { useCallback } from 'react'
 import { PlateEditor } from '@/components/editor/plate-editor'
 import { Toaster } from 'sonner'
 import Link from 'next/link'
@@ -34,7 +35,7 @@ export default function JournalTextEditor() {
     return () => clearTimeout(autoSave)
   }, [title])
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     setIsSaving(true)
     try {
       // Simulate API call
@@ -47,7 +48,7 @@ export default function JournalTextEditor() {
     } finally {
       setIsSaving(false)
     }
-  }
+  }, [title])
 
 
   return (
