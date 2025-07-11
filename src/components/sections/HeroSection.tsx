@@ -1,6 +1,7 @@
  
 import { Button } from "@/components/ui/button"
 import { Brain, Sparkles, RotateCcw } from "lucide-react"
+import Link from "next/link"
 
 export default function HeroSection() {
   return (
@@ -50,24 +51,19 @@ export default function HeroSection() {
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-          <Button
-            href="https://tally.so/r/wLN5e2"
-            target="_blank"
-            rel="noopener noreferrer"
-            size="lg"
-            className="font-medium"
-          >
-            Join the Waitlist
+          <Button asChild size="lg" className="font-medium">
+            <a
+              href="https://tally.so/r/wLN5e2"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Join the Waitlist
+            </a>
           </Button>
-          <Button
-            href="/app"
-            // target="_blank"
-            rel="noopener noreferrer"
-            variant="notion"
-            size="lg"
-            className="font-medium"
-          >
-            Preview
+          <Button asChild variant="notion" size="lg" className="font-medium">
+            <Link href="/app">
+              Preview
+            </Link>
           </Button>
         </div>
 
