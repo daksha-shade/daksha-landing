@@ -67,6 +67,7 @@ export default function JournalTextEditor() {
     return () => clearTimeout(autoSave)
   }, [title, handleSave])
 
+
   const backgroundClass = isFocusMode 
     ? 'bg-white dark:bg-gray-900' 
     : 'bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900'
@@ -76,81 +77,80 @@ export default function JournalTextEditor() {
       {/* Header - Hidden in focus mode unless showMenuBar is true */}
       {(!isFocusMode || showMenuBar) && (
         <div className="sticky top-0 z-10 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700">
-          <div className="max-w-7xl mx-auto px-4 py-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <Link href="/journal">
-                  <Button variant="ghost" size="sm" className="gap-2">
-                    <ArrowLeft className="w-4 h-4" />
-                    Back to Journal
-                  </Button>
-                </Link>
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Link href="/journal">
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <ArrowLeft className="w-4 h-4" />
+                  Back to Journal
+                </Button>
+              </Link>
+              
+              <div className="flex items-center gap-3">
+                <Badge variant="outline" className="gap-1">
+                  <BookOpen className="w-3 h-3" />
+                  Rich Text Entry
+                </Badge>
                 
-                <div className="flex items-center gap-3">
-                  <Badge variant="outline" className="gap-1">
-                    <BookOpen className="w-3 h-3" />
-                    Rich Text Entry
-                  </Badge>
-                  
-                  <div className="text-sm text-muted-foreground">
-                    {isTyping ? (
-                      <span className="flex items-center gap-1">
-                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                        Typing...
-                      </span>
-                    ) : (
-                      `${wordCount} words`
-                    )}
-                  </div>
-                  
-                  {lastSaved && (
-                    <div className="text-xs text-muted-foreground flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      Saved {lastSaved.toLocaleTimeString()}
-                    </div>
+                <div className="text-sm text-muted-foreground">
+                  {isTyping ? (
+                    <span className="flex items-center gap-1">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                      Typing...
+                    </span>
+                  ) : (
+                    `${wordCount} words`
                   )}
                 </div>
+                
+                {lastSaved && (
+                  <div className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    Saved {lastSaved.toLocaleTimeString()}
+                  </div>
+                )}
               </div>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" className="gap-2">
+                <Calendar className="w-4 h-4" />
+                {new Date().toLocaleDateString('en-US', { 
+                  weekday: 'short', 
+                  month: 'short', 
+                  day: 'numeric' 
+                })}
+              </Button>
               
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" size="sm" className="gap-2">
-                  <Calendar className="w-4 h-4" />
-                  {new Date().toLocaleDateString('en-US', { 
-                    weekday: 'short', 
-                    month: 'short', 
-                    day: 'numeric' 
-                  })}
-                </Button>
-                
-                {/* Focus Mode Toggle */}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsFocusMode(!isFocusMode)}
-                  className="gap-2"
-                >
-                  {isFocusMode ? (
-                    <>
-                      <Minimize2 className="w-4 h-4" />
-                      Exit Focus
-                    </>
-                  ) : (
-                    <>
-                      <Focus className="w-4 h-4" />
-                      Focus Mode
-                    </>
-                  )}
-                </Button>
-                
-                <Button 
-                  onClick={handleSave} 
-                  disabled={isSaving}
-                  className="gap-2"
-                >
-                  <Save className="w-4 h-4" />
-                  {isSaving ? 'Saving...' : 'Save Entry'}
-                </Button>
-              </div>
+              {/* Focus Mode Toggle */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsFocusMode(!isFocusMode)}
+                className="gap-2"
+              >
+                {isFocusMode ? (
+                  <>
+                    <Minimize2 className="w-4 h-4" />
+                    Exit Focus
+                  </>
+                ) : (
+                  <>
+                    <Focus className="w-4 h-4" />
+                    Focus Mode
+                  </>
+                )}
+              </Button>
+              
+              <Button 
+                onClick={handleSave} 
+                disabled={isSaving}
+                className="gap-2"
+              >
+                <Save className="w-4 h-4" />
+                {isSaving ? 'Saving...' : 'Save Entry'}
+              </Button>
             </div>
           </div>
         </div>

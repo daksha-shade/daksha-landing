@@ -4,11 +4,11 @@ import { useUser } from '@stackframe/stack'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { useState } from 'react'
-import { 
-  BookOpen, 
-  Brain, 
-  Target, 
-  MessageCircle, 
+import {
+  BookOpen,
+  Brain,
+  Target,
+  MessageCircle,
   Grid3X3,
   Archive,
   Mic
@@ -53,7 +53,7 @@ export default function MainDashboardPage() {
     { icon: Target, label: 'Goals', href: '/goals', color: 'text-green-500', description: 'Track progress' },
     { icon: MessageCircle, label: 'Chat', href: '/chat', color: 'text-orange-500', description: 'Talk to Daksha' },
     { icon: Grid3X3, label: 'Apps', href: '/apps', color: 'text-indigo-500', description: 'Connected services' },
-    { icon: Archive, label: 'Memories', href: '/memories', color: 'text-pink-500', description: 'Your memory vault' },
+    { icon: Archive, label: 'Archive', href: '/archive', color: 'text-gray-500', description: 'Past entries' },
   ]
 
   return (
@@ -68,7 +68,7 @@ export default function MainDashboardPage() {
             {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
           </p>
         </div>
-        <Button 
+        <Button
           onClick={() => setShowVoiceInput(true)}
           className="gap-2 h-10"
           size="default"
@@ -109,14 +109,14 @@ export default function MainDashboardPage() {
         <div className="space-y-6">
           {/* Today's Tasks */}
           <div className="h-fit">
-            <TodayPlanner 
+            <TodayPlanner
               tasks={mockTodayTasks}
               onTaskToggle={(taskId) => {
                 console.log('Toggle task:', taskId)
               }}
             />
           </div>
-          
+
           {/* Goals Progress */}
           <div className="h-fit">
             <GoalsProgress />
@@ -129,7 +129,7 @@ export default function MainDashboardPage() {
           <div className="h-fit">
             <MemoriesVault memories={mockMemories.slice(0, 4)} />
           </div>
-          
+
           {/* Quick Thoughts */}
           <div className="h-fit">
             <ThoughtsApp />
@@ -138,7 +138,7 @@ export default function MainDashboardPage() {
       </div>
 
       {/* Full Screen Voice Input */}
-      <FullScreenVoiceInput 
+      <FullScreenVoiceInput
         isOpen={showVoiceInput}
         onClose={() => setShowVoiceInput(false)}
       />
