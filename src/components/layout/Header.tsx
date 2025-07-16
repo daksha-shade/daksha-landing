@@ -27,6 +27,9 @@ export default function Header() {
             <a href="#features" className="px-2 py-1 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
               Features
             </a>
+            <a href="/usecases" className="px-2 py-1 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
+              Use Cases
+            </a>
             <a href="#about" className="px-2 py-1 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
               About
             </a>
@@ -70,6 +73,9 @@ export default function Header() {
             <div className="flex flex-col space-y-1">
               <a href="#features" className="px-2 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
                 Features
+              </a>
+              <a href="/usecases" className="px-2 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
+                Use Cases
               </a>
               <a href="#about" className="px-2 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
                 About
