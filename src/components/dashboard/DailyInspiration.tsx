@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Quote, Lightbulb, Sparkles, RefreshCw, Brain } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/Card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 

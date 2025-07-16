@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { ArrowLeft, Save, Video, Pause, CircleStop, RotateCcw, Mic, MicOff, FileText, MessageCircle, Send } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function FullScreenVideoJournalPage() {
   const [title, setTitle] = useState("")
@@ -86,7 +86,7 @@ export default function FullScreenVideoJournalPage() {
 
   const handleAIQuestion = async () => {
     if (!aiQuestion.trim()) return
-    
+
     setIsProcessingAI(true)
     // Simulate AI processing
     setTimeout(() => {
@@ -102,7 +102,7 @@ export default function FullScreenVideoJournalPage() {
   return (
     <div className="fixed inset-0 bg-background dark:bg-black overflow-hidden">
       {/* Video Preview - Full Screen */}
-      <div 
+      <div
         className="absolute inset-0 bg-gradient-to-br from-muted/5 to-muted/10 dark:from-gray-900/50 dark:to-black/80"
         onClick={showControlsTemporarily}
       >
@@ -152,21 +152,20 @@ export default function FullScreenVideoJournalPage() {
       </div>
 
       {/* Top Controls */}
-      <div className={`absolute top-0 left-0 right-0 z-10 transition-all duration-300 ${
-        showControls || !isRecording ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full'
-      }`}>
+      <div className={`absolute top-0 left-0 right-0 z-10 transition-all duration-300 ${showControls || !isRecording ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full'
+        }`}>
         <div className="bg-gradient-to-b from-black/60 to-transparent backdrop-blur-sm p-6">
           <div className="flex items-center justify-between">
-            <Button 
-              variant="ghost" 
-              size="sm" 
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => window.location.href = '/journal'}
               className="text-white hover:bg-white/20 gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
               Back
             </Button>
-            
+
             <div className="flex-1 max-w-md mx-6">
               <Input
                 placeholder="Video journal title..."
@@ -176,9 +175,9 @@ export default function FullScreenVideoJournalPage() {
               />
             </div>
 
-            <Button 
-              onClick={handleSave} 
-              size="sm" 
+            <Button
+              onClick={handleSave}
+              size="sm"
               className="gap-2 bg-white/20 hover:bg-white/30 text-white border-white/20"
               disabled={!hasRecording}
             >
@@ -190,9 +189,8 @@ export default function FullScreenVideoJournalPage() {
       </div>
 
       {/* Side Controls */}
-      <div className={`absolute right-6 top-1/2 -translate-y-1/2 z-10 transition-all duration-300 ${
-        showControls || !isRecording ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'
-      }`}>
+      <div className={`absolute right-6 top-1/2 -translate-y-1/2 z-10 transition-all duration-300 ${showControls || !isRecording ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'
+        }`}>
         <div className="flex flex-col gap-4">
           {/* Camera Flip */}
           {!hasRecording && (
@@ -211,11 +209,10 @@ export default function FullScreenVideoJournalPage() {
             variant="ghost"
             size="lg"
             onClick={toggleMute}
-            className={`w-12 h-12 rounded-full border border-white/60 shadow ${
-              isMuted
-          ? 'bg-red-500/90 hover:bg-red-600 text-white'
-          : 'bg-white/30 hover:bg-white/50 text-white'
-            }`}
+            className={`w-12 h-12 rounded-full border border-white/60 shadow ${isMuted
+                ? 'bg-red-500/90 hover:bg-red-600 text-white'
+                : 'bg-white/30 hover:bg-white/50 text-white'
+              }`}
           >
             {isMuted ? (
               <MicOff className="w-6 h-6 text-white" />
@@ -227,9 +224,8 @@ export default function FullScreenVideoJournalPage() {
       </div>
 
       {/* Bottom Controls */}
-      <div className={`absolute bottom-0 left-0 right-0 z-10 transition-all duration-300 ${
-        showControls || !isRecording ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full'
-      }`}>
+      <div className={`absolute bottom-0 left-0 right-0 z-10 transition-all duration-300 ${showControls || !isRecording ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full'
+        }`}>
         <div className="bg-gradient-to-t from-black/60 to-transparent backdrop-blur-sm p-8">
           <div className="flex items-center justify-center">
             {!isRecording ? (
@@ -250,7 +246,7 @@ export default function FullScreenVideoJournalPage() {
                 >
                   <Pause className="w-6 h-6" />
                 </Button>
-                
+
                 <Button
                   onClick={stopRecording}
                   size="lg"
@@ -266,9 +262,9 @@ export default function FullScreenVideoJournalPage() {
           <div className="text-center mt-4">
             <p className="text-white/80 text-sm">
               {isRecording && !isPaused ? 'Recording in progress - tap screen to show controls' :
-               isRecording && isPaused ? 'Recording paused' :
-               hasRecording ? 'Recording complete' :
-               'Tap the red button to start recording'}
+                isRecording && isPaused ? 'Recording paused' :
+                  hasRecording ? 'Recording complete' :
+                    'Tap the red button to start recording'}
             </p>
           </div>
         </div>
@@ -325,7 +321,7 @@ export default function FullScreenVideoJournalPage() {
                   onKeyPress={(e) => e.key === 'Enter' && handleAIQuestion()}
                   className="text-sm"
                 />
-                <Button 
+                <Button
                   onClick={handleAIQuestion}
                   disabled={isProcessingAI || !aiQuestion.trim()}
                   size="sm"
@@ -333,13 +329,13 @@ export default function FullScreenVideoJournalPage() {
                   <Send className="w-3 h-3" />
                 </Button>
               </div>
-              
+
               {aiResponse && (
                 <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
                   <p className="text-xs leading-relaxed">{aiResponse}</p>
                 </div>
               )}
-              
+
               {isProcessingAI && (
                 <div className="p-3 bg-muted/20 rounded-lg">
                   <p className="text-xs text-muted-foreground">AI is analyzing your video...</p>
@@ -352,7 +348,7 @@ export default function FullScreenVideoJournalPage() {
 
       {/* Tap to show controls overlay */}
       {isRecording && !showControls && (
-        <div 
+        <div
           className="absolute inset-0 z-5"
           onClick={showControlsTemporarily}
         />

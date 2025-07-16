@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Lightbulb, Plus, Search, Brain, Star, Clock } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -98,7 +98,7 @@ export default function ThoughtsApp({ className }: ThoughtsAppProps) {
   const formatDate = (date: Date) => {
     const now = new Date()
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60)
-    
+
     if (diffInHours < 1) {
       return 'Just now'
     } else if (diffInHours < 24) {
@@ -253,11 +253,11 @@ export default function ThoughtsApp({ className }: ThoughtsAppProps) {
                   </Button>
                 </div>
               </div>
-              
+
               <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
                 {thought.content}
               </p>
-              
+
               <div className="flex items-center justify-between">
                 <div className="flex flex-wrap gap-1">
                   {thought.tags.map((tag, index) => (

@@ -1,13 +1,13 @@
 "use client"
 
 import { useState } from 'react'
-import { 
-  PenTool, 
-  Mail, 
-  MessageSquare, 
-  Linkedin, 
-  Twitter, 
-  Instagram, 
+import {
+  PenTool,
+  Mail,
+  MessageSquare,
+  Linkedin,
+  Twitter,
+  Instagram,
   Chrome,
   Zap,
   Copy,
@@ -28,7 +28,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -130,9 +130,9 @@ export default function WriteFlowPage() {
 
   const handleGenerate = async () => {
     if (!inputText.trim()) return
-    
+
     setIsGenerating(true)
-    
+
     // Simulate AI generation
     setTimeout(() => {
       const enhanced = `${selectedTemplate?.template.replace('[Your message here]', inputText).replace('[Your Subject]', inputText.split(' ').slice(0, 5).join(' '))}
@@ -142,7 +142,7 @@ export default function WriteFlowPage() {
 📝 Tone: ${tone}
 🎯 Platform optimized: ${selectedTemplate?.platform}
 ${context ? `🧠 Context: ${context}` : ''}`
-      
+
       setGeneratedText(enhanced)
       setIsGenerating(false)
     }, 2000)
@@ -314,7 +314,7 @@ ${context ? `🧠 Context: ${context}` : ''}`
                       </Select>
                     </div>
                   </div>
-                  
+
                   <div>
                     <label className="text-sm font-medium mb-2 block">Context (Optional)</label>
                     <Input
@@ -334,8 +334,8 @@ ${context ? `🧠 Context: ${context}` : ''}`
                     />
                   </div>
 
-                  <Button 
-                    onClick={handleGenerate} 
+                  <Button
+                    onClick={handleGenerate}
                     disabled={!inputText.trim() || isGenerating}
                     className="w-full gap-2"
                   >
@@ -505,7 +505,7 @@ ${context ? `🧠 Context: ${context}` : ''}`
                   Install Extension
                 </Button>
               </div>
-              
+
               <div className="space-y-2 pt-3 border-t">
                 <div className="flex items-center gap-2 text-xs">
                   <Monitor className="w-3 h-3" />

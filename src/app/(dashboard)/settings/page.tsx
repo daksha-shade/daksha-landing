@@ -1,15 +1,15 @@
 "use client"
 import { useState } from 'react'
-import { 
-  Settings, 
-  User, 
-  Bell, 
-  Shield, 
-  Palette, 
-  Mic, 
-  Database, 
-  Download, 
-  Trash2, 
+import {
+  Settings,
+  User,
+  Bell,
+  Shield,
+  Palette,
+  Mic,
+  Database,
+  Download,
+  Trash2,
   Save,
   ArrowLeft,
   FileText,
@@ -21,7 +21,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -34,42 +34,42 @@ export default function SettingsPage() {
     displayName: 'Shaswat Raj',
     email: 'shaswat@example.com',
     bio: 'Software engineer passionate about AI and building products that help people',
-    
+
     // Custom Context
     customContext: 'My name is Shaswat Raj and I am a software engineer and I am 20 years old. I work on AI and web development projects. I am passionate about building products that help people. I enjoy coding, learning new technologies, and solving complex problems.',
-    
+
     // Notifications
     emailNotifications: true,
     pushNotifications: true,
     journalReminders: true,
     goalDeadlines: true,
     weeklyReports: true,
-    
+
     // Privacy
     profileVisibility: 'private',
     dataSharing: false,
     analyticsTracking: true,
-    
+
     // Partner Sharing
     partnerSharingEnabled: false,
     sharedPartners: [],
-    
+
     // Parental Controls
     parentalControlsEnabled: false,
     contentFiltering: 'moderate',
     timeRestrictions: false,
-    
+
     // Appearance
     theme: 'system',
     fontSize: 'medium',
     compactMode: false,
-    
+
     // Voice & AI
     voiceEnabled: true,
     autoTranscription: true,
     voiceLanguage: 'en-US',
     aiPersonality: 'thoughtful',
-    
+
     // Data & Storage
     autoBackup: true,
     backupFrequency: 'daily',
@@ -104,28 +104,28 @@ export default function SettingsPage() {
           <Button variant="ghost" size="sm" className="text-destructive">Remove Photo</Button>
         </div>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <label className="text-sm font-medium">Display Name</label>
-          <Input 
+          <Input
             value={settings.displayName}
             onChange={(e) => updateSetting('displayName', e.target.value)}
           />
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium">Email</label>
-          <Input 
+          <Input
             value={settings.email}
             onChange={(e) => updateSetting('email', e.target.value)}
             type="email"
           />
         </div>
       </div>
-      
+
       <div className="space-y-2">
         <label className="text-sm font-medium">Bio</label>
-        <Textarea 
+        <Textarea
           rows={3}
           value={settings.bio}
           onChange={(e) => updateSetting('bio', e.target.value)}
@@ -143,7 +143,7 @@ export default function SettingsPage() {
           <div>
             <h3 className="font-medium text-blue-900 dark:text-blue-100">Custom Context File</h3>
             <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
-              This context will be prioritized over your journal entries when Daksha generates responses. 
+              This context will be prioritized over your journal entries when Daksha generates responses.
               Include key information about yourself that you want Daksha to always remember.
             </p>
           </div>
@@ -195,7 +195,7 @@ export default function SettingsPage() {
           <p className="font-medium">Enable Partner Sharing</p>
           <p className="text-sm text-muted-foreground">Allow trusted partners to access shared content</p>
         </div>
-        <Switch 
+        <Switch
           checked={settings.partnerSharingEnabled}
           onCheckedChange={(checked) => updateSetting('partnerSharingEnabled', checked)}
         />
@@ -251,7 +251,7 @@ export default function SettingsPage() {
           <p className="font-medium">Enable Parental Controls</p>
           <p className="text-sm text-muted-foreground">Restrict content and features for younger users</p>
         </div>
-        <Switch 
+        <Switch
           checked={settings.parentalControlsEnabled}
           onCheckedChange={(checked) => updateSetting('parentalControlsEnabled', checked)}
         />
@@ -278,7 +278,7 @@ export default function SettingsPage() {
               <p className="font-medium">Time Restrictions</p>
               <p className="text-sm text-muted-foreground">Limit usage during certain hours</p>
             </div>
-            <Switch 
+            <Switch
               checked={settings.timeRestrictions}
               onCheckedChange={(checked) => updateSetting('timeRestrictions', checked)}
             />
@@ -290,7 +290,7 @@ export default function SettingsPage() {
               <div>
                 <h3 className="font-medium text-orange-900 dark:text-orange-100">Parental Control Notice</h3>
                 <p className="text-sm text-orange-700 dark:text-orange-300 mt-1">
-                  These settings help create a safer environment for younger users. 
+                  These settings help create a safer environment for younger users.
                   Some features may be limited when parental controls are enabled.
                 </p>
               </div>
@@ -315,7 +315,7 @@ export default function SettingsPage() {
             <p className="font-medium">{item.label}</p>
             <p className="text-sm text-muted-foreground">{item.description}</p>
           </div>
-          <Switch 
+          <Switch
             checked={settings[item.key as keyof typeof settings] as boolean}
             onCheckedChange={(checked) => updateSetting(item.key, checked)}
           />
@@ -340,7 +340,7 @@ export default function SettingsPage() {
             </SelectContent>
           </Select>
         </div>
-        
+
         <div className="space-y-4">
           {[
             { key: 'dataSharing', label: 'Data Sharing', description: 'Allow anonymized data for research' },
@@ -351,7 +351,7 @@ export default function SettingsPage() {
                 <p className="font-medium">{item.label}</p>
                 <p className="text-sm text-muted-foreground">{item.description}</p>
               </div>
-              <Switch 
+              <Switch
                 checked={settings[item.key as keyof typeof settings] as boolean}
                 onCheckedChange={(checked) => updateSetting(item.key, checked)}
               />
@@ -377,7 +377,7 @@ export default function SettingsPage() {
           </SelectContent>
         </Select>
       </div>
-      
+
       <div className="space-y-2">
         <label className="text-sm font-medium">Font Size</label>
         <Select value={settings.fontSize} onValueChange={(value) => updateSetting('fontSize', value)}>
@@ -391,13 +391,13 @@ export default function SettingsPage() {
           </SelectContent>
         </Select>
       </div>
-      
+
       <div className="flex items-center justify-between p-4 rounded-lg border border-border/30">
         <div>
           <p className="font-medium">Compact Mode</p>
           <p className="text-sm text-muted-foreground">Reduce spacing for more content</p>
         </div>
-        <Switch 
+        <Switch
           checked={settings.compactMode}
           onCheckedChange={(checked) => updateSetting('compactMode', checked)}
         />
@@ -412,12 +412,12 @@ export default function SettingsPage() {
           <p className="font-medium">Voice Input</p>
           <p className="text-sm text-muted-foreground">Enable voice commands and dictation</p>
         </div>
-        <Switch 
+        <Switch
           checked={settings.voiceEnabled}
           onCheckedChange={(checked) => updateSetting('voiceEnabled', checked)}
         />
       </div>
-      
+
       <div className="space-y-2">
         <label className="text-sm font-medium">Voice Language</label>
         <Select value={settings.voiceLanguage} onValueChange={(value) => updateSetting('voiceLanguage', value)}>
@@ -432,7 +432,7 @@ export default function SettingsPage() {
           </SelectContent>
         </Select>
       </div>
-      
+
       <div className="space-y-2">
         <label className="text-sm font-medium">AI Personality</label>
         <Select value={settings.aiPersonality} onValueChange={(value) => updateSetting('aiPersonality', value)}>
@@ -457,12 +457,12 @@ export default function SettingsPage() {
           <p className="font-medium">Auto Backup</p>
           <p className="text-sm text-muted-foreground">Automatically backup your data</p>
         </div>
-        <Switch 
+        <Switch
           checked={settings.autoBackup}
           onCheckedChange={(checked) => updateSetting('autoBackup', checked)}
         />
       </div>
-      
+
       <div className="space-y-2">
         <label className="text-sm font-medium">Backup Frequency</label>
         <Select value={settings.backupFrequency} onValueChange={(value) => updateSetting('backupFrequency', value)}>
@@ -476,13 +476,13 @@ export default function SettingsPage() {
           </SelectContent>
         </Select>
       </div>
-      
+
       <div className="space-y-4">
         <Button variant="outline" className="w-full gap-2">
           <Download className="w-4 h-4" />
           Export All Data
         </Button>
-        
+
         <Button variant="destructive" className="w-full gap-2">
           <Trash2 className="w-4 h-4" />
           Delete All Data
@@ -535,11 +535,10 @@ export default function SettingsPage() {
                   <button
                     key={section.id}
                     onClick={() => setActiveSection(section.id)}
-                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
-                      activeSection === section.id
+                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${activeSection === section.id
                         ? 'bg-primary text-primary-foreground'
                         : 'hover:bg-muted'
-                    }`}
+                      }`}
                   >
                     <section.icon className="w-4 h-4" />
                     <span className="text-sm font-medium">{section.label}</span>

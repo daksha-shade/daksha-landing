@@ -1,24 +1,31 @@
 "use client"
 
-import { useState, useEffect, useCallback } from 'react'
-import { Edit3, Search, Video, Mic, FileText, Clock, Filter, Grid, List, Plus, Volume2, Image as ImageIcon, ChevronDown, Loader2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { mockJournalEntries, getMoodColor, formatDuration, formatDate } from '@/lib/journal-data'
+import { useState, useEffect, useCallback } from "react"
+import { Edit3, Search, Video, Mic, FileText, Grid, List, Plus, ChevronDown, Loader2, MoreHorizontal } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Separator } from "@/components/ui/separator"
+import { mockJournalEntries, getMoodColor, formatDuration, formatDate } from "@/lib/journal-data"
 
 export default function JournalPage() {
-  const [viewMode, setViewMode] = useState<'timeline' | 'grid'>('timeline')
-  const [filterType, setFilterType] = useState<'all' | 'text' | 'audio' | 'video' | 'mixed'>('all')
-  const [displayedEntries, setDisplayedEntries] = useState(5) // Start with 5 entries
+  const [viewMode, setViewMode] = useState("timeline")
+  const [filterType, setFilterType] = useState("all")
+  const [displayedEntries, setDisplayedEntries] = useState(12)
   const [isLoading, setIsLoading] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
 
-  // Use shared journal entries
   const journalEntries = mockJournalEntries
 
   const filteredEntries = journalEntries.filter(entry => {
-    if (filterType === 'all') return true
-    return entry.type === filterType
+    if (filterType !== "all" && entry.type !== filterType) return false
+    if (searchQuery && !entry.title.toLowerCase().includes(searchQuery.toLowerCase()) && 
+        !entry.content?.toLowerCase().includes(searchQuery.toLowerCase())) return false
+    return true
   })
 
   const visibleEntries = filteredEntries.slice(0, displayedEntries)
@@ -26,367 +33,273 @@ export default function JournalPage() {
 
   const loadMore = useCallback(() => {
     if (isLoading || !hasMoreEntries) return
-    
     setIsLoading(true)
-    // Simulate loading delay
     setTimeout(() => {
-      setDisplayedEntries(prev => Math.min(prev + 3, filteredEntries.length))
+      setDisplayedEntries(prev => Math.min(prev + 6, filteredEntries.length))
       setIsLoading(false)
-    }, 800)
+    }, 300)
   }, [isLoading, hasMoreEntries, filteredEntries.length])
 
-  // Reset displayed entries when filter changes
   useEffect(() => {
-    setDisplayedEntries(5)
-  }, [filterType])
+    setDisplayedEntries(12)
+  }, [filterType, searchQuery])
 
+  const stats = {
+    total: journalEntries.length,
+    thisWeek: journalEntries.filter(entry => {
+      const entryDate = new Date(entry.timestamp)
+      const weekAgo = new Date()
+      weekAgo.setDate(weekAgo.getDate() - 7)
+      return entryDate >= weekAgo
+    }).length
+  }
+
+  const getTypeIcon = (type) => {
+    switch (type) {
+      case "text": return <FileText className="h-4 w-4" />
+      case "audio": return <Mic className="h-4 w-4" />
+      case "video": return <Video className="h-4 w-4" />
+      default: return <FileText className="h-4 w-4" />
+    }
+  }
 
   return (
-    <div className="notion-page py-6 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="container mx-auto p-6 space-y-6">
+      
+      <div className="space-y-2">
         <div className="flex items-center gap-3">
-          <Edit3 className="w-6 h-6 text-primary" />
-          <h1 className="notion-title font-serif">Journal</h1>
+          <Edit3 className="h-6 w-6 text-primary" />
+          <h1 className="text-3xl font-bold tracking-tight">Journal</h1>
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex items-center gap-1">
-            <Button
-              variant={viewMode === 'timeline' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setViewMode('timeline')}
-              className="gap-1"
-            >
-              <List className="w-3 h-3" />
-              Timeline
-            </Button>
-            <Button
-              variant={viewMode === 'grid' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setViewMode('grid')}
-              className="gap-1"
-            >
-              <Grid className="w-3 h-3" />
-              Grid
-            </Button>
-          </div>
-          <Button variant="outline" size="sm" className="gap-2">
-            <Search className="w-4 h-4" />
-            Search
-          </Button>
-        </div>
+        <p className="text-muted-foreground">
+          Your personal space for thoughts, memories, and reflections
+        </p>
       </div>
 
-      {/* Filter Bar */}
-      <div className="flex items-center gap-2 pb-4 border-b border-border/20">
-        <Filter className="w-4 h-4 text-muted-foreground" />
-        <div className="flex gap-1 flex-wrap">
-          {(['all', 'text', 'audio', 'video', 'mixed'] as const).map((type) => (
-            <Button
-              key={type}
-              variant={filterType === type ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setFilterType(type)}
-              className="h-7 px-3 text-xs capitalize"
-            >
-              {type === 'all' ? 'All' : type}
-            </Button>
-          ))}
-        </div>
-        <div className="ml-auto text-sm text-muted-foreground">
-          {visibleEntries.length} of {filteredEntries.length} entries
-        </div> {/* Create New Entry */}
-        <div className="flex justify-center">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button className="gap-2 h-8  ">
-                <Plus className="w-5 h-5" />
-                Create New Entry
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Create New Entry</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-3">
-                <p className="text-sm text-muted-foreground text-center">Choose how you'd like to journal today</p>
-                <div className="space-y-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-2xl font-bold">{stats.total}</div>
+            <p className="text-xs text-muted-foreground">Total Entries</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-2xl font-bold">{stats.thisWeek}</div>
+            <p className="text-xs text-muted-foreground">This Week</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-2xl font-bold">{filteredEntries.length}</div>
+            <p className="text-xs text-muted-foreground">Filtered</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 flex items-center justify-center">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button size="sm" className="w-full">
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Entry
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create New Entry</DialogTitle>
+                </DialogHeader>
+                <div className="grid gap-3 py-4">
                   <Button
                     variant="outline"
-                    className="w-full gap-3 h-14 justify-start"
-                    onClick={() => window.location.href = '/journal/text'}
+                    className="justify-start h-auto p-4"
+                    onClick={() => window.location.href = "/journal/text"}
                   >
-                    <FileText className="w-5 h-5" />
+                    <FileText className="h-5 w-5 mr-3" />
                     <div className="text-left">
                       <div className="font-medium">Text Entry</div>
-                      <div className="text-xs text-muted-foreground">Write your thoughts</div>
+                      <div className="text-sm text-muted-foreground">Write your thoughts</div>
                     </div>
                   </Button>
                   <Button
                     variant="outline"
-                    className="w-full gap-3 h-14 justify-start"
-                    onClick={() => window.location.href = '/journal/audio'}
+                    className="justify-start h-auto p-4"
+                    onClick={() => window.location.href = "/journal/audio"}
                   >
-                    <Mic className="w-5 h-5" />
+                    <Mic className="h-5 w-5 mr-3" />
                     <div className="text-left">
                       <div className="font-medium">Audio Journal</div>
-                      <div className="text-xs text-muted-foreground">Record your voice</div>
-                    </div>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full gap-3 h-14 justify-start"
-                    onClick={() => window.location.href = '/journal/video'}
-                  >
-                    <Video className="w-5 h-5" />
-                    <div className="text-left">
-                      <div className="font-medium">Video Journal</div>
-                      <div className="text-xs text-muted-foreground">Capture on camera</div>
+                      <div className="text-sm text-muted-foreground">Record your voice</div>
                     </div>
                   </Button>
                 </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
+              </DialogContent>
+            </Dialog>
+          </CardContent>
+        </Card>
       </div>
 
-
-
-      {/* Journal Entries */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-medium">Your Journal</h2>
-
-        {viewMode === 'timeline' ? (
-          <div className="relative">
-            {/* Main Timeline Line */}
-            <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-200 via-purple-200 to-transparent dark:from-blue-800 dark:via-purple-800" />
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             
-            <div className="space-y-6">
-              {visibleEntries.map((entry) => (
-                <div key={entry.id} className="relative">
-                  <div className="flex gap-4">
-                    {/* Enhanced Timeline Dot */}
-                    <div className="relative flex flex-col items-center z-10">
-                      <div className={`w-4 h-4 rounded-full -mb-4 border-3 border-background shadow-lg ${
-                        entry.type === 'text' ? 'bg-blue-500 ring-2 ring-blue-200 dark:ring-blue-800' :
-                        entry.type === 'audio' ? 'bg-green-500 ring-2 ring-green-200 dark:ring-green-800' :
-                        entry.type === 'video' ? 'bg-red-500 ring-2 ring-red-200 dark:ring-red-800' :
-                        'bg-purple-500 ring-2 ring-purple-200 dark:ring-purple-800'
-                      }`} />
-                      {/* Date marker line */}
-                      <div className="absolute -left-18 top-1 text-xs text-muted-foreground font-mono bg-background px-1 rounded">
-                        {formatDate(entry.timestamp)}
-                      </div>
-                    </div>
-
-                  {/* Entry Content */}
-                  <div className="flex-1 pb-6">
-                    <div 
-                      className="bg-background border border-border/30 rounded-lg p-4 hover:shadow-sm transition-all cursor-pointer"
-                      onClick={() => window.location.href = `/journal/${entry.id}`}
-                    >
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-medium">{entry.title}</h3>
-                          <div className="flex items-center gap-1">
-                            {entry.type === 'text' && <FileText className="w-3 h-3 text-blue-500" />}
-                            {entry.type === 'audio' && <Volume2 className="w-3 h-3 text-green-500" />}
-                            {entry.type === 'video' && <Video className="w-3 h-3 text-red-500" />}
-                            {entry.type === 'mixed' && <Plus className="w-3 h-3 text-purple-500" />}
-                          </div>
-                          {entry.mood && (
-                            <Badge variant="secondary" className={`text-xs ${getMoodColor(entry.mood)}`}>
-                              {entry.mood}
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <Clock className="w-3 h-3" />
-                          {entry.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </div>
-                      </div>
-
-                      {/* Content Preview */}
-                      {entry.content && (
-                        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                          {entry.content}
-                        </p>
-                      )}
-
-                      {/* Audio/Video Duration */}
-                      {entry.duration && (
-                        <div className="flex items-center gap-1 mb-3">
-                          <Clock className="w-3 h-3 text-muted-foreground" />
-                          <span className="text-xs text-muted-foreground">
-                            {formatDuration(entry.duration)}
-                          </span>
-                        </div>
-                      )}
-
-                      {/* Attachments */}
-                      {entry.attachments && entry.attachments.length > 0 && (
-                        <div className="flex items-center gap-2 mb-3">
-                          {entry.attachments.map((attachment, idx) => (
-                            <div key={idx} className="flex items-center gap-1 text-xs text-muted-foreground">
-                              {attachment.type === 'image' && <ImageIcon className="w-3 h-3" />}
-                              {attachment.type === 'audio' && <Volume2 className="w-3 h-3" />}
-                              {attachment.type === 'video' && <Video className="w-3 h-3" />}
-                              <span>{attachment.name}</span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
-                      {/* Tags */}
-                      {entry.tags && entry.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1">
-                          {entry.tags.map((tag, idx) => (
-                            <Badge key={idx} variant="outline" className="text-xs">
-                              #{tag}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
+            <div className="flex flex-col sm:flex-row gap-3 flex-1">
+              <div className="relative flex-1 max-w-sm">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search entries..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9"
+                />
               </div>
-            ))}
-            
-            {/* Load More Section */}
-            {hasMoreEntries && (
-              <div className="relative flex justify-center pt-8">
-                <div className="absolute left-6 top-0 w-0.5 h-8 bg-gradient-to-b from-purple-200 to-transparent dark:from-purple-800" />
-                <Button 
-                  onClick={loadMore}
-                  disabled={isLoading}
-                  variant="outline"
-                  className="gap-2 bg-background/80 backdrop-blur-sm border-dashed hover:border-solid transition-all"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Loading more entries...
-                    </>
-                  ) : (
-                    <>
-                      <ChevronDown className="w-4 h-4" />
-                      Load {Math.min(3, filteredEntries.length - displayedEntries)} more entries
-                    </>
-                  )}
-                </Button>
-              </div>
-            )}
-            
-            {!hasMoreEntries && visibleEntries.length > 5 && (
-              <div className="relative flex justify-center pt-8">
-                <div className="absolute left-6 top-0 w-0.5 h-8 bg-gradient-to-b from-purple-200 to-transparent dark:from-purple-800" />
-                <div className="text-center">
-                  <div className="w-3 h-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">You've reached the beginning of your journal</p>
-                </div>
-              </div>
-            )}
-          </div>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {visibleEntries.map((entry) => (
-              <div 
-                key={entry.id} 
-                className="bg-background border border-border/30 rounded-lg p-4 hover:shadow-sm transition-all cursor-pointer"
-                onClick={() => window.location.href = `/journal/${entry.id}`}
+              
+              <Tabs value={filterType} onValueChange={(value) => setFilterType(value)}>
+                <TabsList>
+                  <TabsTrigger value="all">All</TabsTrigger>
+                  <TabsTrigger value="text">Text</TabsTrigger>
+                  <TabsTrigger value="audio">Audio</TabsTrigger>
+                  <TabsTrigger value="video">Video</TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
+
+            <div className="flex items-center gap-1 border rounded-md p-1">
+              <Button
+                variant={viewMode === "timeline" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setViewMode("timeline")}
               >
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-medium text-sm">{entry.title}</h3>
-                    {entry.type === 'text' && <FileText className="w-3 h-3 text-blue-500" />}
-                    {entry.type === 'audio' && <Volume2 className="w-3 h-3 text-green-500" />}
-                    {entry.type === 'video' && <Video className="w-3 h-3 text-red-500" />}
-                    {entry.type === 'mixed' && <Plus className="w-3 h-3 text-purple-500" />}
+                <List className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={viewMode === "grid" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setViewMode("grid")}
+              >
+                <Grid className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" : "space-y-4"}>
+        {visibleEntries.map((entry) => (
+          <Card key={entry.id} className="group">
+            <CardHeader className="pb-3">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3 flex-1">
+                  <div className="p-2 rounded-md bg-muted">
+                    {getTypeIcon(entry.type)}
                   </div>
-                  <span className="text-xs text-muted-foreground">{formatDate(entry.timestamp)}</span>
+                  <div className="flex-1 min-w-0">
+                    <CardTitle className="text-base truncate">
+                      {entry.title}
+                    </CardTitle>
+                    <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
+                      {entry.mood && (
+                        <>
+                          <div className={`w-2 h-2 rounded-full ${getMoodColor(entry.mood)}`} />
+                          <span className="capitalize">{entry.mood}</span>
+                          <span>•</span>
+                        </>
+                      )}
+                      <span>
+                        {entry.timestamp ? formatDate(entry.timestamp) : "No date"}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-
-                {entry.content && (
-                  <p className="text-xs text-muted-foreground mb-2 line-clamp-3">
-                    {entry.content}
-                  </p>
-                )}
-
-                {entry.duration && (
-                  <div className="flex items-center gap-1 mb-2">
-                    <Clock className="w-3 h-3 text-muted-foreground" />
-                    <span className="text-xs text-muted-foreground">
-                      {formatDuration(entry.duration)}
-                    </span>
+                
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem>Edit</DropdownMenuItem>
+                    <DropdownMenuItem>Share</DropdownMenuItem>
+                    <DropdownMenuItem>Export</DropdownMenuItem>
+                    <Separator />
+                    <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </CardHeader>
+            
+            <CardContent className="pt-0">
+              <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+                {entry.content}
+              </p>
+              
+              {entry.type === "audio" && entry.duration && (
+                <div className="flex items-center gap-2 mt-3 p-2 bg-muted rounded-md">
+                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                    <Mic className="h-3 w-3" />
+                  </Button>
+                  <div className="flex-1 h-1 bg-border rounded-full">
+                    <div className="h-full w-1/3 bg-primary rounded-full"></div>
                   </div>
-                )}
-
-                <div className="flex items-center justify-between">
-                  {entry.mood && (
-                    <Badge variant="secondary" className={`text-xs ${getMoodColor(entry.mood)}`}>
-                      {entry.mood}
+                  <span className="text-xs text-muted-foreground">{formatDuration(entry.duration)}</span>
+                </div>
+              )}
+              
+              {entry.tags && entry.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-3">
+                  {entry.tags.slice(0, 3).map((tag, tagIndex) => (
+                    <Badge key={tagIndex} variant="secondary" className="text-xs">
+                      {tag}
+                    </Badge>
+                  ))}
+                  {entry.tags.length > 3 && (
+                    <Badge variant="secondary" className="text-xs">
+                      +{entry.tags.length - 3}
                     </Badge>
                   )}
-                  {entry.tags && entry.tags.length > 0 && (
-                    <div className="flex gap-1">
-                      {entry.tags.slice(0, 2).map((tag, idx) => (
-                        <Badge key={idx} variant="outline" className="text-xs">
-                          #{tag}
-                        </Badge>
-                      ))}
-                      {entry.tags.length > 2 && (
-                        <span className="text-xs text-muted-foreground">+{entry.tags.length - 2}</span>
-                      )}
-                    </div>
-                  )}
                 </div>
-              </div>
-            ))}
-            </div>
-            
-            {/* Load More for Grid View */}
-            {hasMoreEntries && (
-              <div className="flex justify-center pt-6">
-                <Button 
-                  onClick={loadMore}
-                  disabled={isLoading}
-                  variant="outline"
-                  className="gap-2"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Loading more entries...
-                    </>
-                  ) : (
-                    <>
-                      <ChevronDown className="w-4 h-4" />
-                      Load {Math.min(3, filteredEntries.length - displayedEntries)} more entries
-                    </>
-                  )}
-                </Button>
-              </div>
-            )}
-          </div>
-        )}
+              )}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
-        {filteredEntries.length === 0 && (
-          <div className="text-center py-12">
-            <Edit3 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-medium mb-2">No entries found</h3>
-            <p className="text-muted-foreground">
-              {filterType === 'all'
-                ? 'Start journaling to see your entries here.'
-                : `No ${filterType} entries found. Try a different filter.`
+      {hasMoreEntries && (
+        <div className="flex justify-center">
+          <Button 
+            onClick={loadMore} 
+            disabled={isLoading}
+            variant="outline"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Loading...
+              </>
+            ) : (
+              <>
+                <ChevronDown className="h-4 w-4 mr-2" />
+                Load More Entries
+              </>
+            )}
+          </Button>
+        </div>
+      )}
+
+      {filteredEntries.length === 0 && (
+        <Card>
+          <CardContent className="p-12 text-center">
+            <Edit3 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No entries found</h3>
+            <p className="text-muted-foreground text-sm mb-4">
+              {searchQuery || filterType !== "all" 
+                ? "Try adjusting your search or filters"
+                : "Start your journaling journey by creating your first entry"
               }
             </p>
-          </div>
-        )}
-      </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }

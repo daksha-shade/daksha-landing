@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Camera, Video, FileText, Heart, MapPin, Users, Calendar, ChevronRight } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Memory } from '@/lib/dashboard-data'
@@ -72,7 +72,7 @@ export default function MemoriesVault({ memories = [
   const formatDate = (date: Date) => {
     const now = new Date()
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60)
-    
+
     if (diffInHours < 1) {
       return 'Just now'
     } else if (diffInHours < 24) {
@@ -92,17 +92,17 @@ export default function MemoriesVault({ memories = [
             <Heart className="w-5 h-5 text-red-500" />
             Memories Vault
           </CardTitle>
-            <Button
+          <Button
             asChild
             variant="ghost"
             size="sm"
             className="text-muted-foreground"
-            >
+          >
             <Link href="/memories">
               View All
               <ChevronRight className="w-4 h-4 ml-1" />
             </Link>
-            </Button>
+          </Button>
         </div>
         <p className="text-sm text-muted-foreground">
           Your life's beautiful moments, organized by AI
@@ -119,7 +119,7 @@ export default function MemoriesVault({ memories = [
             >
               {/* Thumbnail or Content Preview */}
               {memory.thumbnail ? (
-                <div 
+                <div
                   className="w-full h-full bg-cover bg-center"
                   style={{ backgroundImage: `url(${memory.thumbnail})` }}
                 />
@@ -128,10 +128,10 @@ export default function MemoriesVault({ memories = [
                   {getTypeIcon(memory.type)}
                 </div>
               )}
-              
+
               {/* Overlay */}
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200" />
-              
+
               {/* Type Badge */}
               <div className={cn(
                 "absolute top-2 left-2 p-1 rounded-full",
@@ -139,7 +139,7 @@ export default function MemoriesVault({ memories = [
               )}>
                 {getTypeIcon(memory.type)}
               </div>
-              
+
               {/* Info Overlay */}
               <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent">
                 <p className="text-white text-xs font-medium truncate">
@@ -188,13 +188,13 @@ export default function MemoriesVault({ memories = [
                 ×
               </Button>
             </div>
-            
+
             {selectedMemory.aiDescription && (
               <p className="text-sm text-muted-foreground mb-2 italic">
                 "{selectedMemory.aiDescription}"
               </p>
             )}
-            
+
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               {selectedMemory.location && (
                 <span className="flex items-center gap-1">
@@ -213,7 +213,7 @@ export default function MemoriesVault({ memories = [
                 {selectedMemory.timestamp.toLocaleDateString()}
               </span>
             </div>
-            
+
             <div className="flex flex-wrap gap-1 mt-2">
               {selectedMemory.tags.map((tag, index) => (
                 <Badge key={index} variant="outline" className="text-xs">

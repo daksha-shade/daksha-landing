@@ -1,12 +1,12 @@
 "use client"
 
 import { useState } from 'react'
-import { 
-  Calendar, 
-  Clock, 
-  Plus, 
-  Brain, 
-  ChevronLeft, 
+import {
+  Calendar,
+  Clock,
+  Plus,
+  Brain,
+  ChevronLeft,
   ChevronRight,
   Zap,
   Target,
@@ -17,7 +17,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
@@ -160,7 +160,7 @@ export default function SchedulerPage() {
 
       if (response.ok) {
         const data = await response.json()
-        
+
         // Parse Daksha's response to create suggested events
         const suggestedEvent: Event = {
           id: Date.now().toString(),
@@ -252,8 +252,8 @@ export default function SchedulerPage() {
                       className="min-h-20"
                     />
                     <div className="flex gap-2">
-                      <Button 
-                        onClick={handleDakshaScheduling} 
+                      <Button
+                        onClick={handleDakshaScheduling}
                         disabled={!dakshaPrompt.trim() || isLoadingDaksha}
                         className="flex-1 gap-2"
                       >
@@ -269,8 +269,8 @@ export default function SchedulerPage() {
                           </>
                         )}
                       </Button>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         onClick={() => setIsDakshaModalOpen(false)}
                       >
                         Cancel
@@ -349,7 +349,7 @@ export default function SchedulerPage() {
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button 
+                      <Button
                         onClick={handleCreateEvent}
                         disabled={!eventTitle.trim() || !eventStartTime || !eventEndTime}
                         className="flex-1 gap-2"
@@ -357,8 +357,8 @@ export default function SchedulerPage() {
                         <Calendar className="w-4 h-4" />
                         Create Event
                       </Button>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         onClick={() => {
                           setIsCreateModalOpen(false)
                           resetForm()
@@ -381,11 +381,11 @@ export default function SchedulerPage() {
                   <ChevronLeft className="w-4 h-4" />
                 </Button>
                 <h2 className="text-xl font-semibold">
-                  {selectedDate.toLocaleDateString('en-US', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
+                  {selectedDate.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
                   })}
                 </h2>
                 <Button variant="outline" size="sm">
@@ -507,7 +507,7 @@ export default function SchedulerPage() {
                 const hourEvents = getEventsForTimeSlot(hour)
                 const energyLevel = getEnergyLevel(hour)
                 const productivity = getProductivityScore(hour)
-                
+
                 return (
                   <div key={hour} className="flex items-center gap-4 py-2 border-b border-border/20 last:border-b-0">
                     <div className="w-20 text-sm font-medium text-muted-foreground">
@@ -551,7 +551,7 @@ export default function SchedulerPage() {
                             <div className={cn(
                               "w-2 h-2 rounded-full",
                               energyLevel === 'high' ? 'bg-green-500' :
-                              energyLevel === 'medium' ? 'bg-yellow-500' : 'bg-red-500'
+                                energyLevel === 'medium' ? 'bg-yellow-500' : 'bg-red-500'
                             )} />
                             <span className="capitalize">{energyLevel} energy</span>
                           </div>

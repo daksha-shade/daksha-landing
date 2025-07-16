@@ -1,15 +1,15 @@
 "use client"
 
 import { useState, useMemo } from 'react'
-import { 
-  Camera, 
-  Video, 
-  FileText, 
-  BookOpen, 
-  Search, 
-  Filter, 
-  Grid, 
-  List, 
+import {
+  Camera,
+  Video,
+  FileText,
+  BookOpen,
+  Search,
+  Filter,
+  Grid,
+  List,
   Calendar,
   MapPin,
   Users,
@@ -30,7 +30,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent } from '@/components/ui/Card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -117,17 +117,17 @@ export default function MemoriesVaultPage() {
 
   const MemoryCard = ({ memory, index }: { memory: Memory; index: number }) => {
     const TypeIcon = getTypeIcon(memory.type)
-    
+
     return (
-      <div 
+      <div
         className="relative group cursor-pointer"
         onClick={() => setSelectedMemory(memory)}
       >
         {/* Main Image/Content */}
         <div className="relative aspect-square bg-gray-100 dark:bg-gray-800 overflow-hidden rounded-lg">
           {memory.thumbnail ? (
-            <img 
-              src={memory.thumbnail} 
+            <img
+              src={memory.thumbnail}
               alt={memory.title}
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
             />
@@ -136,10 +136,10 @@ export default function MemoriesVaultPage() {
               <TypeIcon className="w-8 h-8 text-gray-400" />
             </div>
           )}
-          
+
           {/* Overlay on hover */}
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-200" />
-          
+
           {/* Type indicator */}
           <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <div className="bg-black/60 text-white rounded-full p-1">
@@ -150,9 +150,9 @@ export default function MemoriesVaultPage() {
           {/* Actions */}
           <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <div className="flex gap-1">
-              <Button 
-                size="sm" 
-                variant="ghost" 
+              <Button
+                size="sm"
+                variant="ghost"
                 className="h-8 w-8 p-0 bg-black/60 hover:bg-black/80 text-white border-0"
                 onClick={(e) => {
                   e.stopPropagation()
@@ -161,9 +161,9 @@ export default function MemoriesVaultPage() {
               >
                 <Heart className="w-4 h-4" />
               </Button>
-              <Button 
-                size="sm" 
-                variant="ghost" 
+              <Button
+                size="sm"
+                variant="ghost"
                 className="h-8 w-8 p-0 bg-black/60 hover:bg-black/80 text-white border-0"
                 onClick={(e) => {
                   e.stopPropagation()
@@ -199,7 +199,7 @@ export default function MemoriesVaultPage() {
                 {filteredMemories.length} items
               </div>
             </div>
-            
+
             <div className="flex items-center gap-3">
               {/* Search */}
               <div className="relative">
@@ -211,13 +211,13 @@ export default function MemoriesVaultPage() {
                   className="pl-10 w-80 bg-gray-100 dark:bg-gray-800 border-0 focus:bg-white dark:focus:bg-gray-700"
                 />
               </div>
-              
+
               {/* Filter */}
               <Button variant="ghost" size="sm" className="gap-2">
                 <Filter className="w-4 h-4" />
                 Filter
               </Button>
-              
+
               {/* Upload */}
               <Button className="gap-2 bg-blue-600 hover:bg-blue-700">
                 <Plus className="w-4 h-4" />
@@ -237,8 +237,8 @@ export default function MemoriesVaultPage() {
             <Camera className="w-24 h-24 mx-auto mb-6 text-gray-300" />
             <h3 className="text-2xl font-normal text-gray-900 dark:text-white mb-2">No photos yet</h3>
             <p className="text-gray-500 mb-6">
-              {searchQuery 
-                ? "No photos match your search" 
+              {searchQuery
+                ? "No photos match your search"
                 : "Upload photos to get started"
               }
             </p>
@@ -278,7 +278,7 @@ export default function MemoriesVaultPage() {
                       <p className="text-sm text-gray-300">{formatDate(selectedMemory.timestamp)}</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
                     <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
                       <Star className="w-5 h-5" />
@@ -302,8 +302,8 @@ export default function MemoriesVaultPage() {
               {/* Main image */}
               <div className="flex items-center justify-center w-full h-[95vh] bg-black">
                 {selectedMemory.thumbnail ? (
-                  <img 
-                    src={selectedMemory.thumbnail} 
+                  <img
+                    src={selectedMemory.thumbnail}
                     alt={selectedMemory.title}
                     className="max-w-full max-h-full object-contain"
                   />
@@ -329,7 +329,7 @@ export default function MemoriesVaultPage() {
               >
                 <ChevronLeft className="w-6 h-6" />
               </Button>
-              
+
               <Button
                 variant="ghost"
                 size="sm"
@@ -348,7 +348,7 @@ export default function MemoriesVaultPage() {
                   {selectedMemory.aiDescription && (
                     <p className="text-sm text-gray-300 mb-2">{selectedMemory.aiDescription}</p>
                   )}
-                  
+
                   <div className="flex items-center gap-4 text-xs text-gray-400">
                     {selectedMemory.location && (
                       <span className="flex items-center gap-1">
@@ -363,7 +363,7 @@ export default function MemoriesVaultPage() {
                       </span>
                     )}
                   </div>
-                  
+
                   {selectedMemory.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-2">
                       {selectedMemory.tags.map((tag, index) => (

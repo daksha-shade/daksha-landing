@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { ArrowLeft, Save, Mic, Pause, CircleStop, FileText, MessageCircle, Send } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function AudioJournalPage() {
   const [title, setTitle] = useState("")
@@ -63,7 +63,7 @@ export default function AudioJournalPage() {
 
   const handleAIQuestion = async () => {
     if (!aiQuestion.trim()) return
-    
+
     setIsProcessingAI(true)
     // Simulate AI processing
     setTimeout(() => {
@@ -76,18 +76,18 @@ export default function AudioJournalPage() {
     <div className="min-h-screen bg-background flex flex-col">
       {/* Minimal Header */}
       <div className="flex items-center justify-between p-4 border-b border-border/10">
-        <Button 
-          variant="ghost" 
-          size="sm" 
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => window.location.href = '/journal'}
           className="gap-2"
         >
           <ArrowLeft className="w-4 h-4" />
           Back
         </Button>
-        <Button 
-          onClick={handleSave} 
-          size="sm" 
+        <Button
+          onClick={handleSave}
+          size="sm"
           className="gap-2"
           disabled={!hasRecording}
         >
@@ -116,11 +116,10 @@ export default function AudioJournalPage() {
 
             {/* Recording Button */}
             <div className="flex justify-center">
-              <div className={`w-32 h-32 rounded-full flex items-center justify-center transition-all duration-300 ${
-                isRecording && !isPaused ? 'bg-red-500 scale-110 animate-pulse' : 
-                isRecording && isPaused ? 'bg-yellow-500' :
-                'bg-muted/20 hover:bg-muted/30'
-              }`}>
+              <div className={`w-32 h-32 rounded-full flex items-center justify-center transition-all duration-300 ${isRecording && !isPaused ? 'bg-red-500 scale-110 animate-pulse' :
+                  isRecording && isPaused ? 'bg-yellow-500' :
+                    'bg-muted/20 hover:bg-muted/30'
+                }`}>
                 {!isRecording ? (
                   <Button
                     onClick={startRecording}
@@ -147,11 +146,11 @@ export default function AudioJournalPage() {
             <div className="space-y-2">
               <p className="text-lg text-muted-foreground">
                 {isRecording && !isPaused ? 'Recording...' :
-                 isRecording && isPaused ? 'Paused' :
-                 hasRecording ? 'Recording complete' :
-                 'Tap to start recording'}
+                  isRecording && isPaused ? 'Paused' :
+                    hasRecording ? 'Recording complete' :
+                      'Tap to start recording'}
               </p>
-              
+
               {isRecording && (
                 <Button
                   onClick={stopRecording}
@@ -214,7 +213,7 @@ export default function AudioJournalPage() {
                         onChange={(e) => setAiQuestion(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && handleAIQuestion()}
                       />
-                      <Button 
+                      <Button
                         onClick={handleAIQuestion}
                         disabled={isProcessingAI || !aiQuestion.trim()}
                         size="sm"
@@ -222,13 +221,13 @@ export default function AudioJournalPage() {
                         <Send className="w-4 h-4" />
                       </Button>
                     </div>
-                    
+
                     {aiResponse && (
                       <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
                         <p className="text-sm leading-relaxed">{aiResponse}</p>
                       </div>
                     )}
-                    
+
                     {isProcessingAI && (
                       <div className="p-4 bg-muted/20 rounded-lg">
                         <p className="text-sm text-muted-foreground">AI is analyzing your recording...</p>

@@ -1,7 +1,7 @@
 "use client"
 
 import { Target, TrendingUp, Calendar, CheckCircle2 } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/Card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 
@@ -134,14 +134,14 @@ export default function GoalsProgress() {
                   <div className="text-lg font-bold text-primary">{goal.progress}%</div>
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs">
                   <span>Progress</span>
                   <span>{goal.progress}%</span>
                 </div>
                 <div className="w-full bg-muted rounded-full h-2">
-                  <div 
+                  <div
                     className={`h-2 rounded-full transition-all duration-300 ${getProgressColor(goal.progress)}`}
                     style={{ width: `${goal.progress}%` }}
                   />

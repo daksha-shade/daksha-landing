@@ -1,23 +1,23 @@
 "use client"
 
 import { useState } from 'react'
-import { 
-  User, 
-  Briefcase, 
-  GraduationCap, 
-  Heart, 
-  Plane, 
-  Camera, 
-  Code, 
-  Palette, 
-  Target, 
-  Clock, 
-  Brain, 
-  MessageCircle, 
-  Sparkles, 
-  ArrowRight, 
-  Play, 
-  Copy, 
+import {
+  User,
+  Briefcase,
+  GraduationCap,
+  Heart,
+  Plane,
+  Camera,
+  Code,
+  Palette,
+  Target,
+  Clock,
+  Brain,
+  MessageCircle,
+  Sparkles,
+  ArrowRight,
+  Play,
+  Copy,
   CheckCircle,
   Lightbulb,
   Zap,
@@ -39,7 +39,7 @@ import {
   Music,
   Headphones
 } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -301,95 +301,151 @@ export default function UseCasesPage() {
     <div className="min-h-screen bg-background text-foreground">
       <Header />
       <main className="max-w-6xl mx-auto px-6 py-12 space-y-16">
-      {/* Header */}
-      <div className="text-center space-y-4">
-        <div className="flex items-center justify-center gap-3 mb-4">
-          <Lightbulb className="w-8 h-8 text-primary" />
-          <h1 className="notion-title font-serif">Daksha Use Cases</h1>
-        </div>
-        <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-          Discover how Daksha transforms daily life through intelligent conversations, 
-          memory assistance, and personalized insights. Real scenarios, real prompts, real impact.
-        </p>
-      </div>
-
-      {/* Persona-Based Scenarios */}
-      <section className="space-y-8">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">Who Are You?</h2>
-          <p className="text-muted-foreground">Choose your persona to see tailored use cases</p>
+        {/* Header */}
+        <div className="text-center space-y-4">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <Lightbulb className="w-8 h-8 text-primary" />
+            <h1 className="notion-title font-serif">Daksha Use Cases</h1>
+          </div>
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            Discover how Daksha transforms daily life through intelligent conversations,
+            memory assistance, and personalized insights. Real scenarios, real prompts, real impact.
+          </p>
         </div>
 
-        {/* Persona Selector */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          {personas.map((persona) => {
-            const IconComponent = persona.icon
-            return (
-              <button
-                key={persona.id}
-                onClick={() => setSelectedPersona(persona.id)}
-                className={`p-4 rounded-lg border-2 transition-all hover:shadow-md ${
-                  selectedPersona === persona.id 
-                    ? 'border-primary bg-primary/5' 
-                    : 'border-border hover:border-primary/50'
-                }`}
-              >
-                <IconComponent className="w-8 h-8 mx-auto mb-2 text-primary" />
-                <h3 className="font-medium text-sm">{persona.title}</h3>
-                <p className="text-xs text-muted-foreground mt-1">{persona.description}</p>
-              </button>
-            )
-          })}
-        </div>
+        {/* Persona-Based Scenarios */}
+        <section className="space-y-8">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold mb-2">Who Are You?</h2>
+            <p className="text-muted-foreground">Choose your persona to see tailored use cases</p>
+          </div>
 
-        {/* Selected Persona Scenarios */}
-        {selectedPersonaData && (
-          <div className="space-y-6">
-            <div className="text-center">
-              <h3 className="text-xl font-bold mb-2">
-                {selectedPersonaData.title} Scenarios
-              </h3>
-              <p className="text-muted-foreground">
-                Real-world use cases and conversations
-              </p>
-            </div>
+          {/* Persona Selector */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {personas.map((persona) => {
+              const IconComponent = persona.icon
+              return (
+                <button
+                  key={persona.id}
+                  onClick={() => setSelectedPersona(persona.id)}
+                  className={`p-4 rounded-lg border-2 transition-all hover:shadow-md ${selectedPersona === persona.id
+                      ? 'border-primary bg-primary/5'
+                      : 'border-border hover:border-primary/50'
+                    }`}
+                >
+                  <IconComponent className="w-8 h-8 mx-auto mb-2 text-primary" />
+                  <h3 className="font-medium text-sm">{persona.title}</h3>
+                  <p className="text-xs text-muted-foreground mt-1">{persona.description}</p>
+                </button>
+              )
+            })}
+          </div>
 
-            <div className="grid gap-6">
-              {selectedPersonaData.scenarios.map((scenario, index) => (
-                <Card key={index} className={selectedPersonaData.color}>
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="text-lg">{scenario.title}</CardTitle>
-                        <div className="flex items-center gap-2 mt-2">
-                          <Clock className="w-4 h-4 text-muted-foreground" />
-                          <span className="text-sm text-muted-foreground">{scenario.time}</span>
+          {/* Selected Persona Scenarios */}
+          {selectedPersonaData && (
+            <div className="space-y-6">
+              <div className="text-center">
+                <h3 className="text-xl font-bold mb-2">
+                  {selectedPersonaData.title} Scenarios
+                </h3>
+                <p className="text-muted-foreground">
+                  Real-world use cases and conversations
+                </p>
+              </div>
+
+              <div className="grid gap-6">
+                {selectedPersonaData.scenarios.map((scenario, index) => (
+                  <Card key={index} className={selectedPersonaData.color}>
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <CardTitle className="text-lg">{scenario.title}</CardTitle>
+                          <div className="flex items-center gap-2 mt-2">
+                            <Clock className="w-4 h-4 text-muted-foreground" />
+                            <span className="text-sm text-muted-foreground">{scenario.time}</span>
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          {scenario.tags.map((tag) => (
+                            <Badge key={tag} variant="secondary" className="text-xs">
+                              {tag}
+                            </Badge>
+                          ))}
                         </div>
                       </div>
-                      <div className="flex flex-wrap gap-1">
-                        {scenario.tags.map((tag) => (
-                          <Badge key={tag} variant="secondary" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {/* User Prompt */}
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <User className="w-4 h-4 text-blue-500" />
+                          <span className="text-sm font-medium text-blue-500">You</span>
+                        </div>
+                        <div
+                          className="bg-blue-50 dark:bg-blue-950/20 p-3 rounded-lg cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-950/30 transition-colors group"
+                          onClick={() => copyPrompt(scenario.prompt)}
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <p className="text-sm italic">{scenario.prompt}</p>
+                            <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                              {copiedPrompt === scenario.prompt ? (
+                                <CheckCircle className="w-4 h-4 text-green-500" />
+                              ) : (
+                                <Copy className="w-4 h-4 text-muted-foreground" />
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Daksha Response */}
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <Sparkles className="w-4 h-4 text-purple-500" />
+                          <span className="text-sm font-medium text-purple-500">Daksha</span>
+                        </div>
+                        <div className="bg-purple-50 dark:bg-purple-950/20 p-3 rounded-lg">
+                          <p className="text-sm">{scenario.response}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+
+        {/* Daily Rhythm */}
+        <section className="space-y-8">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold mb-2">Your Daily Rhythm with Daksha</h2>
+            <p className="text-muted-foreground">How Daksha fits seamlessly into your day</p>
+          </div>
+
+          <div className="space-y-4">
+            {dailyUseCases.map((useCase, index) => (
+              <Card key={index} className="hover:shadow-md transition-shadow">
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                        <useCase.icon className="w-6 h-6 text-primary" />
                       </div>
                     </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {/* User Prompt */}
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <User className="w-4 h-4 text-blue-500" />
-                        <span className="text-sm font-medium text-blue-500">You</span>
+                    <div className="flex-1 space-y-2">
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-mono text-muted-foreground">{useCase.time}</span>
+                        <h3 className="font-semibold">{useCase.title}</h3>
                       </div>
-                      <div 
-                        className="bg-blue-50 dark:bg-blue-950/20 p-3 rounded-lg cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-950/30 transition-colors group"
-                        onClick={() => copyPrompt(scenario.prompt)}
+                      <div
+                        className="bg-muted p-3 rounded-lg cursor-pointer hover:bg-muted/80 transition-colors group"
+                        onClick={() => copyPrompt(useCase.prompt)}
                       >
                         <div className="flex items-start justify-between gap-2">
-                          <p className="text-sm italic">{scenario.prompt}</p>
+                          <p className="text-sm italic text-muted-foreground">{useCase.prompt}</p>
                           <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                            {copiedPrompt === scenario.prompt ? (
+                            {copiedPrompt === useCase.prompt ? (
                               <CheckCircle className="w-4 h-4 text-green-500" />
                             ) : (
                               <Copy className="w-4 h-4 text-muted-foreground" />
@@ -397,244 +453,187 @@ export default function UseCasesPage() {
                           </div>
                         </div>
                       </div>
+                      <p className="text-sm text-muted-foreground">{useCase.description}</p>
                     </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
 
-                    {/* Daksha Response */}
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <Sparkles className="w-4 h-4 text-purple-500" />
-                        <span className="text-sm font-medium text-purple-500">Daksha</span>
-                      </div>
-                      <div className="bg-purple-50 dark:bg-purple-950/20 p-3 rounded-lg">
-                        <p className="text-sm">{scenario.response}</p>
-                      </div>
+        {/* Agent Capabilities */}
+        <section className="space-y-8">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold mb-2">What Makes Daksha Special</h2>
+            <p className="text-muted-foreground">Advanced AI capabilities that understand you deeply</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {agentCapabilities.map((category, index) => (
+              <Card key={index} className="hover:shadow-md transition-shadow">
+                <CardHeader>
+                  <div className="flex items-center gap-3">
+                    <category.icon className="w-6 h-6 text-primary" />
+                    <CardTitle className="text-lg">{category.category}</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2">
+                    {category.capabilities.map((capability, capIndex) => (
+                      <li key={capIndex} className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm text-muted-foreground">{capability}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        {/* Quick Prompts to Try */}
+        <section className="space-y-8">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold mb-2">Quick Prompts to Try Right Now</h2>
+            <p className="text-muted-foreground">Copy these prompts and start your Daksha journey</p>
+          </div>
+
+          <Tabs defaultValue="reflection" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
+              <TabsTrigger value="reflection">Reflection</TabsTrigger>
+              <TabsTrigger value="planning">Planning</TabsTrigger>
+              <TabsTrigger value="creativity">Creativity</TabsTrigger>
+              <TabsTrigger value="wellness">Wellness</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="reflection" className="space-y-4">
+              {[
+                "What patterns do you see in my thoughts this week?",
+                "When was I most productive recently? What was different?",
+                "What decisions am I avoiding? Help me think through them.",
+                "Show me how my perspective on [topic] has evolved."
+              ].map((prompt, index) => (
+                <div
+                  key={index}
+                  className="p-4 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors group"
+                  onClick={() => copyPrompt(prompt)}
+                >
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm">&ldquo;{prompt}&rdquo;</p>
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                      {copiedPrompt === prompt ? (
+                        <CheckCircle className="w-4 h-4 text-green-500" />
+                      ) : (
+                        <Copy className="w-4 h-4 text-muted-foreground" />
+                      )}
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               ))}
+            </TabsContent>
+
+            <TabsContent value="planning" className="space-y-4">
+              {[
+                "Based on my past goals, what should I prioritize this month?",
+                "What obstacles have I overcome before that apply to my current challenge?",
+                "Help me break down this big goal into daily actions.",
+                "What time of day am I most focused for important work?"
+              ].map((prompt, index) => (
+                <div
+                  key={index}
+                  className="p-4 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors group"
+                  onClick={() => copyPrompt(prompt)}
+                >
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm">&ldquo;{prompt}&rdquo;</p>
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                      {copiedPrompt === prompt ? (
+                        <CheckCircle className="w-4 h-4 text-green-500" />
+                      ) : (
+                        <Copy className="w-4 h-4 text-muted-foreground" />
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </TabsContent>
+
+            <TabsContent value="creativity" className="space-y-4">
+              {[
+                "What ideas have I been circling around? Help me connect them.",
+                "Find that inspiration I captured last month about [topic].",
+                "What creative projects brought me the most joy?",
+                "Help me brainstorm based on my recent interests and experiences."
+              ].map((prompt, index) => (
+                <div
+                  key={index}
+                  className="p-4 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors group"
+                  onClick={() => copyPrompt(prompt)}
+                >
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm">&ldquo;{prompt}&rdquo;</p>
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                      {copiedPrompt === prompt ? (
+                        <CheckCircle className="w-4 h-4 text-green-500" />
+                      ) : (
+                        <Copy className="w-4 h-4 text-muted-foreground" />
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </TabsContent>
+
+            <TabsContent value="wellness" className="space-y-4">
+              {[
+                "What activities consistently improve my mood?",
+                "When do I feel most anxious? What are the triggers?",
+                "Remind me of recent moments when I felt truly content.",
+                "What self-care practices have I been neglecting?"
+              ].map((prompt, index) => (
+                <div
+                  key={index}
+                  className="p-4 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors group"
+                  onClick={() => copyPrompt(prompt)}
+                >
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm">&ldquo;{prompt}&rdquo;</p>
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                      {copiedPrompt === prompt ? (
+                        <CheckCircle className="w-4 h-4 text-green-500" />
+                      ) : (
+                        <Copy className="w-4 h-4 text-muted-foreground" />
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </TabsContent>
+          </Tabs>
+        </section>
+
+        {/* Call to Action */}
+        <section className="text-center space-y-6">
+          <div className="bg-gradient-to-r from-primary/10 to-purple-500/10 p-8 rounded-lg border">
+            <h2 className="text-2xl font-bold mb-4">Ready to Transform Your Daily Life?</h2>
+            <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
+              Join thousands of users who are already experiencing the power of having an AI companion
+              that truly understands them. Start your journey with Daksha today.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="https://tally.so/r/wLN5e2" className="font-medium text-primary hover:  flex items-center justify-center bg-primary/10 hover:bg-primary/20 px-6 py-2 rounded-lg transition-colors">
+                <ArrowRight className="w-4 h-4 mr-2" />
+                Join the Waitlist
+              </Link>
+              <Link href="/app" className="font-medium text-primary hover:  flex items-center justify-center bg-primary/10 hover:bg-primary/20 px-6 py-2 rounded-lg transition-colors">
+                <Play className="w-4 h-4 mr-2" />
+                Preview
+              </Link>
             </div>
           </div>
-        )}
-      </section>
-
-      {/* Daily Rhythm */}
-      <section className="space-y-8">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">Your Daily Rhythm with Daksha</h2>
-          <p className="text-muted-foreground">How Daksha fits seamlessly into your day</p>
-        </div>
-
-        <div className="space-y-4">
-          {dailyUseCases.map((useCase, index) => (
-            <Card key={index} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                      <useCase.icon className="w-6 h-6 text-primary" />
-                    </div>
-                  </div>
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm font-mono text-muted-foreground">{useCase.time}</span>
-                      <h3 className="font-semibold">{useCase.title}</h3>
-                    </div>
-                    <div 
-                      className="bg-muted p-3 rounded-lg cursor-pointer hover:bg-muted/80 transition-colors group"
-                      onClick={() => copyPrompt(useCase.prompt)}
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <p className="text-sm italic text-muted-foreground">{useCase.prompt}</p>
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                          {copiedPrompt === useCase.prompt ? (
-                            <CheckCircle className="w-4 h-4 text-green-500" />
-                          ) : (
-                            <Copy className="w-4 h-4 text-muted-foreground" />
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{useCase.description}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      {/* Agent Capabilities */}
-      <section className="space-y-8">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">What Makes Daksha Special</h2>
-          <p className="text-muted-foreground">Advanced AI capabilities that understand you deeply</p>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-6">
-          {agentCapabilities.map((category, index) => (
-            <Card key={index} className="hover:shadow-md transition-shadow">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <category.icon className="w-6 h-6 text-primary" />
-                  <CardTitle className="text-lg">{category.category}</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  {category.capabilities.map((capability, capIndex) => (
-                    <li key={capIndex} className="flex items-start gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span className="text-sm text-muted-foreground">{capability}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      {/* Quick Prompts to Try */}
-      <section className="space-y-8">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">Quick Prompts to Try Right Now</h2>
-          <p className="text-muted-foreground">Copy these prompts and start your Daksha journey</p>
-        </div>
-
-        <Tabs defaultValue="reflection" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
-            <TabsTrigger value="reflection">Reflection</TabsTrigger>
-            <TabsTrigger value="planning">Planning</TabsTrigger>
-            <TabsTrigger value="creativity">Creativity</TabsTrigger>
-            <TabsTrigger value="wellness">Wellness</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="reflection" className="space-y-4">
-            {[
-              "What patterns do you see in my thoughts this week?",
-              "When was I most productive recently? What was different?",
-              "What decisions am I avoiding? Help me think through them.",
-              "Show me how my perspective on [topic] has evolved."
-            ].map((prompt, index) => (
-              <div 
-                key={index}
-                className="p-4 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors group"
-                onClick={() => copyPrompt(prompt)}
-              >
-                <div className="flex items-center justify-between">
-                  <p className="text-sm">&ldquo;{prompt}&rdquo;</p>
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                    {copiedPrompt === prompt ? (
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                    ) : (
-                      <Copy className="w-4 h-4 text-muted-foreground" />
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </TabsContent>
-
-          <TabsContent value="planning" className="space-y-4">
-            {[
-              "Based on my past goals, what should I prioritize this month?",
-              "What obstacles have I overcome before that apply to my current challenge?",
-              "Help me break down this big goal into daily actions.",
-              "What time of day am I most focused for important work?"
-            ].map((prompt, index) => (
-              <div 
-                key={index}
-                className="p-4 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors group"
-                onClick={() => copyPrompt(prompt)}
-              >
-                <div className="flex items-center justify-between">
-                  <p className="text-sm">&ldquo;{prompt}&rdquo;</p>
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                    {copiedPrompt === prompt ? (
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                    ) : (
-                      <Copy className="w-4 h-4 text-muted-foreground" />
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </TabsContent>
-
-          <TabsContent value="creativity" className="space-y-4">
-            {[
-              "What ideas have I been circling around? Help me connect them.",
-              "Find that inspiration I captured last month about [topic].",
-              "What creative projects brought me the most joy?",
-              "Help me brainstorm based on my recent interests and experiences."
-            ].map((prompt, index) => (
-              <div 
-                key={index}
-                className="p-4 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors group"
-                onClick={() => copyPrompt(prompt)}
-              >
-                <div className="flex items-center justify-between">
-                  <p className="text-sm">&ldquo;{prompt}&rdquo;</p>
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                    {copiedPrompt === prompt ? (
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                    ) : (
-                      <Copy className="w-4 h-4 text-muted-foreground" />
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </TabsContent>
-
-          <TabsContent value="wellness" className="space-y-4">
-            {[
-              "What activities consistently improve my mood?",
-              "When do I feel most anxious? What are the triggers?",
-              "Remind me of recent moments when I felt truly content.",
-              "What self-care practices have I been neglecting?"
-            ].map((prompt, index) => (
-              <div 
-                key={index}
-                className="p-4 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors group"
-                onClick={() => copyPrompt(prompt)}
-              >
-                <div className="flex items-center justify-between">
-                  <p className="text-sm">&ldquo;{prompt}&rdquo;</p>
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                    {copiedPrompt === prompt ? (
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                    ) : (
-                      <Copy className="w-4 h-4 text-muted-foreground" />
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </TabsContent>
-        </Tabs>
-      </section>
-
-      {/* Call to Action */}
-      <section className="text-center space-y-6">
-        <div className="bg-gradient-to-r from-primary/10 to-purple-500/10 p-8 rounded-lg border">
-          <h2 className="text-2xl font-bold mb-4">Ready to Transform Your Daily Life?</h2>
-          <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-            Join thousands of users who are already experiencing the power of having an AI companion 
-            that truly understands them. Start your journey with Daksha today.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="https://tally.so/r/wLN5e2" className="font-medium text-primary hover:  flex items-center justify-center bg-primary/10 hover:bg-primary/20 px-6 py-2 rounded-lg transition-colors">
-              <ArrowRight className="w-4 h-4 mr-2" />
-              Join the Waitlist
-            </Link>
-            <Link href="/app" className="font-medium text-primary hover:  flex items-center justify-center bg-primary/10 hover:bg-primary/20 px-6 py-2 rounded-lg transition-colors">
-              <Play className="w-4 h-4 mr-2" />
-              Preview
-            </Link>
-          </div>
-        </div>
-      </section>
+        </section>
       </main>
       <Footer />
     </div>

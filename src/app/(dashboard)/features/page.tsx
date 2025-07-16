@@ -1,11 +1,11 @@
 "use client"
 
 import { useState } from 'react'
-import { 
-  CheckCircle, 
-  Clock, 
-  HelpCircle, 
-  Filter, 
+import {
+  CheckCircle,
+  Clock,
+  HelpCircle,
+  Filter,
   Search,
   LayoutDashboard,
   BookOpen,
@@ -52,7 +52,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import featuresData from '@/data/features.json'
@@ -183,10 +183,10 @@ export default function FeaturesPage() {
   // Filter features
   const filteredFeatures = allFeatures.filter(feature => {
     const matchesSearch = feature.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         feature.description.toLowerCase().includes(searchQuery.toLowerCase())
+      feature.description.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesCategory = selectedCategory === 'all' || feature.category === selectedCategory
     const matchesPriority = selectedPriority === 'all' || feature.priority === selectedPriority
-    
+
     return matchesSearch && matchesCategory && matchesPriority
   })
 
@@ -238,7 +238,7 @@ export default function FeaturesPage() {
         </CardHeader>
         <CardContent className="pt-0">
           <p className="text-sm text-muted-foreground mb-3">{feature.description}</p>
-          
+
           <div className="flex flex-wrap gap-2 items-center justify-between">
             <div className="flex flex-wrap gap-2">
               {feature.version && (
@@ -252,7 +252,7 @@ export default function FeaturesPage() {
                 </Badge>
               )}
             </div>
-            
+
             {feature.dependencies && feature.dependencies.length > 0 && (
               <div className="text-xs text-muted-foreground">
                 Depends on: {feature.dependencies.join(', ')}

@@ -1,14 +1,14 @@
 "use client"
 
 import { useState } from 'react'
-import { 
-  Plus, 
-  Search, 
-  Grid, 
-  List, 
-  Edit3, 
-  Trash2, 
-  Star, 
+import {
+  Plus,
+  Search,
+  Grid,
+  List,
+  Edit3,
+  Trash2,
+  Star,
   StarOff,
   Tag,
   Brain,
@@ -21,7 +21,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
@@ -96,8 +96,8 @@ export default function NotesPage() {
 
   const filteredNotes = notes.filter(note => {
     const matchesSearch = note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         note.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         note.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+      note.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      note.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
     const matchesCategory = selectedCategory === 'All' || note.category === selectedCategory
     return matchesSearch && matchesCategory
   })
@@ -153,7 +153,7 @@ export default function NotesPage() {
   }
 
   const handleToggleFavorite = (noteId: string) => {
-    setNotes(prev => prev.map(note => 
+    setNotes(prev => prev.map(note =>
       note.id === noteId ? { ...note, isFavorite: !note.isFavorite } : note
     ))
   }
@@ -183,7 +183,7 @@ export default function NotesPage() {
 
       if (response.ok) {
         const data: DakshaResponse = await response.json()
-        
+
         // Parse Daksha's response to extract title and content
         const lines = data.response.split('\n').filter(line => line.trim())
         const title = lines[0]?.replace(/^(Title:|#\s*)/i, '').trim() || 'AI Generated Note'
@@ -258,8 +258,8 @@ export default function NotesPage() {
                       className="min-h-20"
                     />
                     <div className="flex gap-2">
-                      <Button 
-                        onClick={handleDakshaAssist} 
+                      <Button
+                        onClick={handleDakshaAssist}
                         disabled={!dakshaPrompt.trim() || isLoadingDaksha}
                         className="flex-1 gap-2"
                       >
@@ -275,8 +275,8 @@ export default function NotesPage() {
                           </>
                         )}
                       </Button>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         onClick={() => setIsDakshaModalOpen(false)}
                       >
                         Cancel
@@ -334,7 +334,7 @@ export default function NotesPage() {
                       className="min-h-32"
                     />
                     <div className="flex gap-2">
-                      <Button 
+                      <Button
                         onClick={editingNote ? handleUpdateNote : handleCreateNote}
                         disabled={!noteTitle.trim()}
                         className="flex-1 gap-2"
@@ -342,8 +342,8 @@ export default function NotesPage() {
                         <Save className="w-4 h-4" />
                         {editingNote ? 'Update Note' : 'Create Note'}
                       </Button>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         onClick={() => {
                           setIsCreateModalOpen(false)
                           setEditingNote(null)
@@ -409,8 +409,8 @@ export default function NotesPage() {
               {searchTerm || selectedCategory !== 'All' ? 'No notes found' : 'No notes yet'}
             </h3>
             <p className="text-muted-foreground mb-4">
-              {searchTerm || selectedCategory !== 'All' 
-                ? 'Try adjusting your search or filters' 
+              {searchTerm || selectedCategory !== 'All'
+                ? 'Try adjusting your search or filters'
                 : 'Create your first note to get started'
               }
             </p>
@@ -423,13 +423,13 @@ export default function NotesPage() {
           </div>
         ) : (
           <div className={cn(
-            viewMode === 'grid' 
-              ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' 
+            viewMode === 'grid'
+              ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
               : 'space-y-4'
           )}>
             {filteredNotes.map(note => (
-              <Card 
-                key={note.id} 
+              <Card
+                key={note.id}
                 className={cn(
                   "group hover:shadow-md transition-all duration-200 cursor-pointer",
                   viewMode === 'list' && 'flex-row items-center p-4',

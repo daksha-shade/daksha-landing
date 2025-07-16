@@ -1,7 +1,7 @@
 "use client"
 
 import { Calendar, Clock, CheckCircle2, AlertCircle, ChevronRight, Plus } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -48,10 +48,10 @@ export default function TodayPlanner({ tasks, onTaskToggle, className }: TodayPl
   }
 
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', { 
-      hour: 'numeric', 
+    return date.toLocaleTimeString('en-US', {
+      hour: 'numeric',
       minute: '2-digit',
-      hour12: true 
+      hour12: true
     })
   }
 
@@ -78,7 +78,7 @@ export default function TodayPlanner({ tasks, onTaskToggle, className }: TodayPl
             Add Task
           </Button>
         </div>
-        
+
         {/* Progress Summary */}
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
@@ -88,16 +88,16 @@ export default function TodayPlanner({ tasks, onTaskToggle, className }: TodayPl
             {completionPercentage}%
           </Badge>
         </div>
-        
+
         {/* Progress Bar */}
         <div className="w-full bg-muted rounded-full h-2">
-          <div 
+          <div
             className="bg-blue-500 h-2 rounded-full transition-all duration-300"
             style={{ width: `${completionPercentage}%` }}
           />
         </div>
       </CardHeader>
-      
+
       <CardContent className="space-y-3">
         {/* Pending Tasks */}
         {pendingTasks.length > 0 && (
@@ -116,7 +116,7 @@ export default function TodayPlanner({ tasks, onTaskToggle, className }: TodayPl
                   onCheckedChange={() => handleTaskToggle(task.id)}
                   className="mt-0.5"
                 />
-                
+
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-sm">{getTypeIcon(task.type)}</span>
@@ -130,27 +130,27 @@ export default function TodayPlanner({ tasks, onTaskToggle, className }: TodayPl
                       <AlertCircle className="w-4 h-4 text-red-500" />
                     )}
                   </div>
-                  
+
                   {task.description && (
                     <p className="text-xs text-muted-foreground mb-2">
                       {task.description}
                     </p>
                   )}
-                  
+
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       {formatTime(task.startTime)}
                       {task.endTime && ` - ${formatTime(task.endTime)}`}
                     </span>
-                    
-                    <Badge 
-                      variant="outline" 
+
+                    <Badge
+                      variant="outline"
                       className={cn("text-xs", getPriorityColor(task.priority))}
                     >
                       {task.priority}
                     </Badge>
-                    
+
                     <Badge variant="outline" className="text-xs">
                       {task.category}
                     </Badge>
@@ -178,7 +178,7 @@ export default function TodayPlanner({ tasks, onTaskToggle, className }: TodayPl
                   onCheckedChange={() => handleTaskToggle(task.id)}
                   className="mt-0.5"
                 />
-                
+
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-sm">{getTypeIcon(task.type)}</span>
@@ -186,7 +186,7 @@ export default function TodayPlanner({ tasks, onTaskToggle, className }: TodayPl
                       {task.title}
                     </h5>
                   </div>
-                  
+
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
