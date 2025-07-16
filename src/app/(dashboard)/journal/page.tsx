@@ -67,16 +67,66 @@ export default function JournalPage() {
     <div className="container mx-auto p-6 space-y-6">
       
       <div className="space-y-2">
-        <div className="flex items-center gap-3">
-          <Edit3 className="h-6 w-6 text-primary" />
-          <h1 className="text-3xl font-bold tracking-tight">Journal</h1>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Edit3 className="h-6 w-6 text-primary" />
+            <h1 className="text-3xl font-bold tracking-tight">Journal</h1>
+          </div>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                New Entry
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create New Entry</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-3 py-4">
+                <Button
+                  variant="outline"
+                  className="justify-start h-auto p-4"
+                  onClick={() => window.location.href = '/journal/text'}
+                >
+                  <FileText className="h-5 w-5 mr-3" />
+                  <div className="text-left">
+                    <div className="font-medium">Text Entry</div>
+                    <div className="text-sm text-muted-foreground">Write your thoughts and ideas</div>
+                  </div>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="justify-start h-auto p-4"
+                  onClick={() => window.location.href = '/journal/audio'}
+                >
+                  <Mic className="h-5 w-5 mr-3" />
+                  <div className="text-left">
+                    <div className="font-medium">Audio Journal</div>
+                    <div className="text-sm text-muted-foreground">Record your voice and feelings</div>
+                  </div>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="justify-start h-auto p-4"
+                  onClick={() => window.location.href = '/journal/video'}
+                >
+                  <Video className="h-5 w-5 mr-3" />
+                  <div className="text-left">
+                    <div className="font-medium">Video Journal</div>
+                    <div className="text-sm text-muted-foreground">Capture moments and emotions</div>
+                  </div>
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
         <p className="text-muted-foreground">
           Your personal space for thoughts, memories, and reflections
         </p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardContent className="p-4">
             <div className="text-2xl font-bold">{stats.total}</div>
@@ -95,47 +145,6 @@ export default function JournalPage() {
             <p className="text-xs text-muted-foreground">Filtered</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-4 flex items-center justify-center">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button size="sm" className="w-full">
-                  <Plus className="h-4 w-4 mr-2" />
-                  New Entry
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Create New Entry</DialogTitle>
-                </DialogHeader>
-                <div className="grid gap-3 py-4">
-                  <Button
-                    variant="outline"
-                    className="justify-start h-auto p-4"
-                    onClick={() => window.location.href = "/journal/text"}
-                  >
-                    <FileText className="h-5 w-5 mr-3" />
-                    <div className="text-left">
-                      <div className="font-medium">Text Entry</div>
-                      <div className="text-sm text-muted-foreground">Write your thoughts</div>
-                    </div>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="justify-start h-auto p-4"
-                    onClick={() => window.location.href = "/journal/audio"}
-                  >
-                    <Mic className="h-5 w-5 mr-3" />
-                    <div className="text-left">
-                      <div className="font-medium">Audio Journal</div>
-                      <div className="text-sm text-muted-foreground">Record your voice</div>
-                    </div>
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </CardContent>
-        </Card>
       </div>
 
       <Card>
@@ -146,7 +155,7 @@ export default function JournalPage() {
               <div className="relative flex-1 max-w-sm">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search entries..."
+                  placeholder="Search entries with semantic understanding..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9"
@@ -185,7 +194,11 @@ export default function JournalPage() {
 
       <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" : "space-y-4"}>
         {visibleEntries.map((entry) => (
-          <Card key={entry.id} className="group">
+          <Card 
+            key={entry.id} 
+            className="group cursor-pointer hover:shadow-md transition-shadow"
+            onClick={() => window.open(`/journal/${entry.id}`, '_blank')}
+          >
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3 flex-1">
@@ -213,16 +226,35 @@ export default function JournalPage() {
                 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="opacity-0 group-hover:opacity-100"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem>Edit</DropdownMenuItem>
-                    <DropdownMenuItem>Share</DropdownMenuItem>
-                    <DropdownMenuItem>Export</DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => {
+                      e.stopPropagation()
+                      window.open(`/journal/${entry.id}?mode=edit`, '_blank')
+                    }}>
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+                      Share
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+                      Export
+                    </DropdownMenuItem>
                     <Separator />
-                    <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                    <DropdownMenuItem 
+                      className="text-destructive"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      Delete
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>

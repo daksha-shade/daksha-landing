@@ -24,7 +24,8 @@ import {
   Smartphone,
   Activity,
   MapPinCheckIcon,
-  Lightbulb
+  Lightbulb,
+  BrainCog
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -34,7 +35,7 @@ const navigationItems = [
   { icon: BookOpen, label: 'Journal', href: '/journal' },
   // { icon: Brain, label: 'Mind', href: '/mind' },
   // { icon: Target, label: 'Goals', href: '/goals' },
-  { icon: MapPinCheckIcon, label: 'Agent', href: '/agent' },
+  { icon: BrainCog, label: 'Agent', href: '/agent' },
   { icon: Grid3X3, label: 'Apps', href: '/apps' },
   { icon: Archive, label: 'Archive', href: '/archive' },
   { icon: Settings, label: 'Settings', href: '/settings' },

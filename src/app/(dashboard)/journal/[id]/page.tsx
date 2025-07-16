@@ -1,9 +1,13 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { ArrowLeft, Edit3, Clock, Volume2, Video, FileText, Plus, Play, Pause, Download, Share2, Trash2 } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
+import { ArrowLeft, Edit3, Clock, Volume2, Video, FileText, Plus, Play, Pause, Download, Share2, Trash2, Save, Calendar, Heart, Tag } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator'
 import { useRouter } from 'next/navigation'
 import { getJournalEntryById, getMoodColor, formatDuration, formatFullDate, type JournalEntry } from '@/lib/journal-data'
