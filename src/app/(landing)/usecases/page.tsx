@@ -43,6 +43,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import Header from '@/components/layout/Header'
+import Footer from '@/components/layout/Footer'
+import Link from 'next/link'
 
 const personas = [
   {
@@ -295,7 +298,9 @@ export default function UseCasesPage() {
   const selectedPersonaData = personas.find(p => p.id === selectedPersona)
 
   return (
-    <div className="notion-page py-8 space-y-12">
+    <div className="min-h-screen bg-background text-foreground">
+      <Header />
+      <main className="max-w-6xl mx-auto px-6 py-12 space-y-16">
       {/* Header */}
       <div className="text-center space-y-4">
         <div className="flex items-center justify-center gap-3 mb-4">
@@ -619,17 +624,19 @@ export default function UseCasesPage() {
             that truly understands them. Start your journey with Daksha today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="font-medium">
+            <Link href="https://tally.so/r/wLN5e2" className="font-medium text-primary hover:  flex items-center justify-center bg-primary/10 hover:bg-primary/20 px-6 py-2 rounded-lg transition-colors">
               <ArrowRight className="w-4 h-4 mr-2" />
               Join the Waitlist
-            </Button>
-            <Button variant="outline" size="lg">
+            </Link>
+            <Link href="/app" className="font-medium text-primary hover:  flex items-center justify-center bg-primary/10 hover:bg-primary/20 px-6 py-2 rounded-lg transition-colors">
               <Play className="w-4 h-4 mr-2" />
-              Watch Demo
-            </Button>
+              Preview
+            </Link>
           </div>
         </div>
       </section>
+      </main>
+      <Footer />
     </div>
   )
 }

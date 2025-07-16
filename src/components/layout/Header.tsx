@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Button } from '../ui/button';
 import ThemeToggle from '../ui/ThemeToggle';
+import Link from 'next/link';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -13,42 +14,42 @@ export default function Header() {
       <div className="max-w-5xl mx-auto px-6">
         <div className="flex items-center justify-between h-12">
           {/* Logo - Notion style */}
-          <div className="flex items-center space-x-2">
+            <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
             <div className="w-6 h-6 bg-foreground rounded-sm flex items-center justify-center">
               <span className="text-background font-medium text-xs">D</span>
             </div>
             <span className="text-base font-medium text-foreground font-inter">
               Daksha
             </span>
-          </div>
+            </Link>
 
           {/* Desktop Navigation - Notion style */}
           <nav className="hidden md:flex items-center space-x-1">
-            <a href="#features" className="px-2 py-1 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
+            <Link href="/#features" className="px-2 py-1 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
               Features
-            </a>
-            <a href="/usecases" className="px-2 py-1 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
+            </Link>
+            <Link href="/usecases" className="px-2 py-1 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
               Use Cases
-            </a>
-            <a href="#about" className="px-2 py-1 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
+            </Link>
+            <Link href="/#about" className="px-2 py-1 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
               About
-            </a>
-            <a href="/app" target="_blank" rel="noopener noreferrer" className="px-2 py-1 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
+            </Link>
+            <Link href="/app" rel="noopener noreferrer" className="px-2 py-1 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
               Preview
-            </a>
+            </Link>
           </nav>
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-2">
             <ThemeToggle />
-            <Button
+            <Link
               href="https://tally.so/r/wLN5e2"
               target="_blank"
               rel="noopener noreferrer"
-              size="sm"
+              className="px-2 py-1 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150"
             >
               Join Waitlist
-            </Button>
+            </Link>
           </div>
 
           {/* Mobile menu button */}
@@ -71,27 +72,26 @@ export default function Header() {
         {isMenuOpen && (
           <div className="md:hidden py-2 border-t border-border">
             <div className="flex flex-col space-y-1">
-              <a href="#features" className="px-2 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
+              <Link href="#features" className="px-2 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
                 Features
-              </a>
-              <a href="/usecases" className="px-2 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
+              </Link>
+              <Link href="/usecases" className="px-2 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
                 Use Cases
-              </a>
-              <a href="#about" className="px-2 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
+              </Link>
+              <Link href="#about" className="px-2 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
                 About
-              </a>
-              <a href="/app" target="_blank" rel="noopener noreferrer" className="px-2 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
+              </Link>
+              <Link href="/app" rel="noopener noreferrer" className="px-2 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-sm transition-all duration-150">
                 Preview
-              </a>
-              <Button
+              </Link>
+              <Link
                 href="https://tally.so/r/wLN5e2"
                 target="_blank"
                 rel="noopener noreferrer"
-                size="sm"
                 className="mt-2 w-full justify-center"
               >
                 Join Waitlist
-              </Button>
+              </Link>
             </div>
           </div>
         )}

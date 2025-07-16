@@ -36,7 +36,6 @@ const navigationItems = [
   // { icon: Target, label: 'Goals', href: '/goals' },
   { icon: MapPinCheckIcon, label: 'Agent', href: '/agent' },
   { icon: Grid3X3, label: 'Apps', href: '/apps' },
-  { icon: Lightbulb, label: 'Use Cases', href: '/usecases' },
   { icon: Archive, label: 'Archive', href: '/archive' },
   { icon: Settings, label: 'Settings', href: '/settings' },
 ]
