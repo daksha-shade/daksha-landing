@@ -147,9 +147,9 @@ export default function JournalPage() {
         </Card>
       </div> */}
 
-      <Card className="border-muted-foreground/20 p-2">
-        <CardContent className="py-0 m-0">
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+      <Card className=" border-0 p-0 my-2 bg-transparent">
+        <CardContent className="p-0 m-0">
+          <div className="flex flex-col sm:flex-row gap-4 p-0 m-0   items-start sm:items-center justify-between">
 
             <div className="flex flex-col sm:flex-row gap-3 flex-1">
               <div className="relative flex-1 max-w-sm">
@@ -253,7 +253,7 @@ export default function JournalPage() {
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={(e) => {
                       e.stopPropagation()
-                      window.open(`/journal/${entry.id}?mode=edit`, '_blank')
+                      window.open(`/journal/${entry.id}?mode=edit`)
                     }}>
                       Edit
                     </DropdownMenuItem>
