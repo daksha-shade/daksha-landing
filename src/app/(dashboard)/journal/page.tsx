@@ -23,8 +23,8 @@ export default function JournalPage() {
 
   const filteredEntries = journalEntries.filter(entry => {
     if (filterType !== "all" && entry.type !== filterType) return false
-    if (searchQuery && !entry.title.toLowerCase().includes(searchQuery.toLowerCase()) && 
-        !entry.content?.toLowerCase().includes(searchQuery.toLowerCase())) return false
+    if (searchQuery && !entry.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      !entry.content?.toLowerCase().includes(searchQuery.toLowerCase())) return false
     return true
   })
 
@@ -65,7 +65,7 @@ export default function JournalPage() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      
+
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -125,7 +125,7 @@ export default function JournalPage() {
           Your personal space for thoughts, memories, and reflections
         </p>
       </div>
-
+      {/* 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardContent className="p-4">
@@ -145,12 +145,12 @@ export default function JournalPage() {
             <p className="text-xs text-muted-foreground">Filtered</p>
           </CardContent>
         </Card>
-      </div>
+      </div> */}
 
       <Card>
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-            
+
             <div className="flex flex-col sm:flex-row gap-3 flex-1">
               <div className="relative flex-1 max-w-sm">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -161,7 +161,7 @@ export default function JournalPage() {
                   className="pl-9"
                 />
               </div>
-              
+
               <Tabs value={filterType} onValueChange={(value) => setFilterType(value)}>
                 <TabsList>
                   <TabsTrigger value="all">All</TabsTrigger>
@@ -194,8 +194,8 @@ export default function JournalPage() {
 
       <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" : "space-y-4"}>
         {visibleEntries.map((entry) => (
-          <Card 
-            key={entry.id} 
+          <Card
+            key={entry.id}
             className="group cursor-pointer hover:shadow-md transition-shadow"
             onClick={() => window.open(`/journal/${entry.id}`, '_blank')}
           >
@@ -223,12 +223,12 @@ export default function JournalPage() {
                     </div>
                   </div>
                 </div>
-                
+
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       className="opacity-0 group-hover:opacity-100"
                       onClick={(e) => e.stopPropagation()}
                     >
@@ -249,7 +249,7 @@ export default function JournalPage() {
                       Export
                     </DropdownMenuItem>
                     <Separator />
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       className="text-destructive"
                       onClick={(e) => e.stopPropagation()}
                     >
@@ -259,12 +259,12 @@ export default function JournalPage() {
                 </DropdownMenu>
               </div>
             </CardHeader>
-            
+
             <CardContent className="pt-0">
               <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
                 {entry.content}
               </p>
-              
+
               {entry.type === "audio" && entry.duration && (
                 <div className="flex items-center gap-2 mt-3 p-2 bg-muted rounded-md">
                   <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
@@ -276,7 +276,7 @@ export default function JournalPage() {
                   <span className="text-xs text-muted-foreground">{formatDuration(entry.duration)}</span>
                 </div>
               )}
-              
+
               {entry.tags && entry.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-3">
                   {entry.tags.slice(0, 3).map((tag, tagIndex) => (
@@ -298,8 +298,8 @@ export default function JournalPage() {
 
       {hasMoreEntries && (
         <div className="flex justify-center">
-          <Button 
-            onClick={loadMore} 
+          <Button
+            onClick={loadMore}
             disabled={isLoading}
             variant="outline"
           >
@@ -324,7 +324,7 @@ export default function JournalPage() {
             <Edit3 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">No entries found</h3>
             <p className="text-muted-foreground text-sm mb-4">
-              {searchQuery || filterType !== "all" 
+              {searchQuery || filterType !== "all"
                 ? "Try adjusting your search or filters"
                 : "Start your journaling journey by creating your first entry"
               }
