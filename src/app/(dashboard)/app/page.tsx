@@ -70,10 +70,10 @@ export default function MainDashboardPage() {
         </div>
         <Button
           onClick={() => setShowVoiceInput(true)}
-          className="gap-2 h-10"
+          className="gap-2 h-11"
           size="default"
         >
-          <Mic className="w-4 h-4" />
+          <Mic className="w-5 h-5" />
           Talk to Daksha
         </Button>
       </div>
@@ -84,17 +84,17 @@ export default function MainDashboardPage() {
       {/* Quick Actions - Improved Layout */}
       <div className="space-y-4">
         <h2 className="text-lg font-medium">Quick Actions</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {quickActions.map((action, index) => (
             <Link key={index} href={action.href}>
-              <div className="bg-background border border-border/30 rounded-lg p-4 hover:shadow-sm hover:border-border/50 transition-all cursor-pointer group h-full">
-                <div className="text-center space-y-2.5">
-                  <div className="mx-auto w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
-                    <action.icon className={`w-4 h-4 ${action.color}`} />
+              <div className="bg-background border border-border/30 rounded-lg p-6 hover:shadow-sm hover:border-border/50 transition-all cursor-pointer group h-full">
+                <div className="text-center space-y-3">
+                  <div className="mx-auto w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
+                    <action.icon className={`w-6 h-6 ${action.color}`} />
                   </div>
-                  <div className="space-y-0.5">
-                    <p className="font-medium text-xs">{action.label}</p>
-                    <p className="text-[10px] text-muted-foreground leading-tight">{action.description}</p>
+                  <div className="space-y-1">
+                    <p className="font-medium text-sm">{action.label}</p>
+                    <p className="text-xs text-muted-foreground leading-tight">{action.description}</p>
                   </div>
                 </div>
               </div>

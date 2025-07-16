@@ -147,8 +147,8 @@ export default function JournalPage() {
         </Card>
       </div> */}
 
-      <Card>
-        <CardContent className="p-4">
+      <Card className="border-muted-foreground/20 p-2">
+        <CardContent className="py-0 m-0">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
 
             <div className="flex flex-col sm:flex-row gap-3 flex-1">
@@ -172,21 +172,36 @@ export default function JournalPage() {
               </Tabs>
             </div>
 
-            <div className="flex items-center gap-1 border rounded-md p-1">
-              <Button
-                variant={viewMode === "timeline" ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setViewMode("timeline")}
-              >
-                <List className="h-4 w-4" />
-              </Button>
-              <Button
-                variant={viewMode === "grid" ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setViewMode("grid")}
-              >
-                <Grid className="h-4 w-4" />
-              </Button>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground whitespace-nowrap">
+                <span>
+                  <span className="font-semibold">{stats.total}</span> Total
+                </span>
+                <span>·</span>
+                <span>
+                  <span className="font-semibold">{stats.thisWeek}</span> This Week
+                </span>
+                <span>·</span>
+                <span>
+                  <span className="font-semibold">{filteredEntries.length}</span> Filtered
+                </span>
+              </div>
+              <div className="flex items-center gap-1 border rounded-md p-1">
+                <Button
+                  variant={viewMode === "timeline" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("timeline")}
+                >
+                  <List className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={viewMode === "grid" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("grid")}
+                >
+                  <Grid className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
         </CardContent>
@@ -197,7 +212,7 @@ export default function JournalPage() {
           <Card
             key={entry.id}
             className="group cursor-pointer hover:shadow-md transition-shadow"
-            onClick={() => window.open(`/journal/${entry.id}`, '_blank')}
+            onClick={() => window.open(`/journal/${entry.id}`)}
           >
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">

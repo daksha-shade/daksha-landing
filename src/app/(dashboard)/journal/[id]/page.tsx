@@ -130,11 +130,11 @@ export default function JournalEntryPage({ params }: { params: Promise<{ id: str
         </div>
 
         {/* Entry Content */}
-        <div className="space-y-6">
+        <div className="space-y-1">
           
           {/* Title */}
-          <Card>
-            <CardContent className="p-6">
+          <Card className='border-none shadow-none bg-accent'>
+            <CardContent className="py-1  ">
               {isEditing ? (
                 <Input
                   value={editedTitle}
@@ -145,71 +145,71 @@ export default function JournalEntryPage({ params }: { params: Promise<{ id: str
               ) : (
                 <h1 className="text-2xl font-bold">{entry.title}</h1>
               )}
-            </CardContent>
-          </Card>
-
-          {/* Metadata */}
-          <Card>
-            <CardContent className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                
-                {/* Date */}
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm font-medium">Created</p>
-                    <p className="text-xs text-muted-foreground">
-                      {formatFullDate(entry.timestamp)}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Type */}
-                <div className="flex items-center gap-2">
-                  <div className="p-1 rounded bg-muted">
-                    {getTypeIcon(entry.type)}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Type</p>
-                    <p className="text-xs text-muted-foreground capitalize">
-                      {entry.type}
-                      {entry.duration && ` (${formatDuration(entry.duration)})`}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Mood */}
-                {entry.mood && (
-                  <div className="flex items-center gap-2">
-                    <div className={`w-3 h-3 rounded-full ${getMoodColor(entry.mood)}`} />
-                    <div>
-                      <p className="text-sm font-medium">Mood</p>
-                      <p className="text-xs text-muted-foreground capitalize">
-                        {entry.mood}
-                      </p>
+                  {/* Metadata */}
+                  <div className="flex flex-wrap items-center gap-6 mt-2 mb-2 text-sm text-muted-foreground">
+                    {/* Date */}
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-4 w-4" />
+                      <span>{formatFullDate(entry.timestamp)}</span>
                     </div>
-                  </div>
-                )}
-
-                {/* Tags */}
-                {entry.tags && entry.tags.length > 0 && (
-                  <div className="flex items-start gap-2">
-                    <Tag className="h-4 w-4 text-muted-foreground mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium">Tags</p>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {entry.tags.map((tag, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
+                    {/* Type */}
+                    <div className="flex items-center gap-1">
+                      {getTypeIcon(entry.type)}
+                      <span className="capitalize">{entry.type}{entry.duration && ` (${formatDuration(entry.duration)})`}</span>
+                    </div>
+                    {/* Mood */}
+                    {entry.mood && (
+                      <div className="flex items-center gap-1">
+                        <span className={`w-3 h-3 rounded-full ${getMoodColor(entry.mood)}`} />
+                        <span className="capitalize">{entry.mood}</span>
                       </div>
-                    </div>
+                    )}
+                    {/* Tags */}
+                    {entry.tags && entry.tags.length > 0 && (
+                      <div className="flex items-center gap-1">
+                        <Tag className="h-4 w-4" />
+                        <div className="flex flex-wrap gap-1">
+                          {entry.tags.map((tag, index) => (
+                            <Badge key={index} variant="secondary" className="text-xs">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
             </CardContent>
           </Card>
+
+          {/* Attachments */}
+          {entry.attachments && entry.attachments.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Attachments</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {entry.attachments.map((attachment, index) => (
+                    <div key={index} className="flex items-center gap-3 p-3 border rounded-lg">
+                      <div className="p-2 bg-muted rounded">
+                        {getTypeIcon(attachment.type)}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{attachment.name}</p>
+                        <p className="text-xs text-muted-foreground capitalize">
+                          {attachment.type}
+                        </p>
+                      </div>
+                      <Button variant="ghost" size="sm">
+                        <Download className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          {/* Mood and Tags */}
 
           {/* Main Content */}
           <Card>
@@ -298,31 +298,7 @@ export default function JournalEntryPage({ params }: { params: Promise<{ id: str
             </Card>
           )}
 
-          {/* Danger Zone */}
-          {!isEditing && (
-            <Card className="border-destructive/20">
-              <CardHeader>
-                <CardTitle className="text-destructive flex items-center gap-2">
-                  <Trash2 className="h-5 w-5" />
-                  Danger Zone
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">Delete this entry</p>
-                    <p className="text-sm text-muted-foreground">
-                      This action cannot be undone.
-                    </p>
-                  </div>
-                  <Button variant="destructive" size="sm">
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Delete Entry
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          
         </div>
       </div>
     </div>
