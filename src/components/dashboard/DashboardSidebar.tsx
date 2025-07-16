@@ -22,7 +22,8 @@ import {
   FileText,
   Cloud,
   Smartphone,
-  Activity
+  Activity,
+  MapPinCheckIcon
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -31,8 +32,8 @@ const navigationItems = [
   { icon: Activity, label: 'Dashboard', href: '/app' },
   { icon: BookOpen, label: 'Journal', href: '/journal' },
   // { icon: Brain, label: 'Mind', href: '/mind' },
-  { icon: Target, label: 'Goals', href: '/goals' },
-  { icon: MessageCircle, label: 'Chat', href: '/chat' },
+  // { icon: Target, label: 'Goals', href: '/goals' },
+  { icon: MapPinCheckIcon, label: 'Agent', href: '/agent' },
   { icon: Grid3X3, label: 'Apps', href: '/apps' },
   { icon: Archive, label: 'Archive', href: '/archive' },
   { icon: Settings, label: 'Settings', href: '/settings' },
@@ -186,7 +187,7 @@ export default function DashboardSidebar() {
       <div className="p-3 border-t border-border/10">
         {!collapsed && user && (
           <div className="flex items-center gap-3 mb-3 px-1">
-            
+
             <div className="flex-1 min-w-0 ml-4">
               <p className="text-xs font-medium truncate">{user.displayName || 'User'}</p>
               <p className="text-[11px] text-muted-foreground truncate">{user.primaryEmail}</p>
@@ -210,7 +211,7 @@ export default function DashboardSidebar() {
               <Settings className="w-4 h-4" />
               <span>Settings</span>
             </Button>
-            
+
           </div>
         )}
 

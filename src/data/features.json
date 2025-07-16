@@ -1,0 +1,505 @@
+{
+  "currentFeatures": [
+    {
+      "id": "dashboard",
+      "name": "Dashboard",
+      "description": "Main hub with quick actions and daily overview",
+      "category": "core",
+      "status": "implemented",
+      "icon": "LayoutDashboard",
+      "priority": "high",
+      "version": "1.0.0"
+    },
+    {
+      "id": "journal",
+      "name": "Journal",
+      "description": "Text and audio journaling with AI assistance",
+      "category": "core",
+      "status": "implemented",
+      "icon": "BookOpen",
+      "priority": "high",
+      "version": "1.0.0"
+    },
+    {
+      "id": "chat",
+      "name": "Chat",
+      "description": "Conversational AI assistant (Daksha)",
+      "category": "ai",
+      "status": "implemented",
+      "icon": "MessageCircle",
+      "priority": "high",
+      "version": "1.0.0"
+    },
+    {
+      "id": "mind",
+      "name": "Mind",
+      "description": "Memory organization and insight tracking",
+      "category": "intelligence",
+      "status": "implemented",
+      "icon": "Brain",
+      "priority": "high",
+      "version": "1.0.0"
+    },
+    {
+      "id": "notes",
+      "name": "Notes",
+      "description": "AI-powered note-taking with categorization",
+      "category": "productivity",
+      "status": "implemented",
+      "icon": "StickyNote",
+      "priority": "high",
+      "version": "1.0.0"
+    },
+    {
+      "id": "scheduler",
+      "name": "Scheduler",
+      "description": "Intelligent time management and calendar",
+      "category": "productivity",
+      "status": "implemented",
+      "icon": "Calendar",
+      "priority": "high",
+      "version": "1.0.0"
+    },
+    {
+      "id": "writeflow",
+      "name": "WriteFlow",
+      "description": "AI writing assistant for various platforms",
+      "category": "ai",
+      "status": "implemented",
+      "icon": "PenTool",
+      "priority": "medium",
+      "version": "1.0.0"
+    },
+    {
+      "id": "goals",
+      "name": "Goals",
+      "description": "Goal tracking and progress monitoring",
+      "category": "productivity",
+      "status": "implemented",
+      "icon": "Target",
+      "priority": "high",
+      "version": "1.0.0"
+    },
+    {
+      "id": "apps-integration",
+      "name": "Apps Integration",
+      "description": "External app connections",
+      "category": "integration",
+      "status": "implemented",
+      "icon": "Grid3X3",
+      "priority": "medium",
+      "version": "1.0.0"
+    },
+    {
+      "id": "voice-input",
+      "name": "Voice Input",
+      "description": "Full-screen voice interaction",
+      "category": "accessibility",
+      "status": "implemented",
+      "icon": "Mic",
+      "priority": "medium",
+      "version": "1.0.0"
+    },
+    {
+      "id": "rich-text-editor",
+      "name": "Rich Text Editor",
+      "description": "Advanced editing capabilities",
+      "category": "core",
+      "status": "implemented",
+      "icon": "Edit3",
+      "priority": "high",
+      "version": "1.0.0"
+    }
+  ],
+  "plannedFeatures": [
+    {
+      "id": "mood-analytics",
+      "name": "Mood Analytics Dashboard",
+      "description": "Visual mood tracking over time with AI insights",
+      "category": "intelligence",
+      "status": "planned",
+      "icon": "TrendingUp",
+      "priority": "high",
+      "estimatedVersion": "1.1.0",
+      "dependencies": ["journal", "chat"]
+    },
+    {
+      "id": "habit-tracker",
+      "name": "Habit Tracker",
+      "description": "Track daily habits with streak counters and pattern analysis",
+      "category": "productivity",
+      "status": "planned",
+      "icon": "CheckCircle",
+      "priority": "high",
+      "estimatedVersion": "1.1.0",
+      "dependencies": ["goals"]
+    },
+    {
+      "id": "weekly-reports",
+      "name": "Weekly/Monthly Reports",
+      "description": "AI-generated summaries of progress, patterns, and recommendations",
+      "category": "intelligence",
+      "status": "planned",
+      "icon": "FileText",
+      "priority": "high",
+      "estimatedVersion": "1.2.0",
+      "dependencies": ["mood-analytics", "habit-tracker"]
+    },
+    {
+      "id": "focus-sessions",
+      "name": "Focus Sessions",
+      "description": "Pomodoro timer with distraction blocking",
+      "category": "productivity",
+      "status": "planned",
+      "icon": "Timer",
+      "priority": "medium",
+      "estimatedVersion": "1.1.0"
+    },
+    {
+      "id": "energy-optimizer",
+      "name": "Energy Level Optimizer",
+      "description": "Track energy patterns and suggest optimal scheduling",
+      "category": "intelligence",
+      "status": "planned",
+      "icon": "Zap",
+      "priority": "medium",
+      "estimatedVersion": "1.2.0",
+      "dependencies": ["scheduler", "mood-analytics"]
+    },
+    {
+      "id": "decision-journal",
+      "name": "Decision Journal",
+      "description": "Log important decisions and track outcomes for better future choices",
+      "category": "intelligence",
+      "status": "planned",
+      "icon": "GitBranch",
+      "priority": "medium",
+      "estimatedVersion": "1.2.0"
+    },
+    {
+      "id": "knowledge-graph",
+      "name": "Personal Knowledge Graph",
+      "description": "Visual connections between notes, goals, and insights",
+      "category": "intelligence",
+      "status": "planned",
+      "icon": "Network",
+      "priority": "low",
+      "estimatedVersion": "1.3.0",
+      "dependencies": ["notes", "mind", "goals"]
+    },
+    {
+      "id": "correlation-finder",
+      "name": "Correlation Finder",
+      "description": "Discover connections between mood, activities, and productivity",
+      "category": "intelligence",
+      "status": "planned",
+      "icon": "Link",
+      "priority": "medium",
+      "estimatedVersion": "1.2.0",
+      "dependencies": ["mood-analytics", "habit-tracker"]
+    },
+    {
+      "id": "goal-prediction",
+      "name": "Goal Prediction Engine",
+      "description": "AI estimates likelihood of achieving goals based on current patterns",
+      "category": "ai",
+      "status": "planned",
+      "icon": "TrendingUp",
+      "priority": "medium",
+      "estimatedVersion": "1.3.0",
+      "dependencies": ["goals", "habit-tracker"]
+    },
+    {
+      "id": "personal-metrics",
+      "name": "Personal Metrics Dashboard",
+      "description": "Custom KPIs for self-improvement tracking",
+      "category": "intelligence",
+      "status": "planned",
+      "icon": "BarChart3",
+      "priority": "medium",
+      "estimatedVersion": "1.2.0"
+    }
+  ],
+  "maybeFeatures": [
+    {
+      "id": "accountability-partners",
+      "name": "Accountability Partner System",
+      "description": "Share goals with trusted friends/family",
+      "category": "social",
+      "status": "maybe",
+      "icon": "Users",
+      "priority": "low",
+      "estimatedVersion": "2.0.0"
+    },
+    {
+      "id": "vani-community",
+      "name": "Anonymous Community (Vani)",
+      "description": "Safe space for authentic sharing",
+      "category": "social",
+      "status": "maybe",
+      "icon": "Globe",
+      "priority": "medium",
+      "estimatedVersion": "2.0.0"
+    },
+    {
+      "id": "mentor-mode",
+      "name": "Mentor Mode",
+      "description": "Connect with others for guidance on specific areas",
+      "category": "social",
+      "status": "maybe",
+      "icon": "GraduationCap",
+      "priority": "low",
+      "estimatedVersion": "2.0.0"
+    },
+    {
+      "id": "context-switching-tracker",
+      "name": "Context Switching Tracker",
+      "description": "Monitor and reduce task switching",
+      "category": "productivity",
+      "status": "maybe",
+      "icon": "Shuffle",
+      "priority": "low",
+      "estimatedVersion": "1.4.0"
+    },
+    {
+      "id": "deep-work-scheduler",
+      "name": "Deep Work Scheduler",
+      "description": "AI suggests optimal focus time blocks",
+      "category": "ai",
+      "status": "maybe",
+      "icon": "Focus",
+      "priority": "medium",
+      "estimatedVersion": "1.3.0",
+      "dependencies": ["scheduler", "energy-optimizer"]
+    },
+    {
+      "id": "distraction-log",
+      "name": "Distraction Log",
+      "description": "Track what pulls attention away from important work",
+      "category": "productivity",
+      "status": "maybe",
+      "icon": "AlertTriangle",
+      "priority": "low",
+      "estimatedVersion": "1.4.0"
+    },
+    {
+      "id": "quick-capture-widget",
+      "name": "Quick Capture Widget",
+      "description": "Fast note/thought capture from phone home screen",
+      "category": "mobile",
+      "status": "maybe",
+      "icon": "Smartphone",
+      "priority": "medium",
+      "estimatedVersion": "1.3.0"
+    },
+    {
+      "id": "offline-mode",
+      "name": "Offline Mode",
+      "description": "Core features work without internet",
+      "category": "accessibility",
+      "status": "maybe",
+      "icon": "WifiOff",
+      "priority": "medium",
+      "estimatedVersion": "1.5.0"
+    },
+    {
+      "id": "voice-first-interface",
+      "name": "Voice-First Interface",
+      "description": "Complete hands-free operation",
+      "category": "accessibility",
+      "status": "maybe",
+      "icon": "Volume2",
+      "priority": "low",
+      "estimatedVersion": "2.0.0",
+      "dependencies": ["voice-input"]
+    },
+    {
+      "id": "smart-notifications",
+      "name": "Smart Notifications",
+      "description": "Context-aware reminders and insights",
+      "category": "ai",
+      "status": "maybe",
+      "icon": "Bell",
+      "priority": "medium",
+      "estimatedVersion": "1.3.0"
+    },
+    {
+      "id": "life-event-detector",
+      "name": "Life Event Detector",
+      "description": "AI identifies significant life changes from journal entries",
+      "category": "ai",
+      "status": "maybe",
+      "icon": "Milestone",
+      "priority": "low",
+      "estimatedVersion": "1.4.0",
+      "dependencies": ["journal", "chat"]
+    },
+    {
+      "id": "auto-goal-creation",
+      "name": "Auto-Goal Creation",
+      "description": "Suggest goals based on journal patterns and interests",
+      "category": "ai",
+      "status": "maybe",
+      "icon": "Sparkles",
+      "priority": "medium",
+      "estimatedVersion": "1.4.0",
+      "dependencies": ["goals", "journal"]
+    },
+    {
+      "id": "calendar-integration",
+      "name": "Calendar Integration",
+      "description": "Sync with Google/Apple calendars for holistic scheduling",
+      "category": "integration",
+      "status": "maybe",
+      "icon": "CalendarDays",
+      "priority": "high",
+      "estimatedVersion": "1.2.0",
+      "dependencies": ["scheduler"]
+    },
+    {
+      "id": "health-data-integration",
+      "name": "Health Data Integration",
+      "description": "Connect with fitness trackers for holistic insights",
+      "category": "integration",
+      "status": "maybe",
+      "icon": "Activity",
+      "priority": "medium",
+      "estimatedVersion": "1.5.0"
+    },
+    {
+      "id": "email-analysis",
+      "name": "Email/Message Analysis",
+      "description": "Extract insights from communication patterns",
+      "category": "ai",
+      "status": "maybe",
+      "icon": "Mail",
+      "priority": "low",
+      "estimatedVersion": "2.0.0"
+    },
+    {
+      "id": "personalized-prompts",
+      "name": "Personalized Prompts",
+      "description": "AI generates custom journal prompts based on your patterns",
+      "category": "ai",
+      "status": "maybe",
+      "icon": "MessageSquare",
+      "priority": "medium",
+      "estimatedVersion": "1.3.0",
+      "dependencies": ["journal"]
+    },
+    {
+      "id": "theme-customization",
+      "name": "Theme Customization",
+      "description": "Multiple UI themes and layouts",
+      "category": "personalization",
+      "status": "maybe",
+      "icon": "Palette",
+      "priority": "low",
+      "estimatedVersion": "1.4.0"
+    },
+    {
+      "id": "ai-personality-customization",
+      "name": "AI Personality Customization",
+      "description": "Adjust Daksha's communication style",
+      "category": "personalization",
+      "status": "maybe",
+      "icon": "Settings",
+      "priority": "medium",
+      "estimatedVersion": "1.5.0",
+      "dependencies": ["chat"]
+    },
+    {
+      "id": "celebration-system",
+      "name": "Celebration System",
+      "description": "Acknowledge achievements and milestones",
+      "category": "personalization",
+      "status": "maybe",
+      "icon": "PartyPopper",
+      "priority": "low",
+      "estimatedVersion": "1.3.0",
+      "dependencies": ["goals"]
+    },
+    {
+      "id": "data-export",
+      "name": "Data Export",
+      "description": "Complete data portability",
+      "category": "privacy",
+      "status": "maybe",
+      "icon": "Download",
+      "priority": "high",
+      "estimatedVersion": "1.2.0"
+    },
+    {
+      "id": "privacy-controls",
+      "name": "Granular Privacy Controls",
+      "description": "Choose what data AI can access",
+      "category": "privacy",
+      "status": "maybe",
+      "icon": "Shield",
+      "priority": "high",
+      "estimatedVersion": "1.3.0"
+    },
+    {
+      "id": "local-processing",
+      "name": "Local Processing Mode",
+      "description": "Keep sensitive data on-device only",
+      "category": "privacy",
+      "status": "maybe",
+      "icon": "HardDrive",
+      "priority": "medium",
+      "estimatedVersion": "2.0.0"
+    }
+  ],
+  "categories": {
+    "core": {
+      "name": "Core Features",
+      "description": "Essential functionality for the platform",
+      "color": "blue"
+    },
+    "ai": {
+      "name": "AI & Intelligence",
+      "description": "AI-powered features and intelligent assistance",
+      "color": "purple"
+    },
+    "productivity": {
+      "name": "Productivity",
+      "description": "Tools to enhance personal productivity",
+      "color": "green"
+    },
+    "intelligence": {
+      "name": "Analytics & Insights",
+      "description": "Data analysis and pattern recognition",
+      "color": "orange"
+    },
+    "social": {
+      "name": "Social & Collaboration",
+      "description": "Features for connecting with others",
+      "color": "pink"
+    },
+    "integration": {
+      "name": "Integration",
+      "description": "Connections with external services",
+      "color": "indigo"
+    },
+    "accessibility": {
+      "name": "Accessibility",
+      "description": "Features for improved accessibility",
+      "color": "cyan"
+    },
+    "mobile": {
+      "name": "Mobile",
+      "description": "Mobile-specific features",
+      "color": "emerald"
+    },
+    "personalization": {
+      "name": "Personalization",
+      "description": "Customization and personal preferences",
+      "color": "amber"
+    },
+    "privacy": {
+      "name": "Privacy & Security",
+      "description": "Data protection and security features",
+      "color": "red"
+    }
+  }
+}
