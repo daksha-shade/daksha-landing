@@ -2,24 +2,26 @@
 
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { ArrowLeft, Edit3, Clock, Volume2, Video, FileText, Plus, Play, Pause, Download, Share2, Trash2, Save, Calendar, Heart, Tag } from 'lucide-react'
+import { ArrowLeft, Edit3, Save, Calendar, Clock, Heart, Tag, Share, Download, Trash2, Play, Mic, Video } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator'
-import { useRouter } from 'next/navigation'
-import { getJournalEntryById, getMoodColor, formatDuration, formatFullDate, type JournalEntry } from '@/lib/journal-data'
+import { mockJournalEntries, getMoodColor, formatDuration, formatFullDate } from '@/lib/journal-data'
 
 export default function JournalEntryPage({ params }: { params: Promise<{ id: string }> }) {
-  const router = useRouter()
-  const [entry, setEntry] = useState<JournalEntry | null>(null)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [id, setId] = useState<string | null>(null)
+  const searchParams = useSearchParams()
+  const isEditMode = searchParams.get('mode') === 'edit'
+  
+  const [entry, setEntry] = useState(null)
+  const [id, setId] = useState(null)
+  const [isEditing, setIsEditing] = useState(isEditMode)
+  const [editedTitle, setEditedTitle] = useState('')
+  const [editedContent, setEditedContent] = useState('')
 
   useEffect(() => {
-    // Resolve the params promise to get the id
     params.then(resolvedParams => {
       setId(resolvedParams.id)
     })
@@ -27,206 +29,299 @@ export default function JournalEntryPage({ params }: { params: Promise<{ id: str
 
   useEffect(() => {
     if (id) {
-      // Find the entry by ID
-      const foundEntry = getJournalEntryById(id)
+      const foundEntry = mockJournalEntries.find(e => e.id === id)
       setEntry(foundEntry || null)
+      if (foundEntry) {
+        setEditedTitle(foundEntry.title)
+        setEditedContent(foundEntry.content || '')
+      }
     }
   }, [id])
 
   if (!entry) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-semibold mb-2">Entry not found</h2>
-          <p className="text-muted-foreground mb-4">The journal entry you're looking for doesn't exist.</p>
-          <Button onClick={() => router.push('/journal')}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Journal
-          </Button>
-        </div>
+      <div className="container mx-auto p-6">
+        <Card>
+          <CardContent className=" text-center">
+            <h2 className="text-xl font-semibold mb-2">Entry not found</h2>
+            <p className="text-muted-foreground mb-4">
+              The journal entry you're looking for doesn't exist.
+            </p>
+            <Button onClick={() => window.close()}>
+              Close
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     )
   }
 
+  const handleSave = () => {
+    console.log('Saving entry:', { title: editedTitle, content: editedContent })
+    setEntry({ ...entry, title: editedTitle, content: editedContent })
+    setIsEditing(false)
+  }
 
-  const getTypeIcon = (type: string) => {
+  const handleCancel = () => {
+    setEditedTitle(entry.title)
+    setEditedContent(entry.content || '')
+    setIsEditing(false)
+  }
+
+  const getTypeIcon = (type) => {
     switch (type) {
-      case 'text': return <FileText className="w-5 h-5 text-blue-500" />
-      case 'audio': return <Volume2 className="w-5 h-5 text-green-500" />
-      case 'video': return <Video className="w-5 h-5 text-red-500" />
-      case 'mixed': return <Plus className="w-5 h-5 text-purple-500" />
-      default: return <FileText className="w-5 h-5" />
+      case 'text': return <Edit3 className="h-4 w-4" />
+      case 'audio': return <Mic className="h-4 w-4" />
+      case 'video': return <Video className="h-4 w-4" />
+      default: return <Edit3 className="h-4 w-4" />
     }
   }
 
-  const handlePlayPause = () => {
-    setIsPlaying(!isPlaying)
-    // In a real app, this would control actual audio/video playback
-  }
-
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href)
-    // Could show a toast notification here
-  }
-
-  const handleEdit = () => {
-    // Navigate to edit mode based on entry type
-    router.push(`/journal/${entry.type}?edit=${entry.id}`)
-  }
-
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border/20">
-        <div className="max-w-4xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => router.push('/journal')}
-                className="gap-2"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back to Journal
-              </Button>
-              <Separator orientation="vertical" className="h-6" />
-              <div className="flex items-center gap-2">
-                {getTypeIcon(entry.type)}
-                <span className="text-sm text-muted-foreground capitalize">{entry.type} Entry</span>
-              </div>
-            </div>
-            
+    <div className="min-h-screen  ">
+      <div className="container mx-auto  ">
+        
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => window.close()}
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
+            </Button>
+            <Separator orientation="vertical" className="h-6" />
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" onClick={handleShare}>
-                <Share2 className="w-4 h-4" />
-              </Button>
-              <Button variant="ghost" size="sm" onClick={handleEdit}>
-                <Edit3 className="w-4 h-4" />
-              </Button>
-              <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
-                <Trash2 className="w-4 h-4" />
-              </Button>
+              <Edit3 className="h-5 w-5 text-primary" />
+              <span className="font-medium">Journal Entry</span>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="space-y-6">
-          {/* Entry Header */}
-          <div className="space-y-4">
-            <h1 className="text-3xl font-serif font-bold">{entry.title}</h1>
-            
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <Clock className="w-4 h-4" />
-                {formatFullDate(entry.timestamp)}
-              </div>
-              
-              {entry.duration && (
-                <div className="flex items-center gap-1">
-                  <Volume2 className="w-4 h-4" />
-                  {formatDuration(entry.duration)}
-                </div>
-              )}
-              
-              {entry.mood && (
-                <Badge className={getMoodColor(entry.mood)}>
-                  {entry.mood}
-                </Badge>
-              )}
-            </div>
-
-            {/* Tags */}
-            {entry.tags && entry.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {entry.tags.map((tag, idx) => (
-                  <Badge key={idx} variant="outline" className="text-xs">
-                    #{tag}
-                  </Badge>
-                ))}
-              </div>
+          
+          <div className="flex items-center gap-2">
+            {isEditing ? (
+              <>
+                <Button variant="outline" onClick={handleCancel}>
+                  Cancel
+                </Button>
+                <Button onClick={handleSave}>
+                  <Save className="h-4 w-4 mr-2" />
+                  Save
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" size="sm">
+                  <Share className="h-4 w-4 mr-2" />
+                  Share
+                </Button>
+                <Button variant="outline" size="sm">
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
+                </Button>
+                <Button onClick={() => setIsEditing(true)}>
+                  <Edit3 className="h-4 w-4 mr-2" />
+                  Edit
+                </Button>
+              </>
             )}
           </div>
+        </div>
 
-          <Separator />
+        {/* Entry Content */}
+        <div className="space-y-6">
+          
+          {/* Title */}
+          <Card>
+            <CardContent className="p-6">
+              {isEditing ? (
+                <Input
+                  value={editedTitle}
+                  onChange={(e) => setEditedTitle(e.target.value)}
+                  className="text-2xl font-bold border-none p-0 focus-visible:ring-0 shadow-none"
+                  placeholder="Entry title..."
+                />
+              ) : (
+                <h1 className="text-2xl font-bold">{entry.title}</h1>
+              )}
+            </CardContent>
+          </Card>
 
-          {/* Media Content */}
-          {(entry.type === 'audio' || entry.type === 'video') && (
-            <div className="space-y-4">
-              {entry.type === 'audio' && (
-                <div className="bg-muted/20 rounded-lg p-6 text-center">
-                  <div className="space-y-4">
-                    <Volume2 className="w-12 h-12 text-green-500 mx-auto" />
-                    <div className="space-y-2">
-                      <p className="font-medium">Audio Recording</p>
-                      <p className="text-sm text-muted-foreground">Duration: {formatDuration(entry.duration || 0)}</p>
-                    </div>
-                    <Button onClick={handlePlayPause} className="gap-2">
-                      {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                      {isPlaying ? 'Pause' : 'Play'}
-                    </Button>
+          {/* Metadata */}
+          <Card>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                {/* Date */}
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">Created</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatFullDate(entry.timestamp)}
+                    </p>
                   </div>
                 </div>
-              )}
 
-              {entry.type === 'video' && (
-                <div className="bg-muted/20 rounded-lg p-6 text-center">
-                  <div className="space-y-4">
-                    <Video className="w-12 h-12 text-red-500 mx-auto" />
-                    <div className="space-y-2">
-                      <p className="font-medium">Video Recording</p>
-                      <p className="text-sm text-muted-foreground">Duration: {formatDuration(entry.duration || 0)}</p>
-                    </div>
-                    <Button onClick={handlePlayPause} className="gap-2">
-                      {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                      {isPlaying ? 'Pause' : 'Play'}
-                    </Button>
+                {/* Type */}
+                <div className="flex items-center gap-2">
+                  <div className="p-1 rounded bg-muted">
+                    {getTypeIcon(entry.type)}
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Type</p>
+                    <p className="text-xs text-muted-foreground capitalize">
+                      {entry.type}
+                      {entry.duration && ` (${formatDuration(entry.duration)})`}
+                    </p>
                   </div>
                 </div>
-              )}
-            </div>
-          )}
 
-          {/* Text Content */}
-          {entry.content && (
-            <div className="prose prose-gray dark:prose-invert max-w-none">
-              <div className="whitespace-pre-wrap text-foreground leading-relaxed">
-                {entry.content}
+                {/* Mood */}
+                {entry.mood && (
+                  <div className="flex items-center gap-2">
+                    <div className={`w-3 h-3 rounded-full ${getMoodColor(entry.mood)}`} />
+                    <div>
+                      <p className="text-sm font-medium">Mood</p>
+                      <p className="text-xs text-muted-foreground capitalize">
+                        {entry.mood}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Tags */}
+                {entry.tags && entry.tags.length > 0 && (
+                  <div className="flex items-start gap-2">
+                    <Tag className="h-4 w-4 text-muted-foreground mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium">Tags</p>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {entry.tags.map((tag, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
+            </CardContent>
+          </Card>
+
+          {/* Main Content */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Edit3 className="h-5 w-5" />
+                Content
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {isEditing ? (
+                <Textarea
+                  value={editedContent}
+                  onChange={(e) => setEditedContent(e.target.value)}
+                  className="min-h-[400px] resize-none border-none p-0 focus-visible:ring-0 shadow-none"
+                  placeholder="Write your thoughts..."
+                />
+              ) : (
+                <div className="prose prose-sm max-w-none">
+                  {entry.content?.split('\n').map((paragraph, index) => (
+                    <p key={index} className="mb-4 leading-relaxed">
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Audio/Video Player */}
+          {(entry.type === 'audio' || entry.type === 'video') && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="h-5 w-5" />
+                  {entry.type === 'audio' ? 'Audio Recording' : 'Video Recording'}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="bg-muted rounded-lg p-8 text-center">
+                  <div className="flex items-center justify-center gap-4 mb-4">
+                    <Button variant="outline" size="sm">
+                      <Play className="h-4 w-4 mr-2" />
+                      Play
+                    </Button>
+                    {entry.duration && (
+                      <span className="text-sm text-muted-foreground">
+                        Duration: {formatDuration(entry.duration)}
+                      </span>
+                    )}
+                  </div>
+                  <div className="w-full bg-border rounded-full h-2">
+                    <div className="bg-primary h-2 rounded-full w-0"></div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           )}
 
           {/* Attachments */}
           {entry.attachments && entry.attachments.length > 0 && (
-            <div className="space-y-4">
-              <Separator />
-              <div>
-                <h3 className="font-medium mb-3">Attachments</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {entry.attachments.map((attachment, idx) => (
-                    <div key={idx} className="border border-border/30 rounded-lg p-3 hover:bg-muted/20 transition-colors">
-                      <div className="flex items-center gap-3">
-                        <div className="flex-shrink-0">
-                          {attachment.type === 'image' && <FileText className="w-5 h-5 text-blue-500" />}
-                          {attachment.type === 'audio' && <Volume2 className="w-5 h-5 text-green-500" />}
-                          {attachment.type === 'video' && <Video className="w-5 h-5 text-red-500" />}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{attachment.name}</p>
-                          <p className="text-xs text-muted-foreground capitalize">{attachment.type}</p>
-                        </div>
-                        <Button variant="ghost" size="sm">
-                          <Download className="w-4 h-4" />
-                        </Button>
+            <Card>
+              <CardHeader>
+                <CardTitle>Attachments</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {entry.attachments.map((attachment, index) => (
+                    <div key={index} className="flex items-center gap-3 p-3 border rounded-lg">
+                      <div className="p-2 bg-muted rounded">
+                        {getTypeIcon(attachment.type)}
                       </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{attachment.name}</p>
+                        <p className="text-xs text-muted-foreground capitalize">
+                          {attachment.type}
+                        </p>
+                      </div>
+                      <Button variant="ghost" size="sm">
+                        <Download className="h-4 w-4" />
+                      </Button>
                     </div>
                   ))}
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Danger Zone */}
+          {!isEditing && (
+            <Card className="border-destructive/20">
+              <CardHeader>
+                <CardTitle className="text-destructive flex items-center gap-2">
+                  <Trash2 className="h-5 w-5" />
+                  Danger Zone
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Delete this entry</p>
+                    <p className="text-sm text-muted-foreground">
+                      This action cannot be undone.
+                    </p>
+                  </div>
+                  <Button variant="destructive" size="sm">
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete Entry
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           )}
         </div>
       </div>
