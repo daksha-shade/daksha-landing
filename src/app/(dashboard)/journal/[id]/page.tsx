@@ -14,7 +14,7 @@ import { mockJournalEntries, getMoodColor, formatDuration, formatFullDate } from
 export default function JournalEntryPage({ params }: { params: Promise<{ id: string }> }) {
   const searchParams = useSearchParams()
   const isEditMode = searchParams.get('mode') === 'edit'
-  
+
   const [entry, setEntry] = useState(null)
   const [id, setId] = useState(null)
   const [isEditing, setIsEditing] = useState(isEditMode)
@@ -80,12 +80,12 @@ export default function JournalEntryPage({ params }: { params: Promise<{ id: str
   return (
     <div className="min-h-screen  ">
       <div className="container mx-auto  ">
-        
+
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="sm"
               onClick={() => window.close()}
             >
@@ -98,7 +98,7 @@ export default function JournalEntryPage({ params }: { params: Promise<{ id: str
               <span className="font-medium">Journal Entry</span>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-2">
             {isEditing ? (
               <>
@@ -131,7 +131,7 @@ export default function JournalEntryPage({ params }: { params: Promise<{ id: str
 
         {/* Entry Content */}
         <div className="space-y-1">
-          
+
           {/* Title */}
           <Card className='border-none shadow-none bg-accent'>
             <CardContent className="py-1  ">
@@ -145,39 +145,39 @@ export default function JournalEntryPage({ params }: { params: Promise<{ id: str
               ) : (
                 <h1 className="text-2xl font-bold">{entry.title}</h1>
               )}
-                  {/* Metadata */}
-                  <div className="flex flex-wrap items-center gap-6 mt-2 mb-2 text-sm text-muted-foreground">
-                    {/* Date */}
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      <span>{formatFullDate(entry.timestamp)}</span>
-                    </div>
-                    {/* Type */}
-                    <div className="flex items-center gap-1">
-                      {getTypeIcon(entry.type)}
-                      <span className="capitalize">{entry.type}{entry.duration && ` (${formatDuration(entry.duration)})`}</span>
-                    </div>
-                    {/* Mood */}
-                    {entry.mood && (
-                      <div className="flex items-center gap-1">
-                        <span className={`w-3 h-3 rounded-full ${getMoodColor(entry.mood)}`} />
-                        <span className="capitalize">{entry.mood}</span>
-                      </div>
-                    )}
-                    {/* Tags */}
-                    {entry.tags && entry.tags.length > 0 && (
-                      <div className="flex items-center gap-1">
-                        <Tag className="h-4 w-4" />
-                        <div className="flex flex-wrap gap-1">
-                          {entry.tags.map((tag, index) => (
-                            <Badge key={index} variant="secondary" className="text-xs">
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+              {/* Metadata */}
+              <div className="flex flex-wrap items-center gap-6 mt-2 mb-2 text-sm text-muted-foreground">
+                {/* Date */}
+                <div className="flex items-center gap-1">
+                  <Calendar className="h-4 w-4" />
+                  <span>{formatFullDate(entry.timestamp)}</span>
+                </div>
+                {/* Type */}
+                <div className="flex items-center gap-1">
+                  {getTypeIcon(entry.type)}
+                  <span className="capitalize">{entry.type}{entry.duration && ` (${formatDuration(entry.duration)})`}</span>
+                </div>
+                {/* Mood */}
+                {entry.mood && (
+                  <div className="flex items-center gap-1">
+                    <span className={`w-3 h-3 rounded-full ${getMoodColor(entry.mood)}`} />
+                    <span className="capitalize">{entry.mood}</span>
                   </div>
+                )}
+                {/* Tags */}
+                {entry.tags && entry.tags.length > 0 && (
+                  <div className="flex items-center gap-1">
+                    <Tag className="h-4 w-4" />
+                    <div className="flex flex-wrap gap-1">
+                      {entry.tags.map((tag, index) => (
+                        <Badge key={index} variant="secondary" className="text-xs">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
 
@@ -297,8 +297,6 @@ export default function JournalEntryPage({ params }: { params: Promise<{ id: str
               </CardContent>
             </Card>
           )}
-
-          
         </div>
       </div>
     </div>
