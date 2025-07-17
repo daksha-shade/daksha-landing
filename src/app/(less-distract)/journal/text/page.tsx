@@ -68,14 +68,14 @@ export default function JournalTextEditor() {
   }, [title, handleSave])
 
   const backgroundClass = isFocusMode 
-    ? 'bg-white dark:bg-gray-900' 
-    : 'bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900'
+    ? 'bg-background' 
+    : 'bg-gradient-to-br from-muted/30 via-background to-accent/10'
 
   return (
-    <div className={`min-h-screen text-gray-900 dark:text-white transition-all duration-300 ${backgroundClass}`}>
+    <div className={`min-h-screen text-foreground transition-all duration-300 ${backgroundClass}`}>
       {/* Header - Hidden in focus mode unless showMenuBar is true */}
       {(!isFocusMode || showMenuBar) && (
-        <div className="sticky top-0 z-10 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700">
+        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border">
           <div className="max-w-7xl mx-auto px-4 py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -206,7 +206,7 @@ export default function JournalTextEditor() {
           </div>
 
           {/* Rich Text Editor */}
-          <div className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 transition-all duration-300 ${
+          <div className={`bg-card border border-border transition-all duration-300 ${
             isFocusMode 
               ? 'rounded-none shadow-none min-h-[calc(100vh-200px)]' 
               : 'rounded-lg shadow-sm min-h-[600px]'

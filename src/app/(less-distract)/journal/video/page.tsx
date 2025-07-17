@@ -100,16 +100,16 @@ export default function FullScreenVideoJournalPage() {
   }
 
   return (
-    <div className="fixed inset-0 bg-background dark:bg-black overflow-hidden">
+    <div className="fixed inset-0 bg-background overflow-hidden">
       {/* Video Preview - Full Screen */}
       <div
-        className="absolute inset-0 bg-gradient-to-br from-muted/5 to-muted/10 dark:from-gray-900/50 dark:to-black/80"
+        className="absolute inset-0 bg-gradient-to-br from-muted/5 to-muted/10"
         onClick={showControlsTemporarily}
       >
         {/* Camera Preview */}
         <div className="w-full h-full relative">
           {hasRecording ? (
-            <div className="w-full h-full bg-black/20 dark:bg-black/40 flex items-center justify-center">
+            <div className="w-full h-full bg-muted/20 flex items-center justify-center">
               <div className="text-center space-y-4">
                 <Video className="w-16 h-16 text-white/80 mx-auto" />
                 <p className="text-white/80 text-lg">Video recorded successfully</p>
