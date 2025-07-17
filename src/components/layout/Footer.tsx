@@ -29,7 +29,7 @@ export default function Footer() {
                   </a>
                 </li>
                 <li>
-                  <a href="/app" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <a href="/app"  rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                     Preview
                   </a>
                 </li>
@@ -50,7 +50,7 @@ export default function Footer() {
                   </a>
                 </li>
                 <li>
-                  <a href="https://daksha.live" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <a href="https://daksha.live"  rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                     Website
                   </a>
                 </li>

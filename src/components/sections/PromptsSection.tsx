@@ -3,18 +3,19 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { 
-  PenTool, 
-  Brain, 
-  MessageCircle, 
-  Search, 
-  Target, 
+import {
+  PenTool,
+  Brain,
+  MessageCircle,
+  Search,
+  Target,
   Shuffle,
   ArrowRight,
   Lightbulb,
   Copy,
   Sparkles
 } from "lucide-react"
+import Link from "next/link"
 
 const promptCategories = [
   {
@@ -120,8 +121,8 @@ export default function PromptsSection() {
             {promptCategories.map((category) => {
               const IconComponent = category.icon
               return (
-                <TabsTrigger 
-                  key={category.id} 
+                <TabsTrigger
+                  key={category.id}
                   value={category.id}
                   className="flex items-center gap-2 text-xs sm:text-sm"
                 >
@@ -170,17 +171,16 @@ export default function PromptsSection() {
               The more you use it, the more powerful it becomes
             </p>
           </div>
-          
-          <Button 
+
+          <Link
             href="https://tally.so/r/wLN5e2"
             target="_blank"
             rel="noopener noreferrer"
-            size="lg"
-            className="font-medium"
+            className="font-medium text-primary   hover:text-foreground transition-colors"
           >
             <ArrowRight className="w-4 h-4 mr-2" />
             Join the Waitlist
-          </Button>
+          </Link>
         </div>
       </div>
     </section>
