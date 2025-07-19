@@ -21,7 +21,7 @@ const crimsonText = Crimson_Text({
 });
 
 export const metadata: Metadata = {
-  title: "Daksha - Your Mind, Organized. Your Life, Enhanced.",
+  title: "Daksha - Your Second Brain",
   description: "Journaling-first, AI-powered life OS designed to store, reflect, and act - replacing apps like Notion, Google Photos, Drive, and ChatGPT with a single intuitive companion.",
   keywords: ["journaling", "AI", "productivity", "life OS", "personal assistant", "note taking", "memory", "reflection"],
   authors: [{ name: "Shaswat Raj" }],
