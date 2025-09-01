@@ -4,15 +4,7 @@ import { useUser } from '@stackframe/stack'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { useState } from 'react'
-import {
-  BookOpen,
-  Brain,
-  Target,
-  MessageCircle,
-  Grid3X3,
-  Archive,
-  Mic
-} from 'lucide-react'
+import { BookOpen, Target, MessageCircle, Mic } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import FullScreenVoiceInput from '@/components/dashboard/FullScreenVoiceInput'
 import MemoriesVault from '@/components/dashboard/MemoriesVault'
@@ -47,13 +39,10 @@ export default function MainDashboardPage() {
 
   const displayName = user.displayName || user.primaryEmail?.split('@')[0] || 'there'
 
-  const quickActions = [
+const quickActions = [
     { icon: BookOpen, label: 'Journal', href: '/journal', color: 'text-blue-500', description: 'Write your thoughts' },
-    { icon: Brain, label: 'Mind', href: '/mind', color: 'text-purple-500', description: 'Organize memories' },
     { icon: Target, label: 'Goals', href: '/goals', color: 'text-green-500', description: 'Track progress' },
-    { icon: MessageCircle, label: 'Chat', href: '/chat', color: 'text-orange-500', description: 'Talk to Daksha' },
-    { icon: Grid3X3, label: 'Apps', href: '/apps', color: 'text-indigo-500', description: 'Connected services' },
-    { icon: Archive, label: 'Archive', href: '/archive', color: 'text-gray-500', description: 'Past entries' },
+    { icon: MessageCircle, label: 'Chat', href: '/chat', color: 'text-orange-500', description: 'Talk to Daksha' }
   ]
 
   return (

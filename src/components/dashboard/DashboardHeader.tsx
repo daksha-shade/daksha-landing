@@ -21,23 +21,6 @@ export default function DashboardHeader() {
           <span className="font-serif font-semibold text-lg hidden sm:block">Daksha</span>
         </div>
 
-        {/* Search Bar - Responsive */}
-        <div className="flex-1 max-w-md mx-4 md:mx-8 relative">
-          <div className={`relative transition-all duration-200 ${searchFocused ? 'scale-105' : ''}`}>
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input
-              placeholder="Search or ask Daksha..."
-              className="pl-10 pr-12 bg-muted/30 border-border/50 focus:bg-background transition-colors text-sm"
-              onFocus={() => setSearchFocused(true)}
-              onBlur={() => setSearchFocused(false)}
-            />
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center gap-1 hidden sm:flex">
-              <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-                <Command className="w-3 h-3" />K
-              </kbd>
-            </div>
-          </div>
-        </div>
 
         {/* Actions - Responsive */}
         <div className="flex items-center gap-1 md:gap-2">
