@@ -12,7 +12,8 @@ import {
   Settings,
   LogOut,
   Menu,
-  Activity
+  Activity,
+  FileText
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -21,6 +22,7 @@ const navigationItems = [
   { icon: Activity, label: 'Dashboard', href: '/app' },
   { icon: BookOpen, label: 'Journal', href: '/journal' },
   { icon: Target, label: 'Goals', href: '/goals' },
+  { icon: FileText, label: 'Context', href: '/context' },
   { icon: MessageCircle, label: 'Chat', href: '/chat' },
   { icon: Settings, label: 'Settings', href: '/settings' }
 ]
