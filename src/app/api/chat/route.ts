@@ -1,24 +1,21 @@
-import OpenAI from 'openai';
-import { OpenAIStream, StreamingTextResponse } from 'ai';
+import { openai } from "@ai-sdk/openai";
+import { frontendTools } from "@assistant-ui/react-ai-sdk";
+import { convertToModelMessages, streamText } from "ai";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+export const maxDuration = 30;
 
 export async function POST(req: Request) {
-  try {
-    const { messages } = await req.json();
+  const { messages, system, tools } = await req.json();
 
-    const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
-      stream: true,
-      messages,
-    });
+  const result = streamText({
+    model: openai("gpt-4o"),
+    messages: convertToModelMessages(messages),
+    system,
+    tools: {
+      ...frontendTools(tools),
+      // add backend tools here
+    },
+  });
 
-    const stream = OpenAIStream(response);
-    return new StreamingTextResponse(stream);
-  } catch (error) {
-    console.error('Chat API Error:', error);
-    return new Response('Error processing chat request', { status: 500 });
-  }
+  return result.toUIMessageStreamResponse();
 }
