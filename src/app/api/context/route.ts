@@ -1,0 +1,39 @@
+import { NextRequest, NextResponse } from "next/server";
+import { stackServerApp } from "@/stack";
+import { db } from "@/db/client";
+import { contextFiles } from "@/db/schema";
+import { createContextFileForUser } from "@/lib/context-service";
+
+export async function GET(req: NextRequest) {
+  const user = await stackServerApp.getUser({ or: "return-null" });
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const userId = user.id;
+
+  const rows = await db
+    .select()
+    .from(contextFiles)
+    .where((fields, { eq }) => eq(fields.userId, userId))
+    .orderBy((fields, { desc }) => desc(fields.updatedAt));
+
+  return NextResponse.json({ items: rows });
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const user = await stackServerApp.getUser({ or: "return-null" });
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const userId = user.id;
+
+    const body = await req.json();
+    const { title, content, sourceUrl } = body ?? {};
+    if (!title || !content) {
+      return NextResponse.json({ error: "title and content are required" }, { status: 400 });
+    }
+
+    const created = await createContextFileForUser({ userId, title, content, sourceUrl });
+    return NextResponse.json({ id: created.id });
+  } catch (e: any) {
+    console.error("/api/context error", e);
+    return NextResponse.json({ error: e?.message ?? "Internal Error" }, { status: 500 });
+  }
+}
