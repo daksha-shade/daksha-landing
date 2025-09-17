@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { createContextFileForUser } from "./src/lib/context-service";
+import { createContextFileForUser } from "../src/lib/context-service";
 import { QdrantClient } from "@qdrant/js-client-rest";
 
 async function testEmbeddings() {

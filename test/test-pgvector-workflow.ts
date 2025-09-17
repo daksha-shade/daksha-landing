@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { createContextFileForUser, searchUserContext } from "./src/lib/context-service";
+import { createContextFileForUser, searchUserContext } from "../src/lib/context-service";
 
 async function testPgVectorWorkflow() {
   console.log("🧪 Testing complete pgvector workflow...");
