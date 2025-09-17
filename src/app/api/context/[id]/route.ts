@@ -1,9 +1,96 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stackServerApp } from "@/stack";
 import { db } from "@/db/client";
-import { contextFiles, contextEmbeddings } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
-import { getQdrant, CONTEXT_COLLECTION } from "@/lib/qdrant";
+import { contextFiles } from "@/db/schema";
+import { eq } from "drizzle-orm";
+import { embedText } from "@/lib/embeddings";
+
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const user = await stackServerApp.getUser({ or: "return-null" });
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const contextFile = await db
+      .select()
+      .from(contextFiles)
+      .where(eq(contextFiles.id, params.id))
+      .limit(1);
+
+    if (contextFile.length === 0) {
+      return NextResponse.json({ error: "Context file not found" }, { status: 404 });
+    }
+
+    const file = contextFile[0];
+    
+    // Check if user owns this context file
+    if (file.userId !== user.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    return NextResponse.json(file);
+  } catch (error) {
+    console.error("Error fetching context file:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
+
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const user = await stackServerApp.getUser({ or: "return-null" });
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const body = await req.json() as { title: string; content: string };
+    const { title, content } = body;
+
+    if (!title || !content) {
+      return NextResponse.json(
+        { error: "Title and content are required" },
+        { status: 400 }
+      );
+    }
+
+    // Check if context file exists and belongs to user
+    const existingFile = await db
+      .select()
+      .from(contextFiles)
+      .where(eq(contextFiles.id, params.id))
+      .limit(1);
+
+    if (existingFile.length === 0) {
+      return NextResponse.json({ error: "Context file not found" }, { status: 404 });
+    }
+
+    if (existingFile[0].userId !== user.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    // Generate new embedding for updated content
+    const embedding = await embedText(content);
+
+    // Update the context file
+    const updatedFile = await db
+      .update(contextFiles)
+      .set({
+        title,
+        content,
+        embedding,
+        updatedAt: new Date(),
+      })
+      .where(eq(contextFiles.id, params.id))
+      .returning();
+
+    return NextResponse.json(updatedFile[0]);
+  } catch (error) {
+    console.error("Error updating context file:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
 
 export async function DELETE(
   req: NextRequest,
@@ -11,61 +98,29 @@ export async function DELETE(
 ) {
   try {
     const user = await stackServerApp.getUser({ or: "return-null" });
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const fileId = params.id;
-    const userId = user.id;
-
-    // Verify the file belongs to the user
-    const file = await db
+    // Check if context file exists and belongs to user
+    const existingFile = await db
       .select()
       .from(contextFiles)
-      .where(and(eq(contextFiles.id, fileId), eq(contextFiles.userId, userId)))
+      .where(eq(contextFiles.id, params.id))
       .limit(1);
 
-    if (file.length === 0) {
-      return NextResponse.json({ error: "File not found" }, { status: 404 });
+    if (existingFile.length === 0) {
+      return NextResponse.json({ error: "Context file not found" }, { status: 404 });
     }
 
-    // Get all embedding IDs for this context file
-    const embeddings = await db
-      .select({ id: contextEmbeddings.id })
-      .from(contextEmbeddings)
-      .where(eq(contextEmbeddings.contextFileId, fileId));
-
-    // Delete from Qdrant vector database
-    if (embeddings.length > 0) {
-      try {
-        const qdrant = getQdrant();
-        const pointIds = embeddings.map(e => e.id);
-        await qdrant.delete(CONTEXT_COLLECTION, {
-          wait: true,
-          points: pointIds,
-        });
-      } catch (error) {
-        console.error("Error deleting from Qdrant:", error);
-        // Continue with database deletion even if Qdrant fails
-      }
+    if (existingFile[0].userId !== user.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
-
-    // Delete embeddings from PostgreSQL
-    await db
-      .delete(contextEmbeddings)
-      .where(eq(contextEmbeddings.contextFileId, fileId));
 
     // Delete the context file
-    await db
-      .delete(contextFiles)
-      .where(and(eq(contextFiles.id, fileId), eq(contextFiles.userId, userId)));
+    await db.delete(contextFiles).where(eq(contextFiles.id, params.id));
 
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting context file:", error);
-    return NextResponse.json(
-      { error: "Failed to delete context file" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

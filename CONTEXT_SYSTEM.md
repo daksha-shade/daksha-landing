@@ -5,6 +5,7 @@ This document explains the comprehensive context file system that enhances your 
 ## Overview
 
 The context file system allows you to:
+
 - Create and manage rich-text context files using a Plate.js editor
 - Automatically generate vector embeddings using OpenAI's embedding model
 - Store embeddings in Qdrant vector database for fast semantic search
@@ -14,17 +15,20 @@ The context file system allows you to:
 ## Features
 
 ### 📝 Rich Text Editor
+
 - **Plate.js Integration**: Full-featured rich text editor with formatting, lists, links, and more
 - **Auto-save**: Context files are saved to PostgreSQL database
 - **Version Control**: Track creation and update timestamps
 
 ### 🔍 Vector Search
+
 - **OpenAI Embeddings**: Uses `text-embedding-3-small` model (1536 dimensions)
 - **Qdrant Storage**: High-performance vector database for similarity search
 - **Semantic Search**: Find relevant content using natural language queries
 - **Chunk Processing**: Large texts are intelligently chunked for better search results
 
 ### 💬 Chat Integration
+
 - **Priority Context**: Context files take priority over general knowledge
 - **Automatic Retrieval**: Relevant context is automatically found and included
 - **Score-based Ranking**: Results ranked by semantic similarity
@@ -33,8 +37,8 @@ The context file system allows you to:
 ## Architecture
 
 ```
-User Input → Plate.js Editor → PostgreSQL (metadata) 
-                           ↘ 
+User Input → Plate.js Editor → PostgreSQL (metadata)
+                           ↘
                              OpenAI Embeddings → Qdrant (vectors)
                                               ↘
 Chat Query → Vector Search → Context Retrieval → Enhanced AI Response
@@ -43,6 +47,7 @@ Chat Query → Vector Search → Context Retrieval → Enhanced AI Response
 ## Database Schema
 
 ### Context Files Table
+
 ```sql
 CREATE TABLE context_files (
   id TEXT PRIMARY KEY,
@@ -56,6 +61,7 @@ CREATE TABLE context_files (
 ```
 
 ### Context Embeddings Table
+
 ```sql
 CREATE TABLE context_embeddings (
   id TEXT PRIMARY KEY,             -- Same as Qdrant point ID
@@ -72,14 +78,17 @@ CREATE TABLE context_embeddings (
 ## API Endpoints
 
 ### Context Files
+
 - `GET /api/context` - List user's context files
 - `POST /api/context` - Create new context file
 - `DELETE /api/context/[id]` - Delete context file and embeddings
 
 ### Context Search
+
 - `POST /api/context/search` - Search context using semantic similarity
 
 ### System Initialization
+
 - `POST /api/init` - Initialize database schema and Qdrant collection
 
 ## Usage Guide
@@ -92,7 +101,8 @@ Navigate to `/context` and use the rich text editor to create context files:
 // Example: Creating a context file
 const contextFile = {
   title: "Project Documentation",
-  content: "This project uses Next.js, TypeScript, and Qdrant for vector search..."
+  content:
+    "This project uses Next.js, TypeScript, and Qdrant for vector search...",
 };
 ```
 
@@ -103,9 +113,9 @@ Test your context search on the `/context` page:
 ```typescript
 // Example: Searching context
 const searchQuery = "How do I set up vector search?";
-const results = await fetch('/api/context/search', {
-  method: 'POST',
-  body: JSON.stringify({ query: searchQuery, limit: 5 })
+const results = await fetch("/api/context/search", {
+  method: "POST",
+  body: JSON.stringify({ query: searchQuery, limit: 5 }),
 });
 ```
 
@@ -138,7 +148,7 @@ DATABASE_URL=postgresql://user:password@host:5432/database
 
 ```typescript
 // Current configuration
-const EMBEDDING_MODEL = 'text-embedding-3-small';
+const EMBEDDING_MODEL = "text-embedding-3-small";
 const EMBEDDING_DIMENSION = 1536;
 const MAX_CHUNK_SIZE = 1200; // characters
 const SEARCH_SCORE_THRESHOLD = 0.2;
@@ -147,12 +157,14 @@ const SEARCH_SCORE_THRESHOLD = 0.2;
 ## Best Practices
 
 ### Content Creation
+
 1. **Clear Titles**: Use descriptive titles for better organization
 2. **Structured Content**: Use headings, lists, and clear paragraphs
 3. **Specific Information**: Include specific details, examples, and procedures
 4. **Regular Updates**: Keep context files current and relevant
 
 ### Search Optimization
+
 1. **Natural Language**: Use natural language queries for best results
 2. **Specific Terms**: Include specific technical terms or keywords
 3. **Context Relevance**: Create context files for topics you frequently discuss
@@ -163,16 +175,19 @@ const SEARCH_SCORE_THRESHOLD = 0.2;
 ### Common Issues
 
 **No Search Results**
+
 - Check if context files exist and contain relevant content
 - Try different search terms or phrases
 - Verify Qdrant connection and API key
 
 **Context Not Appearing in Chat**
+
 - Ensure context files are created and saved
 - Check that search terms in chat match context content
 - Verify OpenAI API key for embeddings
 
 **Database Errors**
+
 - Run `npm run db:test` to check database connectivity
 - Ensure DATABASE_URL is properly formatted and encoded
 - Check that all required tables exist
@@ -195,6 +210,7 @@ curl -X POST http://localhost:3000/api/context/search \
 ## Files and Components
 
 ### Core Files
+
 - `/src/lib/qdrant.ts` - Qdrant client configuration
 - `/src/lib/embeddings.ts` - OpenAI embedding utilities
 - `/src/lib/context-service.ts` - Context file CRUD operations
@@ -202,12 +218,14 @@ curl -X POST http://localhost:3000/api/context/search \
 - `/src/components/context/ContextSearch.tsx` - Search interface
 
 ### API Routes
+
 - `/src/app/api/context/route.ts` - Context file CRUD
 - `/src/app/api/context/search/route.ts` - Semantic search
 - `/src/app/api/context/[id]/route.ts` - Individual file operations
 - `/src/app/api/chat/route.ts` - Chat with context integration
 
 ### Database
+
 - `/src/db/schema.ts` - Database schema definitions
 - `/src/db/sync.ts` - Schema synchronization utilities
 

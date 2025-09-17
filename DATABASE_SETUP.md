@@ -5,15 +5,19 @@ This document explains how to set up the database and user synchronization for t
 ## Quick Setup
 
 1. **Environment Setup**
+
    ```bash
    npm run setup
    ```
+
    This will create a `.env` file from `.env.example`. Update the values as needed.
 
 2. **Database Connection Test**
+
    ```bash
    npm run db:test
    ```
+
    This will test your database connection and provide helpful error messages.
 
 3. **Database Schema Sync**
@@ -51,6 +55,7 @@ If your database password contains special characters, they must be URL-encoded:
 - `+` becomes `%2B`
 
 **Example:**
+
 - Original: `Prince@4#`
 - URL-encoded: `Prince%404%23`
 
@@ -91,7 +96,7 @@ The application automatically syncs user data from StackAuth to the database:
 You can also manually trigger user sync by calling:
 
 ```typescript
-const response = await fetch('/api/auth/sync-user', { method: 'POST' });
+const response = await fetch("/api/auth/sync-user", { method: "POST" });
 ```
 
 ## Troubleshooting

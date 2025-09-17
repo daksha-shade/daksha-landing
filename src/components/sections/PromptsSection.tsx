@@ -172,15 +172,13 @@ export default function PromptsSection() {
             </p>
           </div>
 
-          <Link
-            href="https://tally.so/r/wLN5e2"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-medium text-primary   hover:text-foreground transition-colors"
-          >
+            <Button
+            onClick={() => window.open("https://tally.so/r/wLN5e2", "_blank")}
+            className="font-medium text-base   transition-colors"
+            >
             <ArrowRight className="w-4 h-4 mr-2" />
             Join the Waitlist
-          </Link>
+            </Button>
         </div>
       </div>
     </section>

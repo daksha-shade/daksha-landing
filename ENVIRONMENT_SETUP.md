@@ -21,6 +21,7 @@ cp .env.example .env
 ```
 
 Edit `.env` and replace the placeholder values with your actual credentials:
+
 - `NEXT_PUBLIC_STACK_PROJECT_ID` - Your Stack project ID
 - `NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY` - Your Stack publishable key
 - `STACK_SECRET_SERVER_KEY` - Your Stack secret server key
@@ -30,6 +31,7 @@ Edit `.env` and replace the placeholder values with your actual credentials:
 - `OPENAI_API_KEY` - Your OpenAI API key
 
 **Important**: If your database password contains special characters like `@` or `#`, make sure to URL-encode them:
+
 - `@` should be `%40`
 - `#` should be `%23`
 
@@ -56,6 +58,7 @@ cp wrangler.jsonc.template wrangler.jsonc
 ```
 
 Edit `wrangler.jsonc` and replace the placeholder values with your actual credentials:
+
 - `YOUR_STACK_PROJECT_ID`
 - `YOUR_STACK_PUBLISHABLE_CLIENT_KEY`
 - `YOUR_LIVEKIT_URL`
@@ -86,11 +89,13 @@ npm run deploy
 ## Environment Variables vs Secrets
 
 ### Public Variables (safe in wrangler.jsonc)
+
 - `NEXT_PUBLIC_STACK_PROJECT_ID` - Public project ID
 - `NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY` - Public client key
 - `LIVEKIT_URL` - WebSocket URL (not sensitive)
 
 ### Secrets (use Cloudflare secrets)
+
 - `STACK_SECRET_SERVER_KEY` - Server-side secret key
 - `LIVEKIT_API_KEY` - API key for LiveKit
 - `LIVEKIT_API_SECRET` - API secret for LiveKit

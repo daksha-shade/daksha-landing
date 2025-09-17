@@ -2,16 +2,14 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { useRouter } from "next/navigation"
 import { FileText, Search, Grid, List, Plus, ChevronDown, Loader2, MoreHorizontal, Book, Edit3 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Separator } from "@/components/ui/separator"
-import { ContextEditor } from "@/components/context/ContextEditor"
 import { ContextSearch } from "@/components/context/ContextSearch"
 
 type ContextFile = { 
@@ -24,13 +22,13 @@ type ContextFile = {
 }
 
 export default function ContextPage() {
+  const router = useRouter()
   const [viewMode, setViewMode] = useState("timeline")
   const [displayedEntries, setDisplayedEntries] = useState(12)
   const [isLoading, setIsLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [items, setItems] = useState<ContextFile[]>([])
   const [loading, setLoading] = useState(true)
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
 
   async function load() {
     setLoading(true)
@@ -122,27 +120,10 @@ export default function ContextPage() {
             <Book className="h-6 w-6 text-primary" />
             <h1 className="text-3xl font-bold tracking-tight">Context</h1>
           </div>
-          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                New Context
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Create New Context File</DialogTitle>
-              </DialogHeader>
-              <div className="py-4">
-                <ContextEditor 
-                  onSaved={() => {
-                    load()
-                    setIsCreateDialogOpen(false)
-                  }} 
-                />
-              </div>
-            </DialogContent>
-          </Dialog>
+          <Button onClick={() => router.push("/context/edit")}>
+            <Plus className="h-4 w-4 mr-2" />
+            New Context
+          </Button>
         </div>
         <p className="text-muted-foreground">
           Create and manage context files that enhance your AI conversations
@@ -221,7 +202,7 @@ export default function ContextPage() {
           <p className="text-muted-foreground mb-4">
             Create your first context file to get started
           </p>
-          <Button onClick={() => setIsCreateDialogOpen(true)}>
+          <Button onClick={() => router.push("/context/edit")}>
             <Plus className="h-4 w-4 mr-2" />
             Create Context File
           </Button>
@@ -271,8 +252,7 @@ export default function ContextPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => {
-                          // TODO: Add edit functionality
-                          alert("Edit functionality coming soon!")
+                          router.push(`/context/edit?id=${item.id}`)
                         }}>
                           <Edit3 className="h-4 w-4 mr-2" />
                           Edit
