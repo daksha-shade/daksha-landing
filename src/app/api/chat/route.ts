@@ -50,7 +50,24 @@ export async function POST(req: Request) {
   }
 
   // Combine agent system prompt with context and any additional system message
-  const combinedSystem = `${prioritySystem}${agentConfig.systemPrompt}\n\n${system ?? ""}`.trim();
+  const combinedSystem = `${prioritySystem}${agentConfig.systemPrompt}
+
+CRITICAL TOOL RESPONSE PROTOCOL:
+- When you call any tool, you MUST continue with a conversational response
+- NEVER end your response after calling a tool
+- Always explain what the tool found in natural language
+- Use the tool results to provide helpful insights to the user
+- Make your response conversational and engaging
+
+Example correct behavior:
+1. User asks "When is my birthday?"
+2. You call search_context tool
+3. Tool returns data
+4. You MUST continue: "I found your birthday information! According to your personal details, your birthday is September 4, 2004. That's coming up soon - hope you have a wonderful celebration!"
+
+IMPORTANT: After using any tool, you MUST provide a conversational response explaining what you found or what action you took. Never execute a tool and remain silent.
+
+${system ?? ""}`.trim();
 
   const result = streamText({
     model: openai("gpt-4o"),
@@ -60,6 +77,16 @@ export async function POST(req: Request) {
     tools: {
       ...frontendTools(tools),
       ...agentTools,
+    },
+    toolChoice: "auto",
+    async onFinish(result) {
+      // Log tool usage for debugging
+      if (result.toolCalls && result.toolCalls.length > 0) {
+        console.log("Tools called:", result.toolCalls.map(tc => tc.toolName));
+        console.log("Response text length:", result.text?.length || 0);
+        console.log("Steps count:", result.steps?.length || 0);
+        console.log("Full result:", JSON.stringify(result, null, 2));
+      }
     },
   });
 

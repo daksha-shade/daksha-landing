@@ -59,14 +59,7 @@ export default function ChatPage() {
 
   return (
     <div className="flex flex-col h-[90vh] w-full py-6">
-      {/* Agent Status */}
-      <Card className="mx-6 mb-4 p-3 border-dashed">
-        <AgentIndicator agent={currentAgent} isThinking={isProcessing} />
-        <p className="text-sm text-muted-foreground">
-          I'm Daksha, your empathetic AI companion. I can help you with journaling, 
-          productivity, research, writing, wellness, and more. What would you like to explore today?
-        </p>
-      </Card>
+      
 
       {/* Chat Container */}
       <div className="flex-1 overflow-hidden rounded-xl mx-6">
