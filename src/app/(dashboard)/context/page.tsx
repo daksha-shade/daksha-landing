@@ -214,6 +214,7 @@ export default function ContextPage() {
               <Card
                 key={item.id}
                 className="group cursor-pointer hover:shadow-md transition-shadow"
+                onClick={() => router.push(`/context/edit?id=${item.id}`)}
               >
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">

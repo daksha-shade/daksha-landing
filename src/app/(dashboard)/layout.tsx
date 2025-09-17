@@ -1,12 +1,18 @@
+import type { Metadata } from 'next';
 import { Inter, Crimson_Text } from 'next/font/google'
 import DashboardHeader from '@/components/dashboard/DashboardHeader'
 import DashboardSidebar from '@/components/dashboard/DashboardSidebar'
 import DashboardCommandBar from '@/components/dashboard/DashboardCommandBar'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 
+export const metadata: Metadata = {
+  title: 'Dashboard - Daksha',
+  description: 'Your personal AI-powered dashboard for journaling, goal tracking, and memory management.',
+};
+
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
-const crimsonText = Crimson_Text({ 
-  subsets: ['latin'], 
+const crimsonText = Crimson_Text({
+  subsets: ['latin'],
   variable: '--font-serif',
   weight: ['400', '600', '700']
 })

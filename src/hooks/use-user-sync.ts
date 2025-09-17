@@ -37,13 +37,3 @@ export function useUserSync() {
 
   return user;
 }
-
-// HOC to wrap components that need automatic user sync
-export function withUserSync<P extends object>(
-  Component: React.ComponentType<P>
-) {
-  return function UserSyncWrapper(props: P) {
-    useUserSync();
-    return <Component {...props} />;
-  };
-}

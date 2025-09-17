@@ -5,13 +5,21 @@ import { contextFiles } from "@/db/schema";
 import { createContextFileForUser } from "@/lib/context-service";
 import { eq, desc } from "drizzle-orm";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const user = await stackServerApp.getUser({ or: "return-null" });
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const userId = user.id;
 
+  // Exclude embedding column to prevent timeout with large vector data
   const rows = await db
-    .select()
+    .select({
+      id: contextFiles.id,
+      title: contextFiles.title,
+      content: contextFiles.content,
+      sourceUrl: contextFiles.sourceUrl,
+      createdAt: contextFiles.createdAt,
+      updatedAt: contextFiles.updatedAt,
+    })
     .from(contextFiles)
     .where(eq(contextFiles.userId, userId))
     .orderBy(desc(contextFiles.updatedAt));
@@ -25,8 +33,8 @@ export async function POST(req: NextRequest) {
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const userId = user.id;
 
-    const body = await req.json();
-    const { title, content, sourceUrl } = body ?? {};
+    const body = await req.json() as { title?: string; content?: string; sourceUrl?: string };
+    const { title, content, sourceUrl } = body;
     if (!title || !content) {
       return NextResponse.json({ error: "title and content are required" }, { status: 400 });
     }

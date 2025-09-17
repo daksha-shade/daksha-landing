@@ -7,16 +7,26 @@ import { embedText } from "@/lib/embeddings";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await stackServerApp.getUser({ or: "return-null" });
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+    const { id } = await params;
+
     const contextFile = await db
-      .select()
+      .select({
+        id: contextFiles.id,
+        title: contextFiles.title,
+        content: contextFiles.content,
+        sourceUrl: contextFiles.sourceUrl,
+        userId: contextFiles.userId,
+        createdAt: contextFiles.createdAt,
+        updatedAt: contextFiles.updatedAt,
+      })
       .from(contextFiles)
-      .where(eq(contextFiles.id, params.id))
+      .where(eq(contextFiles.id, id))
       .limit(1);
 
     if (contextFile.length === 0) {
