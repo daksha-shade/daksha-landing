@@ -58,7 +58,7 @@ also in the settings add option to add connect other partner that can share.... 
 
 ---
 
-in the context add feature like on /context people can go and create context files (use tiptap editor and also sync it with db ) use qdrant to to save the vector embedding and I have used https://www.assistant-ui.com/llms.txt fetch the docs for it 
+<!-- in the context add feature like on /context people can go and create context files (use tiptap editor and also sync it with db ) use qdrant to to save the vector embedding and I have used https://www.assistant-ui.com/llms.txt fetch the docs for it 
 and create the context file and save it in the db and vector db and also save it supabase postgres db see the .env.local for qdrant api key and url and all and use the same to save the vector embedding and use openai embedding model to create the vector embedding and save it in qdrant and also save the context file in supabase db - in /chat we must able to fetch the context from the context file and use it as a priorety context over other context so that it can be used in the chat page to answer the questions search for online docs for creating the agents .
 
 
@@ -82,3 +82,12 @@ also use drizzle orm and also sync the db using api and DATABASE_URL="postgresql
 
 
 in drizzle also sync it with the stackauth user and also create other tables like context file table and all and also create the vector embedding table and all
+ -->
+---
+
+https://www.assistant-ui.com/docs/cloud/persistence/ai-sdk
+
+fetch this and create db schema to keep the chat history and also keep the embedding of chat history so that we can search ac it....
+
+---
+
