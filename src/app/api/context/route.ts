@@ -3,6 +3,7 @@ import { stackServerApp } from "@/stack";
 import { db } from "@/db/client";
 import { contextFiles } from "@/db/schema";
 import { createContextFileForUser } from "@/lib/context-service";
+import { eq, desc } from "drizzle-orm";
 
 export async function GET(req: NextRequest) {
   const user = await stackServerApp.getUser({ or: "return-null" });
@@ -12,8 +13,8 @@ export async function GET(req: NextRequest) {
   const rows = await db
     .select()
     .from(contextFiles)
-    .where((fields, { eq }) => eq(fields.userId, userId))
-    .orderBy((fields, { desc }) => desc(fields.updatedAt));
+    .where(eq(contextFiles.userId, userId))
+    .orderBy(desc(contextFiles.updatedAt));
 
   return NextResponse.json({ items: rows });
 }

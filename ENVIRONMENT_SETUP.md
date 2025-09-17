@@ -7,10 +7,47 @@ This document explains how to set up environment variables and secrets for the D
 - `wrangler.jsonc.template` - Template configuration file (safe to commit)
 - `wrangler.jsonc` - Actual configuration file (DO NOT commit - contains sensitive data)
 - `setup-secrets.sh` - Script to set up Cloudflare secrets (DO NOT commit - contains sensitive data)
+- `.env.example` - Template for local development environment variables
+- `.env` - Local environment variables (DO NOT commit - contains sensitive data)
 
 ## Setup Instructions
 
-### 1. Create your wrangler.jsonc file
+### 1. Set up local environment variables
+
+Copy the template and fill in your actual values:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and replace the placeholder values with your actual credentials:
+- `NEXT_PUBLIC_STACK_PROJECT_ID` - Your Stack project ID
+- `NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY` - Your Stack publishable key
+- `STACK_SECRET_SERVER_KEY` - Your Stack secret server key
+- `DATABASE_URL` - Your PostgreSQL database connection string
+- `QDRANT_URL` - Your Qdrant vector database URL
+- `QDRANT_API_KEY` - Your Qdrant API key
+- `OPENAI_API_KEY` - Your OpenAI API key
+
+**Important**: If your database password contains special characters like `@` or `#`, make sure to URL-encode them:
+- `@` should be `%40`
+- `#` should be `%23`
+
+### 2. Test your database connection
+
+After setting up your `.env` file, test the database connection:
+
+```bash
+npm run db:test
+```
+
+If the connection is successful, sync your database schema:
+
+```bash
+npm run db:sync
+```
+
+### 3. Create your wrangler.jsonc file
 
 Copy the template and fill in your actual values:
 
@@ -23,7 +60,7 @@ Edit `wrangler.jsonc` and replace the placeholder values with your actual creden
 - `YOUR_STACK_PUBLISHABLE_CLIENT_KEY`
 - `YOUR_LIVEKIT_URL`
 
-### 2. Set up Cloudflare Secrets
+### 4. Set up Cloudflare Secrets
 
 For sensitive data like API keys and secrets, use Cloudflare secrets instead of storing them in the config file:
 
@@ -38,7 +75,7 @@ npx wrangler secret put LIVEKIT_API_KEY
 npx wrangler secret put LIVEKIT_API_SECRET
 ```
 
-### 3. Deploy
+### 5. Deploy
 
 Once your secrets are set up, you can deploy normally:
 

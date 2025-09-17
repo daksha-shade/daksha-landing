@@ -8,12 +8,16 @@ export const CONTEXT_COLLECTION = "daksha_context";
 
 if (!QDRANT_URL || !QDRANT_API_KEY) {
   console.warn("Qdrant env not fully set; vector features will be disabled.");
+  console.warn("QDRANT_URL:", QDRANT_URL);
+  console.warn("QDRANT_API_KEY:", QDRANT_API_KEY ? `${QDRANT_API_KEY.substring(0, 20)}...` : 'NOT SET');
 }
 
 export function getQdrant() {
   if (!QDRANT_URL || !QDRANT_API_KEY) {
     throw new Error("QDRANT_URL or QDRANT_API_KEY not set");
   }
+  
+  console.log("Creating Qdrant client with URL:", QDRANT_URL);
   return new QdrantClient({ url: QDRANT_URL, apiKey: QDRANT_API_KEY });
 }
 

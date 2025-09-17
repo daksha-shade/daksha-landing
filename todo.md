@@ -56,3 +56,29 @@ also in the settings add option to add connect other partner that can share.... 
 
 
 
+---
+
+in the context add feature like on /context people can go and create context files (use tiptap editor and also sync it with db ) use qdrant to to save the vector embedding and I have used https://www.assistant-ui.com/llms.txt fetch the docs for it 
+and create the context file and save it in the db and vector db and also save it supabase postgres db see the .env.local for qdrant api key and url and all and use the same to save the vector embedding and use openai embedding model to create the vector embedding and save it in qdrant and also save the context file in supabase db - in /chat we must able to fetch the context from the context file and use it as a priorety context over other context so that it can be used in the chat page to answer the questions search for online docs for creating the agents .
+
+
+
+QDRANT_API_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.d7RqqOYKS51Djxghd0CjAbx0Wlx_t0BUYlgzCeYMhJE
+QDRANT_URL=https://2edc2f9e-eba3-4ac4-99b1-e34ea5a8b816.us-east-1-1.aws.cloud.qdrant.io:6333
+
+shaswatraj@Sh daksha-landing % curl \
+    -X GET 'https://2edc2f9e-eba3-4ac4-99b1-e34ea5a8b816.us-east-1-1.aws.cloud.qdrant.io:6333' \
+    --header 'api-key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.d7RqqOYKS51Djxghd0CjAbx0Wlx_t0BUYlgzCeYMhJE'
+{"title":"qdrant - vector search engine","version":"1.15.4","commit":"20db14f87c861f3958ad50382cf0b69396e40c10"}%                     
+shaswatraj@Sh daksha-landing % curl \
+    -X GET 'https://2edc2f9e-eba3-4ac4-99b1-e34ea5a8b816.us-east-1-1.aws.cloud.qdrant.io:6333' \
+    --header 'api-key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.5G1J3g47EI_AiGv7HNmKKIk2yiGGudrmsOxdb1tJ6xI'
+{"title":"qdrant - vector search engine","version":"1.15.4","commit":"20db14f87c861f3958ad50382cf0b69396e40c10"}%                     
+shaswatraj@Sh daksha-landing % 
+also use drizzle orm and also sync the db using api and DATABASE_URL="postgresql://postgres:Prince@4#@db.acljdqliyrtpyhfdzdws.supabase.co:5432/postgres"
+ and make everything work
+
+
+
+
+in drizzle also sync it with the stackauth user and also create other tables like context file table and all and also create the vector embedding table and all

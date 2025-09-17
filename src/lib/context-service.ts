@@ -1,8 +1,7 @@
 import "server-only";
 import { db } from "@/db/client";
-import { contextEmbeddings, contextFiles } from "@/db/schema";
-import { CONTEXT_COLLECTION, ensureCollection, getQdrant } from "@/lib/qdrant";
-import { EMBEDDING_DIMS, EMBEDDING_MODEL, chunkText, embedText } from "@/lib/embeddings";
+import { contextFiles } from "@/db/schema";
+import { embedText } from "@/lib/embeddings";
 import { sql } from "drizzle-orm";
 import { ensureDbSchema } from "@/db/sync";
 
@@ -24,83 +23,53 @@ export async function createContextFileForUser(input: CreateContextInput) {
   // Ensure schema exists (idempotent)
   await ensureDbSchema();
 
-  // Insert context file row
+  // Generate embedding for the content
+  const embedding = await embedText(content);
+
+  // Insert context file row with embedding
   await db.insert(contextFiles).values({
     id,
     userId,
     title,
     content,
+    embedding: embedding, // Store as number array directly
     sourceUrl,
   });
 
-  // Prepare vector store
-  await ensureCollection(EMBEDDING_DIMS);
-  const qdrant = getQdrant();
-
-  const chunks = chunkText(content);
-  const points: { id: string; vector: number[]; payload: Record<string, any> }[] = [];
-
-  for (let i = 0; i < chunks.length; i++) {
-    const chunk = chunks[i];
-    const vector = await embedText(chunk);
-    const pointId = crypto.randomUUID();
-    points.push({
-      id: pointId,
-      vector,
-      payload: {
-        userId,
-        contextFileId: id,
-        title,
-        position: i,
-        sourceUrl: sourceUrl ?? null,
-        chunkText: chunk,
-      },
-    });
-
-    // Record in Postgres
-    await db.insert(contextEmbeddings).values({
-      id: pointId,
-      contextFileId: id,
-      userId,
-      chunkText: chunk,
-      model: EMBEDDING_MODEL,
-      dims: vector.length,
-      metadata: { position: i },
-    });
-  }
-
-  // Upsert to Qdrant
-  if (points.length) {
-    await qdrant.upsert(CONTEXT_COLLECTION, {
-      wait: true,
-      points,
-    });
-  }
-
-  return { id };
+  return { id, title, content };
 }
 
 export async function searchUserContext(userId: string, query: string, limit = 5) {
-  const qdrant = getQdrant();
-  const vector = await embedText(query);
-  const res = await qdrant.search(CONTEXT_COLLECTION, {
-    vector,
-    limit,
-    filter: {
-      must: [
-        {
-          key: "userId",
-          match: { value: userId },
-        },
-      ],
-    },
-    with_payload: true,
-    score_threshold: 0.2,
-  });
+  // Generate embedding for the search query
+  const queryEmbedding = await embedText(query);
+  
+  // Use pgvector's cosine similarity for search
+  const results = await db.execute(sql`
+    SELECT 
+      id,
+      title,
+      content,
+      source_url,
+      created_at,
+      updated_at,
+      1 - (embedding <=> ${sql.raw(`'[${queryEmbedding.join(',')}]'`)}::vector) as similarity
+    FROM context_files 
+    WHERE user_id = ${userId}
+      AND embedding IS NOT NULL
+    ORDER BY embedding <=> ${sql.raw(`'[${queryEmbedding.join(',')}]'`)}::vector
+    LIMIT ${limit}
+  `);
 
-  const matches = res as unknown as Array<
-    { id: string | number; payload: any; score: number }
-  >;
-
-  return matches;
+  // Transform results to match expected format
+  return results.map((row: any) => ({
+    id: row.id,
+    score: row.similarity,
+    payload: {
+      userId,
+      contextFileId: row.id,
+      title: row.title,
+      chunkText: row.content,
+      sourceUrl: row.source_url,
+    }
+  }));
 }

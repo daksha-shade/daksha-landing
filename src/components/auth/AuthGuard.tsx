@@ -1,8 +1,8 @@
 "use client"
 
-import { useUser } from '@stackframe/stack'
 import { redirect, useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import { useUserSync } from '@/hooks/use-user-sync'
 
 interface AuthGuardProps {
   children: React.ReactNode
@@ -10,7 +10,7 @@ interface AuthGuardProps {
 }
 
 export default function AuthGuard({ children, fallback }: AuthGuardProps) {
-  const user = useUser()
+  const user = useUserSync() // This will automatically sync user data
   const router = useRouter()
 
   useEffect(() => {
