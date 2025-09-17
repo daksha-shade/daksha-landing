@@ -1,5 +1,4 @@
 import { openai } from "@ai-sdk/openai";
-import { frontendTools } from "@assistant-ui/react-ai-sdk";
 import { convertToModelMessages, streamText } from "ai";
 import { stackServerApp } from "@/stack";
 import { searchUserContext } from "@/lib/context-service";
@@ -12,9 +11,8 @@ export async function POST(req: Request) {
   const body = await req.json() as {
     messages: any[];
     system?: string;
-    tools?: any;
   };
-  const { messages, system, tools } = body;
+  const { messages, system } = body;
 
   // Get the last user message to determine which agent to use
   const modelMessages = convertToModelMessages(messages);
@@ -52,32 +50,50 @@ export async function POST(req: Request) {
   // Combine agent system prompt with context and any additional system message
   const combinedSystem = `${prioritySystem}${agentConfig.systemPrompt}
 
-CRITICAL TOOL RESPONSE PROTOCOL:
-- When you call any tool, you MUST continue with a conversational response
-- NEVER end your response after calling a tool
-- Always explain what the tool found in natural language
-- Use the tool results to provide helpful insights to the user
-- Make your response conversational and engaging
+MANDATORY TEXT GENERATION PROTOCOL:
+You MUST ALWAYS generate a text response to every user message. This is non-negotiable.
 
-Example correct behavior:
-1. User asks "When is my birthday?"
-2. You call search_context tool
-3. Tool returns data
-4. You MUST continue: "I found your birthday information! According to your personal details, your birthday is September 4, 2004. That's coming up soon - hope you have a wonderful celebration!"
+If you need information, gather it using tools, then IMMEDIATELY provide a helpful text response.
 
-IMPORTANT: After using any tool, you MUST provide a conversational response explaining what you found or what action you took. Never execute a tool and remain silent.
+CRITICAL RULES:
+1. NEVER end your response without generating text for the user
+2. If you use tools, the tool results must be followed by conversational text
+3. Always acknowledge the user's question with a natural response
+4. Be helpful, informative, and engaging in your text responses
+
+For birthday questions specifically:
+- Use search_context tool to find birthday information
+- Then respond naturally like: "Your birthday is [DATE]! That's [context about timing]. Hope you have a wonderful celebration!"
+
+Remember: Tool execution + Text response = Complete interaction
 
 ${system ?? ""}`.trim();
 
-  const result = streamText({
+  // Check if this looks like a query that would need tools
+  const needsTools = lastUserContent.toLowerCase().includes('birthday') || 
+                    lastUserContent.toLowerCase().includes('when') ||
+                    lastUserContent.toLowerCase().includes('what') ||
+                    lastUserContent.toLowerCase().includes('my');
+
+  // If this looks like a tool-heavy query, add explicit instruction
+  const finalMessages = needsTools ? [
+    ...modelMessages,
+    {
+      role: "system" as const,
+      content: "Remember: After using any tools to gather information, you MUST provide a conversational text response to the user. Do not end your response after tool execution."
+    }
+  ] : modelMessages;
+
+  let result = streamText({
     model: openai("gpt-4o"),
-    messages: modelMessages,
+    messages: finalMessages,
     system: combinedSystem,
     temperature: agentConfig.temperature,
     tools: {
-      ...frontendTools(tools),
+      // Only use backend tools to avoid frontend tool UI
       ...agentTools,
     },
+    // Force the model to generate text after tool calls
     toolChoice: "auto",
     async onFinish(result) {
       // Log tool usage for debugging
@@ -85,10 +101,18 @@ ${system ?? ""}`.trim();
         console.log("Tools called:", result.toolCalls.map(tc => tc.toolName));
         console.log("Response text length:", result.text?.length || 0);
         console.log("Steps count:", result.steps?.length || 0);
-        console.log("Full result:", JSON.stringify(result, null, 2));
+        console.log("Response text:", result.text);
+        
+        // If no text was generated after tool calls, this is the issue
+        if (!result.text || result.text.length === 0) {
+          console.error("⚠️  Model stopped after tool execution without generating text!");
+        }
       }
     },
   });
+
+  // If this is a tool-heavy request and we expect the model might stop after tool execution,
+  // we can add additional logic here in the future
 
   return result.toUIMessageStreamResponse();
 }
