@@ -118,23 +118,37 @@ async function searchWeb({ query, maxResults = 5 }: { query: string; maxResults?
 
 async function searchContext({ query, maxResults = 3 }: { query: string; maxResults?: number }) {
   try {
-    const response = await fetch("/api/context/search", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query, maxResults }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to search context");
+    // Import the search function directly to avoid authentication issues
+    const { searchUserContext } = await import("@/lib/context-service");
+    const { stackServerApp } = await import("@/stack");
+    
+    // Get the current user
+    const user = await stackServerApp.getUser({ or: "return-null" });
+    if (!user) {
+      return {
+        error: "User not authenticated",
+        query,
+        results: [],
+        totalResults: 0,
+      };
     }
 
-    const data = await response.json() as { results?: any[] };
+    // Search the user's context directly
+    const results = await searchUserContext(user.id, query, maxResults);
+    
     return {
-      results: data.results || [],
+      results: results.map(result => ({
+        id: result.id,
+        score: result.score,
+        title: result.payload?.title || "Untitled",
+        content: result.payload?.chunkText || "",
+        sourceUrl: result.payload?.sourceUrl,
+      })),
       query,
-      totalResults: data.results?.length || 0,
+      totalResults: results.length,
     };
-  } catch {
+  } catch (error) {
+    console.error("Context search error:", error);
     return {
       error: "Failed to search context",
       query,
@@ -146,27 +160,35 @@ async function searchContext({ query, maxResults = 3 }: { query: string; maxResu
 
 async function saveMemory({ title, content, tags }: { title: string; content: string; tags?: string[] | null }) {
   try {
-    const response = await fetch("/api/context", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        title: `[Memory] ${title}`,
-        content: `${content}\n\nTags: ${tags?.join(", ") || "none"}`,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to save memory");
+    // Import context service to save directly
+    const { createContextFileForUser } = await import("@/lib/context-service");
+    const { stackServerApp } = await import("@/stack");
+    
+    // Get the current user
+    const user = await stackServerApp.getUser({ or: "return-null" });
+    if (!user) {
+      return {
+        error: "User not authenticated",
+        title,
+      };
     }
 
-    const data = await response.json() as { id: string };
+    // Save the memory directly using the context service
+    const memoryContent = `${content}\n\nTags: ${tags?.join(", ") || "none"}`;
+    const result = await createContextFileForUser({
+      userId: user.id,
+      title: `[Memory] ${title}`,
+      content: memoryContent,
+    });
+
     return {
       success: true,
       title,
-      id: data.id,
+      id: result.id,
       message: "Memory saved successfully",
     };
-  } catch {
+  } catch (error) {
+    console.error("Save memory error:", error);
     return {
       error: "Failed to save memory",
       title,
@@ -186,24 +208,37 @@ async function createJournalEntry({
   tags?: string[] | null; 
 }) {
   try {
-    const response = await fetch("/api/journal", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content, title, mood, tags }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to create journal entry");
+    // Use context service to create journal entry
+    const { createContextFileForUser } = await import("@/lib/context-service");
+    const { stackServerApp } = await import("@/stack");
+    
+    // Get the current user
+    const user = await stackServerApp.getUser({ or: "return-null" });
+    if (!user) {
+      return {
+        error: "User not authenticated",
+        content: content.substring(0, 100) + "...",
+      };
     }
 
-    const data = await response.json() as { id: string; title: string };
+    // Create journal entry as a context file
+    const journalTitle = title || `Journal Entry - ${new Date().toLocaleDateString()}`;
+    const journalContent = `${content}\n\n---\nMood: ${mood || "Not specified"}\nTags: ${tags?.join(", ") || "none"}\nDate: ${new Date().toISOString()}`;
+    
+    const result = await createContextFileForUser({
+      userId: user.id,
+      title: `[Journal] ${journalTitle}`,
+      content: journalContent,
+    });
+
     return {
       success: true,
-      id: data.id,
-      title: data.title,
+      id: result.id,
+      title: journalTitle,
       message: "Journal entry created successfully",
     };
-  } catch {
+  } catch (error) {
+    console.error("Create journal entry error:", error);
     return {
       error: "Failed to create journal entry",
       content: content.substring(0, 100) + "...",
