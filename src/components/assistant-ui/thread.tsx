@@ -16,8 +16,11 @@ import {
   PencilIcon,
   RefreshCwIcon,
   Square,
+  ExternalLink,
 } from "lucide-react";
 import type { FC } from "react";
+import Link from "next/link";
+import { getChatSuggestionsByCategory } from "@/lib/chat-suggestions";
 
 import {
   ComposerAddAttachment,
@@ -100,6 +103,20 @@ const ThreadWelcome: FC = () => {
             >
               How can I help you today?
             </m.div>
+            <m.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ delay: 0.2 }}
+              className="aui-thread-welcome-message-motion-3 mt-4"
+            >
+              <Link 
+                href="/usecases" 
+                className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+              >
+                Explore more use cases and examples <ExternalLink className="w-4 h-4" />
+              </Link>
+            </m.div>
           </div>
         </div>
       </div>
@@ -108,30 +125,11 @@ const ThreadWelcome: FC = () => {
 };
 
 const ThreadWelcomeSuggestions: FC = () => {
+  const suggestions = getChatSuggestionsByCategory();
+  
   return (
     <div className="aui-thread-welcome-suggestions grid w-full gap-2 @md:grid-cols-2">
-      {[
-        {
-          title: "What's the weather",
-          label: "in San Francisco?",
-          action: "What's the weather in San Francisco?",
-        },
-        {
-          title: "Explain React hooks",
-          label: "like useState and useEffect",
-          action: "Explain React hooks like useState and useEffect",
-        },
-        {
-          title: "Write a SQL query",
-          label: "to find top customers",
-          action: "Write a SQL query to find top customers",
-        },
-        {
-          title: "Create a meal plan",
-          label: "for healthy weight loss",
-          action: "Create a meal plan for healthy weight loss",
-        },
-      ].map((suggestedAction, index) => (
+      {suggestions.map((suggestedAction, index) => (
         <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

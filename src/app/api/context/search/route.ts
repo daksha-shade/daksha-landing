@@ -9,7 +9,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { query, limit = 5 } = await req.json();
+    const body = await req.json() as { query: string; limit?: number };
+    const { query, limit = 5 } = body;
     
     if (!query || typeof query !== 'string') {
       return NextResponse.json(

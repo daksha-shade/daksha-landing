@@ -43,7 +43,9 @@ export const sql =
   postgres(connectionString, {
     // Supabase requires SSL
     ssl: "require",
-    max: 1,
+    max: 3, // Increased connection pool
+    idle_timeout: 20,
+    connect_timeout: 10,
     // Suppress schema notices that clutter console logs
     onnotice: () => {}
   });

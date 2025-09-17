@@ -6,25 +6,32 @@ import { createContextFileForUser } from "@/lib/context-service";
 import { eq, desc } from "drizzle-orm";
 
 export async function GET() {
-  const user = await stackServerApp.getUser({ or: "return-null" });
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const userId = user.id;
+  try {
+    const user = await stackServerApp.getUser({ or: "return-null" });
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const userId = user.id;
 
-  // Exclude embedding column to prevent timeout with large vector data
-  const rows = await db
-    .select({
-      id: contextFiles.id,
-      title: contextFiles.title,
-      content: contextFiles.content,
-      sourceUrl: contextFiles.sourceUrl,
-      createdAt: contextFiles.createdAt,
-      updatedAt: contextFiles.updatedAt,
-    })
-    .from(contextFiles)
-    .where(eq(contextFiles.userId, userId))
-    .orderBy(desc(contextFiles.updatedAt));
+    // Exclude embedding column to prevent timeout with large vector data
+    // Add limit to prevent loading too many records at once
+    const rows = await db
+      .select({
+        id: contextFiles.id,
+        title: contextFiles.title,
+        content: contextFiles.content,
+        sourceUrl: contextFiles.sourceUrl,
+        createdAt: contextFiles.createdAt,
+        updatedAt: contextFiles.updatedAt,
+      })
+      .from(contextFiles)
+      .where(eq(contextFiles.userId, userId))
+      .orderBy(desc(contextFiles.updatedAt))
+      .limit(50); // Limit to 50 most recent items
 
-  return NextResponse.json({ items: rows });
+    return NextResponse.json({ items: rows });
+  } catch (error) {
+    console.error("Context API error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }
 
 export async function POST(req: NextRequest) {
