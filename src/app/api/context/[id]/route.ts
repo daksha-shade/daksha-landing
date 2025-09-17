@@ -49,12 +49,13 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await stackServerApp.getUser({ or: "return-null" });
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+    const { id } = await params;
     const body = await req.json() as { title: string; content: string };
     const { title, content } = body;
 
@@ -69,7 +70,7 @@ export async function PUT(
     const existingFile = await db
       .select()
       .from(contextFiles)
-      .where(eq(contextFiles.id, params.id))
+      .where(eq(contextFiles.id, id))
       .limit(1);
 
     if (existingFile.length === 0) {
@@ -92,7 +93,7 @@ export async function PUT(
         embedding,
         updatedAt: new Date(),
       })
-      .where(eq(contextFiles.id, params.id))
+      .where(eq(contextFiles.id, id))
       .returning();
 
     return NextResponse.json(updatedFile[0]);
@@ -104,17 +105,19 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await stackServerApp.getUser({ or: "return-null" });
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+    const { id } = await params;
+
     // Check if context file exists and belongs to user
     const existingFile = await db
       .select()
       .from(contextFiles)
-      .where(eq(contextFiles.id, params.id))
+      .where(eq(contextFiles.id, id))
       .limit(1);
 
     if (existingFile.length === 0) {
@@ -126,7 +129,7 @@ export async function DELETE(
     }
 
     // Delete the context file
-    await db.delete(contextFiles).where(eq(contextFiles.id, params.id));
+    await db.delete(contextFiles).where(eq(contextFiles.id, id));
 
     return NextResponse.json({ success: true });
   } catch (error) {
