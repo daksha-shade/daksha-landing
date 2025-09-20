@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { GetObjectCommand } from '@aws-sdk/client-s3';
 
 // Initialize S3 client for Cloudflare R2
 const s3Client = new S3Client({
@@ -41,6 +43,19 @@ export async function POST(request: NextRequest) {
 
     await s3Client.send(command);
 
+    // Generate presigned URL for accessing the file (valid for 24 hours)
+    const getObjectCommand = new GetObjectCommand({
+      Bucket: process.env.R2_BUCKET!,
+      Key: fileName,
+    });
+    
+    const presignedUrl = await getSignedUrl(s3Client, getObjectCommand, { 
+      expiresIn: 86400 // 24 hours
+    });
+
+    // Also provide a proxy URL through our app
+    const proxyUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3001'}/api/files/${fileName}`;
+
     // Return success response with file info
     return NextResponse.json({
       success: true,
@@ -50,7 +65,9 @@ export async function POST(request: NextRequest) {
         originalName: file.name,
         size: file.size,
         type: file.type,
-        url: `${process.env.R2_ENDPOINT}/${process.env.R2_BUCKET}/${fileName}`,
+        url: presignedUrl, // Presigned URL for direct access
+        proxyUrl: proxyUrl, // Proxy URL through our app
+        directUrl: `${process.env.R2_ENDPOINT}/${process.env.R2_BUCKET}/${fileName}`, // Direct URL (will require auth)
       },
     });
 

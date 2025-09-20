@@ -11,7 +11,9 @@ interface UploadedFile {
   originalName: string;
   size: number;
   type: string;
-  url: string;
+  url: string; // Presigned URL
+  proxyUrl?: string; // Proxy URL through our app
+  directUrl?: string; // Direct R2 URL (requires auth)
 }
 
 interface UploadProgress {
@@ -141,9 +143,14 @@ export default function UploadPage() {
     <div className="container mx-auto p-6 max-w-4xl">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Cloudflare R2 Upload Test</h1>
-        <p className="text-gray-600">
+        <p className="text-gray-600 mb-2">
           Test file uploads to Cloudflare R2 storage bucket: <code className="bg-gray-100 px-2 py-1 rounded text-sm">daksha-storage</code>
         </p>
+        <div className="text-sm text-blue-600 bg-blue-50 p-3 rounded-lg">
+          <p><strong>📁 File Access Options:</strong></p>
+          <p>• <strong>Presigned URLs:</strong> Direct access for 24 hours (recommended for temporary sharing)</p>
+          <p>• <strong>Proxy URLs:</strong> Permanent access through your Next.js app</p>
+        </div>
       </div>
 
       {/* Upload Area */}
@@ -241,18 +248,40 @@ export default function UploadPage() {
                   {upload.status === 'completed' && upload.result && (
                     <div className="bg-green-50 border border-green-200 rounded p-3">
                       <p className="text-green-800 font-medium mb-2">✅ Upload completed!</p>
-                      <div className="text-sm space-y-1">
+                      <div className="text-sm space-y-2">
                         <p><strong>Filename:</strong> {upload.result.name}</p>
-                        <p><strong>URL:</strong> 
+                        
+                        <div className="space-y-1">
+                          <p><strong>Presigned URL (24h access):</strong></p>
                           <a 
                             href={upload.result.url} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline ml-1"
+                            className="text-blue-600 hover:underline text-xs break-all block"
                           >
                             {upload.result.url}
                           </a>
-                        </p>
+                        </div>
+
+                        {upload.result.proxyUrl && (
+                          <div className="space-y-1">
+                            <p><strong>Proxy URL (permanent):</strong></p>
+                            <a 
+                              href={upload.result.proxyUrl} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:underline text-xs break-all block"
+                            >
+                              {upload.result.proxyUrl}
+                            </a>
+                          </div>
+                        )}
+
+                        <div className="text-xs text-gray-600 mt-2 p-2 bg-gray-50 rounded">
+                          <p><strong>💡 Tips:</strong></p>
+                          <p>• Use <strong>Presigned URL</strong> for temporary access (expires in 24h)</p>
+                          <p>• Use <strong>Proxy URL</strong> for permanent access through your app</p>
+                        </div>
                       </div>
                     </div>
                   )}
