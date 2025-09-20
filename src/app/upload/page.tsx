@@ -11,8 +11,10 @@ interface UploadedFile {
   originalName: string;
   size: number;
   type: string;
-  url: string; // Presigned URL
-  proxyUrl?: string; // Proxy URL through our app
+  url: string; // Primary URL (permanent for DB storage)
+  permanentUrl?: string; // Permanent URL
+  temporaryUrl?: string; // Presigned URL (24h)
+  proxyUrl?: string; // Proxy URL through app
   directUrl?: string; // Direct R2 URL (requires auth)
 }
 

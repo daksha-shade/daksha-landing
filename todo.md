@@ -91,3 +91,11 @@ fetch this and create db schema to keep the chat history and also keep the embed
 
 ---
 
+
+---
+
+
+in /journal page every data is hardcoded we have used openai-api drizzle postgres with pgvector - and platjs for texteditor in /journal/text 
+keep thr ui same and create the backend of the application and also fetch the users in the db and seed the sample jounals with all the features that can be added to the db schema about jounalling the features that we may use in the feature as the purpose of the website 
+connect the frontend to the be and also keep the vector embedding of the jounal - use r2 endpoints see  the .env.local file and /upload and also add the audio and video recording and uploading feature use openai api key tts and stt features
+dont make any mistakes keep ui consistant and working 

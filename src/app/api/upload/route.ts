@@ -43,20 +43,30 @@ export async function POST(request: NextRequest) {
 
     await s3Client.send(command);
 
-    // Generate presigned URL for accessing the file (valid for 24 hours)
+    // Determine the best permanent URL for database storage
+    let permanentUrl: string;
+    let temporaryUrl: string;
+    
+    // Generate presigned URL for temporary access (24 hours)
     const getObjectCommand = new GetObjectCommand({
       Bucket: process.env.R2_BUCKET!,
       Key: fileName,
     });
     
-    const presignedUrl = await getSignedUrl(s3Client, getObjectCommand, { 
+    temporaryUrl = await getSignedUrl(s3Client, getObjectCommand, { 
       expiresIn: 86400 // 24 hours
     });
 
-    // Also provide a proxy URL through our app
-    const proxyUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3001'}/api/files/${fileName}`;
+    // Determine permanent URL strategy
+    if (process.env.R2_PUBLIC_DOMAIN && process.env.R2_USE_PROXY_URLS !== 'true') {
+      // Use custom domain if configured
+      permanentUrl = `${process.env.R2_PUBLIC_DOMAIN}/${fileName}`;
+    } else {
+      // Use proxy URL through our app as permanent solution
+      permanentUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3001'}/api/files/${fileName}`;
+    }
 
-    // Return success response with file info
+    // Return success response with file info optimized for database storage
     return NextResponse.json({
       success: true,
       message: 'File uploaded successfully',
@@ -65,9 +75,13 @@ export async function POST(request: NextRequest) {
         originalName: file.name,
         size: file.size,
         type: file.type,
-        url: presignedUrl, // Presigned URL for direct access
-        proxyUrl: proxyUrl, // Proxy URL through our app
-        directUrl: `${process.env.R2_ENDPOINT}/${process.env.R2_BUCKET}/${fileName}`, // Direct URL (will require auth)
+        // Primary URL for database storage (permanent)
+        url: permanentUrl,
+        // Alternative URLs for different use cases
+        permanentUrl: permanentUrl,
+        temporaryUrl: temporaryUrl,
+        proxyUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3001'}/api/files/${fileName}`,
+        directUrl: `${process.env.R2_ENDPOINT}/${process.env.R2_BUCKET}/${fileName}`, // Requires auth
       },
     });
 

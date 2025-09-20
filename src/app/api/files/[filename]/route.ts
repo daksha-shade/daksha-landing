@@ -16,7 +16,7 @@ export async function GET(
   { params }: { params: { filename: string } }
 ) {
   try {
-    const filename = params.filename;
+    const { filename } = await params;
 
     if (!filename) {
       return NextResponse.json(
