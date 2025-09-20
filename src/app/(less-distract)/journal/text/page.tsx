@@ -67,15 +67,16 @@ export default function JournalTextEditor() {
     return () => clearTimeout(autoSave)
   }, [title, handleSave])
 
-  const backgroundClass = isFocusMode 
-    ? 'bg-background' 
-    : 'bg-gradient-to-br from-muted/30 via-background to-accent/10'
+  const backgroundClass = "" 
+  // || isFocusMode 
+  //   ? 'bg-background' 
+  //   : 'bg-gradient-to-br from-muted/30 via-background to-accent/10'
 
   return (
     <div className={`min-h-screen text-foreground transition-all duration-300 ${backgroundClass}`}>
       {/* Header - Hidden in focus mode unless showMenuBar is true */}
       {(!isFocusMode || showMenuBar) && (
-        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border">
+        <div className="sticky top-0 z-10   ">
           <div className="max-w-7xl mx-auto px-4 py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -163,7 +164,7 @@ export default function JournalTextEditor() {
             variant="outline"
             size="sm"
             onClick={() => setShowMenuBar(true)}
-            className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm shadow-lg"
+            className="  backdrop-blur-sm shadow-lg"
           >
             <Menu className="w-4 h-4" />
           </Button>
@@ -177,7 +178,7 @@ export default function JournalTextEditor() {
             variant="outline"
             size="sm"
             onClick={() => setShowMenuBar(false)}
-            className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm shadow-lg"
+            className="  backdrop-blur-sm shadow-lg"
           >
             <X className="w-4 h-4" />
           </Button>
@@ -206,10 +207,10 @@ export default function JournalTextEditor() {
           </div>
 
           {/* Rich Text Editor */}
-          <div className={`bg-card border border-border transition-all duration-300 ${
+          <div className={`transition-all duration-300 ${
             isFocusMode 
               ? 'rounded-none shadow-none min-h-[calc(100vh-200px)]' 
-              : 'rounded-lg shadow-sm min-h-[600px]'
+              : ' min-h-[600px]'
           }`}>
             <PlateEditor />
           </div>

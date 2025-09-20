@@ -56,12 +56,20 @@ export function ChatInterface() {
 
     const runtime = useChatRuntime({
         api: "/api/chat",
+        body: {
+            contextSearch: true,
+            webSearch: false,
+        },
     });
+
+    // Debug: Log runtime state
+    console.log('Runtime state:', runtime);
 
     return (
         <div className="flex flex-col h-[90vh] w-full py-6">
+           
             {/* Chat Container */}
-            <div className="flex-1 overflow-hidden rounded-xl mx-6">
+            <div className="flex-1 overflow-hidden rounded-xl mx-6  ">
                 <AssistantRuntimeProvider runtime={runtime}>
                     <Thread />
                 </AssistantRuntimeProvider>

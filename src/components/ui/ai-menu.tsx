@@ -59,7 +59,7 @@ export function AIMenu() {
 
   const chat = useChat();
 
-  const { input, messages, setInput, status } = chat;
+  const { input, messages, status } = chat;
   const [anchorElement, setAnchorElement] = React.useState<HTMLElement | null>(
     null
   );
@@ -98,7 +98,7 @@ export function AIMenu() {
     onOpenChange: (open) => {
       if (!open) {
         setAnchorElement(null);
-        setInput('');
+        setValue('');
       }
     },
     onOpenCursor: () => {
@@ -179,7 +179,7 @@ export function AIMenu() {
                   void api.aiChat.submit();
                 }
               }}
-              onValueChange={setInput}
+              onValueChange={setValue}
               placeholder="Ask AI anything..."
               data-plate-focus
               autoFocus
