@@ -79,9 +79,46 @@ export default function FullScreenVideoJournalPage() {
     setIsMuted(!isMuted)
   }
 
-  const handleSave = () => {
-    console.log({ title, recordingTime, hasRecording, cameraFacing, isMuted, transcript })
-    window.location.href = '/journal'
+  const handleSave = async () => {
+    if (!title.trim()) {
+      alert("Please enter a title for your video journal")
+      return
+    }
+
+    if (!hasRecording) {
+      alert("Please record a video first")
+      return
+    }
+
+    try {
+      const response = await fetch('/api/journal', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: title.trim(),
+          type: 'video',
+          duration: recordingTime,
+          transcript: transcript,
+          plainTextContent: transcript,
+          // videoUrl: videoUrl, // You'd get this from the upload
+          entryDate: new Date().toISOString(),
+          generateAI: true
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to save video journal')
+      }
+
+      const result = await response.json()
+      console.log('Video journal saved:', result)
+      window.location.href = '/journal'
+    } catch (error) {
+      console.error('Save failed:', error)
+      alert('Failed to save video journal. Please try again.')
+    }
   }
 
   const handleAIQuestion = async () => {
@@ -210,8 +247,8 @@ export default function FullScreenVideoJournalPage() {
             size="lg"
             onClick={toggleMute}
             className={`w-12 h-12 rounded-full border border-white/60 shadow ${isMuted
-                ? 'bg-red-500/90 hover:bg-red-600 text-white'
-                : 'bg-white/30 hover:bg-white/50 text-white'
+              ? 'bg-red-500/90 hover:bg-red-600 text-white'
+              : 'bg-white/30 hover:bg-white/50 text-white'
               }`}
           >
             {isMuted ? (

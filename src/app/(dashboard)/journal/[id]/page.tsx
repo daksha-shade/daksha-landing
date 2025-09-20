@@ -9,7 +9,40 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator'
-import { mockJournalEntries, getMoodColor, formatDuration, formatFullDate } from '@/lib/journal-data'
+// Helper functions
+const getMoodColor = (mood?: string) => {
+  const colors: Record<string, string> = {
+    happy: "bg-yellow-400",
+    sad: "bg-blue-400",
+    excited: "bg-orange-400",
+    anxious: "bg-red-400",
+    calm: "bg-green-400",
+    grateful: "bg-purple-400",
+    stressed: "bg-red-500",
+    energized: "bg-orange-500",
+    contemplative: "bg-indigo-400",
+  };
+  return colors[mood || ""] || "bg-gray-400";
+};
+
+const formatDuration = (seconds?: number) => {
+  if (!seconds) return "";
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+};
+
+const formatFullDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
 
 export default function JournalEntryPage({ params }: { params: Promise<{ id: string }> }) {
   const searchParams = useSearchParams()
@@ -29,14 +62,29 @@ export default function JournalEntryPage({ params }: { params: Promise<{ id: str
 
   useEffect(() => {
     if (id) {
-      const foundEntry = mockJournalEntries.find(e => e.id === id)
+      fetchEntry(id)
+    }
+  }, [id])
+
+  const fetchEntry = async (entryId: string) => {
+    try {
+      const response = await fetch(`/api/journal/${entryId}`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch journal entry')
+      }
+
+      const data = await response.json()
+      const foundEntry = data.entry
       setEntry(foundEntry || null)
       if (foundEntry) {
         setEditedTitle(foundEntry.title)
-        setEditedContent(foundEntry.content || '')
+        setEditedContent(foundEntry.plainTextContent || foundEntry.content || '')
       }
+    } catch (error) {
+      console.error('Error fetching journal entry:', error)
+      setEntry(null)
     }
-  }, [id])
+  }
 
   if (!entry) {
     return (
@@ -56,10 +104,37 @@ export default function JournalEntryPage({ params }: { params: Promise<{ id: str
     )
   }
 
-  const handleSave = () => {
-    console.log('Saving entry:', { title: editedTitle, content: editedContent })
-    setEntry({ ...entry, title: editedTitle, content: editedContent })
-    setIsEditing(false)
+  const handleSave = async () => {
+    if (!entry) return
+
+    try {
+      const response = await fetch(`/api/journal/${entry.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: editedTitle,
+          plainTextContent: editedContent,
+          content: editedContent,
+          regenerateAI: true
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to update journal entry')
+      }
+
+      const result = await response.json()
+      console.log('Entry updated:', result)
+
+      // Update local state
+      setEntry({ ...entry, title: editedTitle, plainTextContent: editedContent, content: editedContent })
+      setIsEditing(false)
+    } catch (error) {
+      console.error('Save failed:', error)
+      alert('Failed to save changes. Please try again.')
+    }
   }
 
   const handleCancel = () => {
@@ -150,7 +225,7 @@ export default function JournalEntryPage({ params }: { params: Promise<{ id: str
                 {/* Date */}
                 <div className="flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
-                  <span>{formatFullDate(entry.timestamp)}</span>
+                  <span>{formatFullDate(entry.entryDate)}</span>
                 </div>
                 {/* Type */}
                 <div className="flex items-center gap-1">
@@ -229,7 +304,7 @@ export default function JournalEntryPage({ params }: { params: Promise<{ id: str
                 />
               ) : (
                 <div className="prose prose-sm max-w-none">
-                  {entry.content?.split('\n').map((paragraph, index) => (
+                  {(entry.plainTextContent || entry.content || entry.transcript || "No content").split('\n').map((paragraph, index) => (
                     <p key={index} className="mb-4 leading-relaxed">
                       {paragraph}
                     </p>

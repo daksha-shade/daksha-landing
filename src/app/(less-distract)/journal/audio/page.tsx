@@ -46,19 +46,73 @@ export default function AudioJournalPage() {
     setIsPaused(!isPaused)
   }
 
-  const stopRecording = () => {
+  const stopRecording = async () => {
     setIsRecording(false)
     setIsPaused(false)
     setHasRecording(true)
-    // Simulate transcript generation
-    setTimeout(() => {
-      setTranscript("This is a sample transcript of your audio recording. In a real implementation, this would be generated using speech-to-text technology like OpenAI Whisper or similar services.")
-    }, 1000)
+
+    // In a real implementation, you would:
+    // 1. Stop the MediaRecorder
+    // 2. Upload the audio file to R2
+    // 3. Send it for transcription
+
+    try {
+      // Simulate audio file upload and transcription
+      const formData = new FormData()
+      // formData.append('audio', audioBlob) // You'd get this from MediaRecorder
+      formData.append('action', 'transcribe')
+
+      // For now, simulate the process
+      setTimeout(async () => {
+        setTranscript("This is a sample transcript of your audio recording. In a real implementation, this would be generated using OpenAI Whisper API.")
+      }, 2000)
+
+    } catch (error) {
+      console.error('Error processing audio:', error)
+      setTranscript("Error generating transcript")
+    }
   }
 
-  const handleSave = () => {
-    console.log({ title, recordingTime, hasRecording, transcript })
-    window.location.href = '/journal'
+  const handleSave = async () => {
+    if (!title.trim()) {
+      alert("Please enter a title for your audio journal")
+      return
+    }
+
+    if (!hasRecording) {
+      alert("Please record some audio first")
+      return
+    }
+
+    try {
+      const response = await fetch('/api/journal', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: title.trim(),
+          type: 'audio',
+          duration: recordingTime,
+          transcript: transcript,
+          plainTextContent: transcript,
+          // audioUrl: audioUrl, // You'd get this from the upload
+          entryDate: new Date().toISOString(),
+          generateAI: true
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to save audio journal')
+      }
+
+      const result = await response.json()
+      console.log('Audio journal saved:', result)
+      window.location.href = '/journal'
+    } catch (error) {
+      console.error('Save failed:', error)
+      alert('Failed to save audio journal. Please try again.')
+    }
   }
 
   const handleAIQuestion = async () => {
@@ -117,8 +171,8 @@ export default function AudioJournalPage() {
             {/* Recording Button */}
             <div className="flex justify-center">
               <div className={`w-32 h-32 rounded-full flex items-center justify-center transition-all duration-300 ${isRecording && !isPaused ? 'bg-red-500 scale-110 animate-pulse' :
-                  isRecording && isPaused ? 'bg-yellow-500' :
-                    'bg-muted/20 hover:bg-muted/30'
+                isRecording && isPaused ? 'bg-yellow-500' :
+                  'bg-muted/20 hover:bg-muted/30'
                 }`}>
                 {!isRecording ? (
                   <Button

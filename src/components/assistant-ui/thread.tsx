@@ -111,7 +111,7 @@ const ThreadWelcome: FC = () => {
             >
               <Link 
                 href="/usecases" 
-                className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+                className="inline-flex items-center gap-2 text-sm   hover:text-blue-800   dark:hover:text-blue-300 transition-colors"
               >
                 Explore more use cases and examples <ExternalLink className="w-4 h-4" />
               </Link>

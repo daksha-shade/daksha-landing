@@ -24,15 +24,45 @@ export default function JournalTextEditor() {
   }, [])
 
   const handleSave = useCallback(async () => {
+    if (!title.trim()) {
+      alert("Please enter a title for your journal entry")
+      return
+    }
+
     setIsSaving(true)
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      console.log('Saving:', { title })
+      // Get content from Plate editor (you'll need to implement this)
+      const editorContent = ""; // TODO: Get from Plate editor
+      const plainTextContent = title; // TODO: Extract plain text from editor
+
+      const response = await fetch('/api/journal', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: title.trim(),
+          content: editorContent,
+          plainTextContent: plainTextContent,
+          type: 'text',
+          entryDate: new Date().toISOString(),
+          generateAI: true
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to save journal entry')
+      }
+
+      const result = await response.json()
+      console.log('Journal entry saved:', result)
       setLastSaved(new Date())
-      // Here you would typically save to your backend
+
+      // Optionally redirect to journal list
+      // window.location.href = '/journal'
     } catch (error) {
       console.error('Save failed:', error)
+      alert('Failed to save journal entry. Please try again.')
     } finally {
       setIsSaving(false)
     }
@@ -67,7 +97,7 @@ export default function JournalTextEditor() {
     return () => clearTimeout(autoSave)
   }, [title, handleSave])
 
-  const backgroundClass = "" 
+  const backgroundClass = ""
   // || isFocusMode 
   //   ? 'bg-background' 
   //   : 'bg-gradient-to-br from-muted/30 via-background to-accent/10'
@@ -86,13 +116,13 @@ export default function JournalTextEditor() {
                     Back to Journal
                   </Button>
                 </Link>
-                
+
                 <div className="flex items-center gap-3">
                   <Badge variant="outline" className="gap-1">
                     <BookOpen className="w-3 h-3" />
                     Rich Text Entry
                   </Badge>
-                  
+
                   <div className="text-sm text-muted-foreground">
                     {isTyping ? (
                       <span className="flex items-center gap-1">
@@ -103,7 +133,7 @@ export default function JournalTextEditor() {
                       `${wordCount} words`
                     )}
                   </div>
-                  
+
                   {lastSaved && (
                     <div className="text-xs text-muted-foreground flex items-center gap-1">
                       <Clock className="w-3 h-3" />
@@ -112,17 +142,17 @@ export default function JournalTextEditor() {
                   )}
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <Button variant="ghost" size="sm" className="gap-2">
                   <Calendar className="w-4 h-4" />
-                  {new Date().toLocaleDateString('en-US', { 
-                    weekday: 'short', 
-                    month: 'short', 
-                    day: 'numeric' 
+                  {new Date().toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric'
                   })}
                 </Button>
-                
+
                 {/* Focus Mode Toggle */}
                 <Button
                   variant="outline"
@@ -142,9 +172,9 @@ export default function JournalTextEditor() {
                     </>
                   )}
                 </Button>
-                
-                <Button 
-                  onClick={handleSave} 
+
+                <Button
+                  onClick={handleSave}
                   disabled={isSaving}
                   className="gap-2"
                 >
@@ -186,11 +216,10 @@ export default function JournalTextEditor() {
       )}
 
       {/* Main Content */}
-      <div className={`mx-auto px-4 transition-all duration-300 ${
-        isFocusMode 
-          ? 'max-w-4xl py-4' 
+      <div className={`mx-auto px-4 transition-all duration-300 ${isFocusMode
+          ? 'max-w-4xl py-4'
           : 'max-w-5xl py-8'
-      }`}>
+        }`}>
         <div className="space-y-6">
           {/* Title */}
           <div>
@@ -200,18 +229,16 @@ export default function JournalTextEditor() {
               placeholder="Give your entry a title..."
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className={`w-full font-bold bg-transparent border-none outline-none placeholder-gray-400 dark:placeholder-gray-600 focus:placeholder-gray-300 dark:focus:placeholder-gray-400 text-gray-900 dark:text-white transition-all duration-300 ${
-                isFocusMode ? 'text-3xl' : 'text-4xl'
-              }`}
+              className={`w-full font-bold bg-transparent border-none outline-none placeholder-gray-400 dark:placeholder-gray-600 focus:placeholder-gray-300 dark:focus:placeholder-gray-400 text-gray-900 dark:text-white transition-all duration-300 ${isFocusMode ? 'text-3xl' : 'text-4xl'
+                }`}
             />
           </div>
 
           {/* Rich Text Editor */}
-          <div className={`transition-all duration-300 ${
-            isFocusMode 
-              ? 'rounded-none shadow-none min-h-[calc(100vh-200px)]' 
+          <div className={`transition-all duration-300 ${isFocusMode
+              ? 'rounded-none shadow-none min-h-[calc(100vh-200px)]'
               : ' min-h-[600px]'
-          }`}>
+            }`}>
             <PlateEditor />
           </div>
         </div>

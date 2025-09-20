@@ -10,7 +10,68 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Separator } from "@/components/ui/separator"
-import { mockJournalEntries, getMoodColor, formatDuration, formatDate } from "@/lib/journal-data"
+
+// Types for journal entries
+interface JournalEntry {
+  id: string;
+  title: string;
+  content?: string;
+  plainTextContent?: string;
+  type: "text" | "audio" | "video";
+  mood?: string;
+  moodIntensity?: number;
+  emotionalTags?: string[];
+  tags?: string[];
+  location?: string;
+  weather?: string;
+  audioUrl?: string;
+  videoUrl?: string;
+  imageUrls?: string[];
+  duration?: number;
+  transcript?: string;
+  aiSummary?: string;
+  aiInsights?: string[];
+  entryDate: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Helper functions
+const getMoodColor = (mood?: string) => {
+  const colors: Record<string, string> = {
+    happy: "bg-yellow-400",
+    sad: "bg-blue-400",
+    excited: "bg-orange-400",
+    anxious: "bg-red-400",
+    calm: "bg-green-400",
+    grateful: "bg-purple-400",
+    stressed: "bg-red-500",
+    energized: "bg-orange-500",
+    contemplative: "bg-indigo-400",
+  };
+  return colors[mood || ""] || "bg-gray-400";
+};
+
+const formatDuration = (seconds?: number) => {
+  if (!seconds) return "";
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+};
+
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
+
+  if (diffInHours < 24) {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  } else if (diffInHours < 24 * 7) {
+    return date.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+  } else {
+    return date.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+};
 
 export default function JournalPage() {
   const [viewMode, setViewMode] = useState("timeline")
@@ -18,13 +79,58 @@ export default function JournalPage() {
   const [displayedEntries, setDisplayedEntries] = useState(12)
   const [isLoading, setIsLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const journalEntries = mockJournalEntries
+  // Fetch journal entries
+  const fetchEntries = useCallback(async () => {
+    try {
+      setLoading(true)
+      const params = new URLSearchParams({
+        limit: "50",
+        offset: "0",
+      })
+
+      if (filterType !== "all") {
+        params.append("type", filterType)
+      }
+
+      const response = await fetch(`/api/journal?${params}`)
+      if (!response.ok) {
+        throw new Error("Failed to fetch journal entries")
+      }
+
+      const data = await response.json()
+      setJournalEntries(data.entries || [])
+    } catch (err) {
+      console.error("Error fetching journal entries:", err)
+      setError(err instanceof Error ? err.message : "Failed to load entries")
+    } finally {
+      setLoading(false)
+    }
+  }, [filterType])
+
+  // Seed data if no entries exist
+  const seedData = async () => {
+    try {
+      const response = await fetch("/api/journal/seed", { method: "POST" })
+      if (response.ok) {
+        fetchEntries()
+      }
+    } catch (error) {
+      console.error("Error seeding data:", error)
+    }
+  }
+
+  useEffect(() => {
+    fetchEntries()
+  }, [fetchEntries])
 
   const filteredEntries = journalEntries.filter(entry => {
     if (filterType !== "all" && entry.type !== filterType) return false
     if (searchQuery && !entry.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      !entry.content?.toLowerCase().includes(searchQuery.toLowerCase())) return false
+      !entry.plainTextContent?.toLowerCase().includes(searchQuery.toLowerCase())) return false
     return true
   })
 
@@ -47,11 +153,36 @@ export default function JournalPage() {
   const stats = {
     total: journalEntries.length,
     thisWeek: journalEntries.filter(entry => {
-      const entryDate = new Date(entry.timestamp)
+      const entryDate = new Date(entry.entryDate)
       const weekAgo = new Date()
       weekAgo.setDate(weekAgo.getDate() - 7)
       return entryDate >= weekAgo
     }).length
+  }
+
+  if (loading) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <span className="ml-2">Loading journal entries...</span>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto p-6">
+        <Card>
+          <CardContent className="p-8 text-center">
+            <h2 className="text-xl font-semibold mb-2">Error Loading Journal</h2>
+            <p className="text-muted-foreground mb-4">{error}</p>
+            <Button onClick={fetchEntries}>Try Again</Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   const getTypeIcon = (type) => {
@@ -233,7 +364,7 @@ export default function JournalPage() {
                         </>
                       )}
                       <span>
-                        {entry.timestamp ? formatDate(entry.timestamp) : "No date"}
+                        {formatDate(entry.entryDate)}
                       </span>
                     </div>
                   </div>
@@ -277,7 +408,7 @@ export default function JournalPage() {
 
             <CardContent className="pt-0">
               <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
-                {entry.content}
+                {entry.plainTextContent || entry.content || entry.transcript || "No content"}
               </p>
 
               {entry.type === "audio" && entry.duration && (
@@ -341,9 +472,16 @@ export default function JournalPage() {
             <p className="text-muted-foreground text-sm mb-4">
               {searchQuery || filterType !== "all"
                 ? "Try adjusting your search or filters"
-                : "Start your journaling journey by creating your first entry"
+                : journalEntries.length === 0
+                  ? "Start your journaling journey by creating your first entry"
+                  : "No entries match your current filters"
               }
             </p>
+            {journalEntries.length === 0 && (
+              <Button onClick={seedData} variant="outline" className="mt-2">
+                Load Sample Entries
+              </Button>
+            )}
           </CardContent>
         </Card>
       )}
