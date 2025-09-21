@@ -16,6 +16,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const type = searchParams.get("type");
     const mood = searchParams.get("mood");
+    const q = searchParams.get("q");
     const limit = parseInt(searchParams.get("limit") || "20");
     const offset = parseInt(searchParams.get("offset") || "0");
     const startDate = searchParams.get("startDate");
@@ -40,37 +41,116 @@ export async function GET(req: NextRequest) {
       conditions.push(lte(journalEntries.entryDate, new Date(endDate)));
     }
 
-    // Fetch entries
-    const entries = await db
-      .select({
-        id: journalEntries.id,
-        title: journalEntries.title,
-        yooptaContent: journalEntries.yooptaContent,
-        plainTextContent: journalEntries.plainTextContent,
-        type: journalEntries.type,
-        mood: journalEntries.mood,
-        moodIntensity: journalEntries.moodIntensity,
-        emotionalTags: journalEntries.emotionalTags,
-        tags: journalEntries.tags,
-        location: journalEntries.location,
-        weather: journalEntries.weather,
-        audioUrl: journalEntries.audioUrl,
-        videoUrl: journalEntries.videoUrl,
-        imageUrls: journalEntries.imageUrls,
-        attachmentUrls: journalEntries.attachmentUrls,
-        duration: journalEntries.duration,
-        transcript: journalEntries.transcript,
-        aiSummary: journalEntries.aiSummary,
-        aiInsights: journalEntries.aiInsights,
-        entryDate: journalEntries.entryDate,
-        createdAt: journalEntries.createdAt,
-        updatedAt: journalEntries.updatedAt,
-      })
-      .from(journalEntries)
-      .where(and(...conditions))
-      .orderBy(desc(journalEntries.entryDate))
-      .limit(limit)
-      .offset(offset);
+    let entries: any[];
+
+    if (q && q.trim()) {
+      // Semantic search using pgvector cosine distance
+      const { embedText } = await import("@/lib/embeddings");
+      const queryEmbedding = await embedText(q);
+      const vectorSql = sql.raw(`'[${queryEmbedding.join(',')}]'`);
+
+      // Build dynamic filters
+      const typeFilter = type && type !== 'all' ? sql` AND type = ${type} ` : sql``;
+      const moodFilter = mood ? sql` AND mood = ${mood} ` : sql``;
+      const startFilter = startDate ? sql` AND entry_date >= ${new Date(startDate)} ` : sql``;
+      const endFilter = endDate ? sql` AND entry_date <= ${new Date(endDate)} ` : sql``;
+
+      const rows = await db.execute(sql`
+        SELECT 
+          id,
+          user_id,
+          title,
+          yoopta_content,
+          plain_text_content,
+          type,
+          mood,
+          mood_intensity,
+          emotional_tags,
+          tags,
+          location,
+          weather,
+          audio_url,
+          video_url,
+          image_urls,
+          attachment_urls,
+          duration,
+          transcript,
+          ai_summary,
+          ai_insights,
+          entry_date,
+          created_at,
+          updated_at,
+          1 - (embedding <=> ${vectorSql}::vector) as similarity
+        FROM journal_entries
+        WHERE user_id = ${user.id}
+          AND embedding IS NOT NULL
+          ${typeFilter}
+          ${moodFilter}
+          ${startFilter}
+          ${endFilter}
+        ORDER BY embedding <=> ${vectorSql}::vector
+        LIMIT ${limit}
+        OFFSET ${offset}
+      `);
+
+      entries = rows.map((r: any) => ({
+        id: r.id,
+        title: r.title,
+        yooptaContent: r.yoopta_content,
+        plainTextContent: r.plain_text_content,
+        type: r.type,
+        mood: r.mood,
+        moodIntensity: r.mood_intensity,
+        emotionalTags: r.emotional_tags,
+        tags: r.tags,
+        location: r.location,
+        weather: r.weather,
+        audioUrl: r.audio_url,
+        videoUrl: r.video_url,
+        imageUrls: r.image_urls,
+        attachmentUrls: r.attachment_urls,
+        duration: r.duration,
+        transcript: r.transcript,
+        aiSummary: r.ai_summary,
+        aiInsights: r.ai_insights,
+        entryDate: r.entry_date,
+        createdAt: r.created_at,
+        updatedAt: r.updated_at,
+        similarity: r.similarity,
+      }));
+    } else {
+      // Fetch entries (regular order)
+      entries = await db
+        .select({
+          id: journalEntries.id,
+          title: journalEntries.title,
+          yooptaContent: journalEntries.yooptaContent,
+          plainTextContent: journalEntries.plainTextContent,
+          type: journalEntries.type,
+          mood: journalEntries.mood,
+          moodIntensity: journalEntries.moodIntensity,
+          emotionalTags: journalEntries.emotionalTags,
+          tags: journalEntries.tags,
+          location: journalEntries.location,
+          weather: journalEntries.weather,
+          audioUrl: journalEntries.audioUrl,
+          videoUrl: journalEntries.videoUrl,
+          imageUrls: journalEntries.imageUrls,
+          attachmentUrls: journalEntries.attachmentUrls,
+          duration: journalEntries.duration,
+          transcript: journalEntries.transcript,
+          aiSummary: journalEntries.aiSummary,
+          aiInsights: journalEntries.aiInsights,
+          entryDate: journalEntries.entryDate,
+          createdAt: journalEntries.createdAt,
+          updatedAt: journalEntries.updatedAt,
+        })
+        .from(journalEntries)
+        .where(and(...conditions))
+        .orderBy(desc(journalEntries.entryDate))
+        .limit(limit)
+        .offset(offset);
+    }
 
     // Get total count for pagination
     const totalResult = await db

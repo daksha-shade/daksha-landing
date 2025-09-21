@@ -102,23 +102,26 @@ export function JournalList() {
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
 
-    // Build API URL with filters
+    // Build API URL with filters + semantic search
     const apiUrl = `/api/journal?${new URLSearchParams({
         limit: "50",
         offset: "0",
         ...(filterType !== "all" && { type: filterType }),
+        ...(searchQuery.trim() && { q: searchQuery.trim() }),
     })}`;
 
     const { data, error, isLoading, mutate } = useSWR<JournalResponse>(apiUrl, fetcher);
 
     const journalEntries = data?.entries || [];
 
-    // Client-side filtering for search
-    const filteredEntries = journalEntries.filter(entry => {
-        if (searchQuery && !entry.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
-            !entry.plainTextContent?.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-        return true;
-    });
+    // If server-side semantic search used (q present), skip client filtering
+    const filteredEntries = searchQuery.trim()
+        ? journalEntries
+        : journalEntries.filter(entry => {
+            if (searchQuery && !entry.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
+                !entry.plainTextContent?.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+            return true;
+        });
 
     const visibleEntries = filteredEntries.slice(0, displayedEntries);
     const hasMoreEntries = displayedEntries < filteredEntries.length;
