@@ -300,6 +300,44 @@ export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: P
         }
     };
 
+    // Distraction-free overlay
+    if (focusMode) {
+        return (
+            <div className="fixed inset-0 z-50 bg-background">
+                <div className="flex items-center justify-between px-4 py-3 border-b">
+                    <Button variant="ghost" size="sm" onClick={() => setFocusMode(false)} className="gap-2">
+                        <ArrowLeft className="h-4 w-4" />
+                        Exit
+                    </Button>
+                    <div className="text-xs text-muted-foreground">
+                        {isNew && draftSavedAt ? `Draft saved ${draftSavedAt.toLocaleTimeString()}` : lastSaved ? `Saved ${lastSaved.toLocaleTimeString()}` : ''}
+                    </div>
+                    <Button onClick={handleSave} disabled={isSaving} size="sm" className="gap-2">
+                        {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                        Save
+                    </Button>
+                </div>
+                <div className="h-[calc(100vh-49px)] overflow-auto">
+                    <div className="mx-auto max-w-3xl p-6 space-y-6">
+                        <Input
+                            value={formData.title}
+                            onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                            className="text-3xl md:text-4xl font-semibold border-none p-0 focus-visible:ring-0 shadow-none bg-transparent h-auto tracking-tight placeholder:text-muted-foreground/60"
+                            placeholder="What's on your mind?"
+                        />
+                        <div className="min-h-[60vh] rounded-xl">
+                            <YooptaJournalEditor
+                                initialValue={yooptaContent}
+                                onChange={setYooptaContent}
+                                className="min-h-[60vh] p-2"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-background">
             {/* Header */}
@@ -411,7 +449,7 @@ export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: P
                     <div className={focusMode ? 'hidden' : 'space-y-4 xl:sticky xl:top-24 h-fit'}>
                         {/* Only show mood selector for existing entries; for new entries, we ask optionally after save */}
                         {!isNew && (
-                            <Card className="border rounded-xl">
+                            <Card className="border-none shadow-none bg-transparent">
                                 <CardContent className="p-4">
                                     <MoodSelector
                                         mood={formData.mood}
@@ -431,7 +469,7 @@ export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: P
                         )}
 
                         {/* Advanced (Tags & Context) */}
-                        <Card className="border rounded-xl">
+                        <Card className="border-none shadow-none bg-transparent">
                             <CardHeader className="pb-2">
                                 <CardTitle className="text-sm font-medium">Advanced</CardTitle>
                             </CardHeader>

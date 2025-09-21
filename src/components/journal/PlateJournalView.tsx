@@ -8,6 +8,7 @@ import { ArrowLeft, Edit3, Share, Trash2, MapPin, Cloud, BarChart3, Loader2, Mor
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { MoodSelector } from './MoodSelector';
@@ -542,78 +543,73 @@ export function PlateJournalView({ id, initialMode = 'view' }: PlateJournalViewP
                             </>
                         )}
 
-                        {/* AI Analysis */}
+                        {/* AI Analysis (Accordion) */}
                         {(entry.aiSummary || entry.aiSentiment || (entry.aiInsights && entry.aiInsights.length > 0)) && (
-                            <Card className="border rounded-xl">
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2 text-lg">
-                                        <BarChart3 className="h-5 w-5" />
-                                        AI Insights
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-6">
-                                    {entry.aiSummary && (
-                                        <div>
-                                            <h4 className="font-medium text-sm uppercase tracking-wide text-muted-foreground mb-3">Summary</h4>
-                                            <div className="prose prose-sm max-w-none">
-                                                <ReactMarkdown remarkPlugins={[remarkGfm]}>{entry.aiSummary}</ReactMarkdown>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {entry.aiSentiment && (
-                                        <div>
-                                            <h4 className="font-medium text-sm uppercase tracking-wide text-muted-foreground mb-3">Sentiment Analysis</h4>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                <div className="space-y-2">
-                                                    <div className="flex items-center justify-between">
-                                                        <span className="text-sm">Overall Sentiment</span>
-                                                        <Badge variant="outline" className="capitalize">
-                                                            {entry.aiSentiment.overall}
-                                                        </Badge>
-                                                    </div>
-                                                    <div className="flex items-center justify-between">
-                                                        <span className="text-sm">Confidence</span>
-                                                        <span className="text-sm font-medium">
-                                                            {Math.round(entry.aiSentiment.confidence * 100)}%
-                                                        </span>
+                            <div className="rounded-xl">
+                                <Accordion type="single" collapsible defaultValue="insights">
+                                    <AccordionItem value="insights">
+                                        <AccordionTrigger className="text-sm">AI Insights</AccordionTrigger>
+                                        <AccordionContent className="space-y-6">
+                                            {entry.aiSummary && (
+                                                <div>
+                                                    <h4 className="font-medium text-sm uppercase tracking-wide text-muted-foreground mb-3">Summary</h4>
+                                                    <div className="prose prose-sm max-w-none">
+                                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{entry.aiSummary}</ReactMarkdown>
                                                     </div>
                                                 </div>
+                                            )}
 
-                                                {entry.aiSentiment.emotions && entry.aiSentiment.emotions.length > 0 && (
-                                                    <div>
-                                                        <span className="text-sm font-medium mb-2 block">Top Emotions</span>
-                                                        <div className="space-y-1">
-                                                            {entry.aiSentiment.emotions.slice(0, 4).map((emotion, index) => (
-                                                                <div key={index} className="flex items-center justify-between text-sm">
-                                                                    <span className="capitalize">{emotion.emotion}</span>
-                                                                    <span className="text-muted-foreground">{Math.round(emotion.intensity * 100)}%</span>
-                                                                </div>
-                                                            ))}
+                                            {entry.aiSentiment && (
+                                                <div>
+                                                    <h4 className="font-medium text-sm uppercase tracking-wide text-muted-foreground mb-3">Sentiment</h4>
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                        <div className="space-y-2">
+                                                            <div className="flex items-center justify-between">
+                                                                <span className="text-sm">Overall</span>
+                                                                <Badge variant="outline" className="capitalize">{entry.aiSentiment.overall}</Badge>
+                                                            </div>
+                                                            <div className="flex items-center justify-between">
+                                                                <span className="text-sm">Confidence</span>
+                                                                <span className="text-sm font-medium">{Math.round(entry.aiSentiment.confidence * 100)}%</span>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    )}
 
-                                    {entry.aiInsights && entry.aiInsights.length > 0 && (
-                                        <div>
-                                            <h4 className="font-medium text-sm uppercase tracking-wide text-muted-foreground mb-3">Key Insights</h4>
-                                            <ul className="space-y-3">
-                                                {entry.aiInsights.map((insight, index) => (
-                                                    <li key={index} className="flex items-start gap-3">
-                                                        <span className="text-primary mt-2 w-1.5 h-1.5 rounded-full bg-current flex-shrink-0"></span>
-                                                        <span className="text-sm leading-relaxed prose prose-sm w-full max-w-none">
-                                                            <ReactMarkdown remarkPlugins={[remarkGfm]}>{insight}</ReactMarkdown>
-                                                        </span>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    )}
-                                </CardContent>
-                            </Card>
+                                                        {entry.aiSentiment.emotions && entry.aiSentiment.emotions.length > 0 && (
+                                                            <div>
+                                                                <span className="text-sm font-medium mb-2 block">Top Emotions</span>
+                                                                <div className="space-y-1">
+                                                                    {entry.aiSentiment.emotions.slice(0, 4).map((emotion, index) => (
+                                                                        <div key={index} className="flex items-center justify-between text-sm">
+                                                                            <span className="capitalize">{emotion.emotion}</span>
+                                                                            <span className="text-muted-foreground">{Math.round(emotion.intensity * 100)}%</span>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {entry.aiInsights && entry.aiInsights.length > 0 && (
+                                                <div>
+                                                    <h4 className="font-medium text-sm uppercase tracking-wide text-muted-foreground mb-3">Key Insights</h4>
+                                                    <ul className="space-y-3">
+                                                        {entry.aiInsights.map((insight, index) => (
+                                                            <li key={index} className="flex items-start gap-3">
+                                                                <span className="text-primary mt-2 w-1.5 h-1.5 rounded-full bg-current flex-shrink-0" />
+                                                                <span className="text-sm leading-relaxed prose prose-sm w-full max-w-none">
+                                                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{insight}</ReactMarkdown>
+                                                                </span>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                </Accordion>
+                            </div>
                         )}
                     </div>
                 </div>
