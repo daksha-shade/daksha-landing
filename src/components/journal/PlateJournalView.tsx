@@ -15,6 +15,8 @@ import { TagInput } from './TagInput';
 import { toast } from 'sonner';
 import YooptaJournalEditor from './YooptaJournalEditor';
 import { yooptaToPlainText } from '@/lib/yoopta-utils';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface JournalEntry {
     id: string;
@@ -162,6 +164,65 @@ export function PlateJournalView({ id, initialMode = 'view' }: PlateJournalViewP
         setEditorKey(prev => prev + 1);
     };
 
+    const [pendingMood, setPendingMood] = useState<{ mood?: string; moodIntensity?: number; emotionalTags?: string[] }>({});
+
+    const handleSaveMood = async () => {
+        if (!entry) return;
+        try {
+            const res = await fetch(`/api/journal/${entry.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    mood: pendingMood.mood,
+                    moodIntensity: pendingMood.moodIntensity,
+                    emotionalTags: pendingMood.emotionalTags,
+                }),
+            });
+            if (res.ok) {
+                toast.success('Mood saved');
+                mutate();
+            } else {
+                toast.error('Failed to save mood');
+            }
+        } catch (e) {
+            console.error(e);
+            toast.error('Failed to save mood');
+        }
+    };
+
+    const handleDecideMoodAI = async () => {
+        if (!entry) return;
+        try {
+            const content = yooptaToPlainText(yooptaContent || entry.yooptaContent || {});
+            await fetch(`/api/journal/${entry.id}/analyze`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ plainTextContent: content })
+            });
+            await mutate();
+        } catch (e) {
+            console.error(e);
+        }
+        try {
+            const top = data?.entry?.aiSentiment?.emotions?.[0] || null;
+            if (!top) {
+                toast.error('AI could not determine mood');
+                return;
+            }
+            const mood = top.emotion;
+            const res2 = await fetch(`/api/journal/${entry.id}`, {
+                method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ mood })
+            });
+            if (res2.ok) {
+                toast.success(`Mood set to ${mood}`);
+                mutate();
+            }
+        } catch (e) {
+            console.error(e);
+            toast.error('Failed to set mood');
+        }
+    };
+
     const handleDelete = async () => {
         if (!entry || !confirm('Are you sure you want to delete this journal entry?')) return;
 
@@ -305,7 +366,7 @@ export function PlateJournalView({ id, initialMode = 'view' }: PlateJournalViewP
             </div>
 
             <div className="container mx-auto px-4 py-6">
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px] gap-8">
                     {/* Main Content */}
                     <div className="lg:col-span-3 space-y-6">
                         {/* Title */}
@@ -403,7 +464,24 @@ export function PlateJournalView({ id, initialMode = 'view' }: PlateJournalViewP
                     </div>
 
                     {/* Sidebar */}
-                    <div className="space-y-4">
+                    <div className="space-y-4 xl:sticky xl:top-24 h-fit">
+                        {!isEditing && !entry.mood && (
+                            <Card className="border rounded-xl">
+                                <CardHeader className="pb-2"><CardTitle className="text-sm">How are you feeling?</CardTitle></CardHeader>
+                                <CardContent className="pt-0 space-y-3">
+                                    <MoodSelector
+                                        mood={pendingMood.mood}
+                                        moodIntensity={pendingMood.moodIntensity}
+                                        emotionalTags={pendingMood.emotionalTags}
+                                        onChange={(m, i, tags) => setPendingMood({ mood: m, moodIntensity: i, emotionalTags: tags || [] })}
+                                    />
+                                    <div className="flex gap-2">
+                                        <Button size="sm" onClick={handleSaveMood}>Save mood</Button>
+                                        <Button size="sm" variant="outline" onClick={handleDecideMoodAI}>Decide for me</Button>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )}
                         {isEditing && (
                             <>
                                 {/* Mood & Emotions */}
@@ -466,7 +544,7 @@ export function PlateJournalView({ id, initialMode = 'view' }: PlateJournalViewP
 
                         {/* AI Analysis */}
                         {(entry.aiSummary || entry.aiSentiment || (entry.aiInsights && entry.aiInsights.length > 0)) && (
-                            <Card className="border-none shadow-sm">
+                            <Card className="border rounded-xl">
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2 text-lg">
                                         <BarChart3 className="h-5 w-5" />
@@ -478,7 +556,7 @@ export function PlateJournalView({ id, initialMode = 'view' }: PlateJournalViewP
                                         <div>
                                             <h4 className="font-medium text-sm uppercase tracking-wide text-muted-foreground mb-3">Summary</h4>
                                             <div className="prose prose-sm max-w-none">
-                                                <div dangerouslySetInnerHTML={{ __html: entry.aiSummary }} />
+                                                <ReactMarkdown remarkPlugins={[remarkGfm]}>{entry.aiSummary}</ReactMarkdown>
                                             </div>
                                         </div>
                                     )}
@@ -526,7 +604,9 @@ export function PlateJournalView({ id, initialMode = 'view' }: PlateJournalViewP
                                                 {entry.aiInsights.map((insight, index) => (
                                                     <li key={index} className="flex items-start gap-3">
                                                         <span className="text-primary mt-2 w-1.5 h-1.5 rounded-full bg-current flex-shrink-0"></span>
-                                                        <span className="text-sm leading-relaxed">{insight}</span>
+                                                        <span className="text-sm leading-relaxed prose prose-sm w-full max-w-none">
+                                                            <ReactMarkdown remarkPlugins={[remarkGfm]}>{insight}</ReactMarkdown>
+                                                        </span>
                                                     </li>
                                                 ))}
                                             </ul>

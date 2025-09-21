@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Save, Loader2, Sparkles, MapPin, Cloud, Calendar } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Sparkles, MapPin, Cloud, Calendar, ScanLine } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -65,6 +65,7 @@ export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: P
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [lastSaved, setLastSaved] = useState<Date | null>(null);
     const [draftSavedAt, setDraftSavedAt] = useState<Date | null>(null);
+    const [focusMode, setFocusMode] = useState(false);
 
     const [formData, setFormData] = useState({
         title: entry?.title || '',
@@ -302,7 +303,7 @@ export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: P
     return (
         <div className="min-h-screen bg-background">
             {/* Header */}
-            <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+            <div className="sticky top-0 z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
                 <div className="container mx-auto px-4 py-3">
                     <div className="flex items-center justify-between">
                         <Button
@@ -347,6 +348,18 @@ export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: P
                                 </Button>
                             )}
 
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setFocusMode(v => !v)}
+                                className="hidden sm:inline-flex gap-2"
+                                title="Distraction-free writing"
+                            >
+                                <ScanLine className="h-4 w-4" />
+                                <span className="hidden md:inline">{focusMode ? 'Exit Focus' : 'Focus Mode'}</span>
+                            </Button>
+
                             <Button onClick={handleSave} disabled={isSaving} size="sm" className="gap-2">
                                 {isSaving ? (
                                     <>
@@ -366,7 +379,7 @@ export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: P
             </div>
 
             <div className="container mx-auto px-4 py-6">
-                <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px] gap-8">
+                <div className={focusMode ? 'grid grid-cols-1 gap-8' : 'grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px] gap-8'}>
                     {/* Main Editor */}
                     <div className="lg:col-span-3 space-y-4">
                         {/* Title */}
@@ -378,70 +391,83 @@ export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: P
                         />
 
                         {/* Yoopta Editor */}
-                        <div className="min-h-[400px] rounded-xl border bg-background/30">
+                        <div className={"min-h-[400px] rounded-xl border bg-background/30 " + (focusMode ? 'fixed inset-16 z-30 container mx-auto max-w-4xl bg-background shadow-xl' : '')}>
                             <YooptaJournalEditor
                                 initialValue={yooptaContent}
                                 onChange={setYooptaContent}
                                 className="min-h-[400px] p-5"
                             />
                         </div>
+                        {focusMode && (
+                            <div className="fixed top-6 right-6 z-40">
+                                <Button size="sm" onClick={() => setFocusMode(false)}>
+                                    Exit Focus
+                                </Button>
+                            </div>
+                        )}
                     </div>
 
                     {/* Sidebar */}
-                    <div className="space-y-4 xl:sticky xl:top-24 h-fit">
-                        {/* Mood & Emotions */}
-                        <Card className="border rounded-xl">
-                            <CardContent className="p-4">
-                                <MoodSelector
-                                    mood={formData.mood}
-                                    moodIntensity={formData.moodIntensity}
-                                    emotionalTags={formData.emotionalTags}
-                                    onChange={(mood, intensity, emotions) =>
-                                        setFormData(prev => ({
-                                            ...prev,
-                                            mood,
-                                            moodIntensity: intensity,
-                                            emotionalTags: emotions || []
-                                        }))
-                                    }
-                                />
-                            </CardContent>
-                        </Card>
+                    <div className={focusMode ? 'hidden' : 'space-y-4 xl:sticky xl:top-24 h-fit'}>
+                        {/* Only show mood selector for existing entries; for new entries, we ask optionally after save */}
+                        {!isNew && (
+                            <Card className="border rounded-xl">
+                                <CardContent className="p-4">
+                                    <MoodSelector
+                                        mood={formData.mood}
+                                        moodIntensity={formData.moodIntensity}
+                                        emotionalTags={formData.emotionalTags}
+                                        onChange={(mood, intensity, emotions) =>
+                                            setFormData(prev => ({
+                                                ...prev,
+                                                mood,
+                                                moodIntensity: intensity,
+                                                emotionalTags: emotions || []
+                                            }))
+                                        }
+                                    />
+                                </CardContent>
+                            </Card>
+                        )}
 
-                        {/* Tags */}
+                        {/* Advanced (Tags & Context) */}
                         <Card className="border rounded-xl">
-                            <CardContent className="p-4">
-                                <TagInput
-                                    tags={formData.tags}
-                                    onChange={(tags) => setFormData(prev => ({ ...prev, tags }))}
-                                />
-                            </CardContent>
-                        </Card>
-
-                        {/* Context */}
-                        <Card className="border rounded-xl">
-                            <CardHeader className="pb-3">
-                                <CardTitle className="text-sm font-medium">Context</CardTitle>
+                            <CardHeader className="pb-2">
+                                <CardTitle className="text-sm font-medium">Advanced</CardTitle>
                             </CardHeader>
-                            <CardContent className="pt-0 space-y-3">
-                                <div className="relative">
-                                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                    <Input
-                                        placeholder="Location"
-                                        value={formData.location}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                                        className="pl-10 h-9"
-                                    />
-                                </div>
-                                <div className="relative">
-                                    <Cloud className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                    <Input
-                                        placeholder="Weather"
-                                        value={formData.weather}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, weather: e.target.value }))}
-                                        className="pl-10 h-9"
-                                    />
-                                </div>
+                            <CardContent className="pt-0">
+                                <details className="group">
+                                    <summary className="cursor-pointer text-sm text-muted-foreground py-2">Tags</summary>
+                                    <div className="pt-2">
+                                        <TagInput
+                                            tags={formData.tags}
+                                            onChange={(tags) => setFormData(prev => ({ ...prev, tags }))}
+                                        />
+                                    </div>
+                                </details>
+                                <details className="group mt-4">
+                                    <summary className="cursor-pointer text-sm text-muted-foreground py-2">Context</summary>
+                                    <div className="pt-2 space-y-3">
+                                        <div className="relative">
+                                            <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                            <Input
+                                                placeholder="Location"
+                                                value={formData.location}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                                                className="pl-10 h-9"
+                                            />
+                                        </div>
+                                        <div className="relative">
+                                            <Cloud className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                            <Input
+                                                placeholder="Weather"
+                                                value={formData.weather}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, weather: e.target.value }))}
+                                                className="pl-10 h-9"
+                                            />
+                                        </div>
+                                    </div>
+                                </details>
                             </CardContent>
                         </Card>
 
