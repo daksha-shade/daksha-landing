@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { ContentRenderer } from './ContentRenderer';
 import { toast } from 'sonner';
 
 interface JournalEntry {
@@ -82,30 +83,7 @@ const formatFullDate = (dateString: string) => {
 
 const fetcher = (url: string): Promise<{ entry: JournalEntry }> => fetch(url).then((res) => res.json());
 
-// Helper function to render rich content from JSON
-const renderContent = (content: any, plainTextContent?: string) => {
-    if (!content && !plainTextContent) return <p className="text-muted-foreground italic">No content</p>;
 
-    // If we have plainTextContent, use it for display (it's more reliable)
-    if (plainTextContent) {
-        return plainTextContent.split('\n').map((paragraph, index) => (
-            <p key={index} className="mb-4 leading-relaxed">
-                {paragraph || '\u00A0'} {/* Non-breaking space for empty lines */}
-            </p>
-        ));
-    }
-
-    // Fallback to content if no plainTextContent
-    if (typeof content === 'string') {
-        return content.split('\n').map((paragraph, index) => (
-            <p key={index} className="mb-4 leading-relaxed">
-                {paragraph || '\u00A0'}
-            </p>
-        ));
-    }
-
-    return <p className="text-muted-foreground italic">Content format not supported</p>;
-};
 
 export function JournalEntryView({ id, initialMode }: JournalEntryViewProps) {
     const router = useRouter();
@@ -306,9 +284,10 @@ export function JournalEntryView({ id, initialMode }: JournalEntryViewProps) {
                     {/* Main Content */}
                     <Card className="border-none shadow-sm">
                         <CardContent className="p-6 sm:p-8">
-                            <div className="prose prose-sm sm:prose-base max-w-none">
-                                {renderContent(entry.content, entry.plainTextContent)}
-                            </div>
+                            <ContentRenderer
+                                content={entry.content}
+                                plainTextContent={entry.plainTextContent}
+                            />
                         </CardContent>
                     </Card>
 

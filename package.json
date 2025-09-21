@@ -93,6 +93,7 @@
 		"@radix-ui/react-tooltip": "^1.2.8",
 		"@radix-ui/react-use-controllable-state": "^1.2.2",
 		"@stackframe/stack": "^2.8.16",
+		"@tailwindcss/typography": "^0.5.18",
 		"@tiptap/extension-character-count": "^3.4.4",
 		"@tiptap/extension-code-block-lowlight": "^3.4.4",
 		"@tiptap/extension-highlight": "^3.4.4",

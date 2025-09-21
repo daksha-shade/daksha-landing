@@ -496,17 +496,13 @@ export function JournalList() {
                                                 : "No entries match your current filters"
                                         }
                                     </p>
-                                    <div className="flex gap-2 justify-center">
-                                        {journalEntries.length === 0 ? (
-                                            <Button onClick={seedData} variant="outline" className="mt-2">
-                                                Load Sample Entries
-                                            </Button>
-                                        ) : (
+                                    {journalEntries.length > 0 && (
+                                        <div className="flex gap-2 justify-center">
                                             <Button onClick={deleteAndReseedData} variant="outline" className="mt-2 text-destructive hover:text-destructive">
                                                 Delete All & Reseed
                                             </Button>
-                                        )}
-                                    </div>
+                                        </div>
+                                    )}
                                 </CardContent>
                             </Card>
                         )}
