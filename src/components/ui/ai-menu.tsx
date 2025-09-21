@@ -57,7 +57,7 @@ export function AIMenu() {
 
   const [value, setValue] = React.useState('');
 
-  const chat = useChat();
+  const chat = useChat() as any;
 
   const { input, messages, status } = chat;
   const [anchorElement, setAnchorElement] = React.useState<HTMLElement | null>(

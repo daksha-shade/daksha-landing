@@ -1,28 +1,26 @@
 'use client';
 
 import * as React from 'react';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import useSWR from 'swr';
-import { Plate, usePlateEditor } from 'platejs/react';
-import { serializeMd } from '@platejs/markdown';
 import { ArrowLeft, Edit3, Share, Trash2, MapPin, Cloud, BarChart3, Loader2, MoreVertical, Save, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Editor, EditorContainer } from '@/components/ui/editor';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { EditorKit } from '@/components/editor/editor-kit';
 import { MoodSelector } from './MoodSelector';
 import { TagInput } from './TagInput';
 import { toast } from 'sonner';
+import YooptaJournalEditor from './YooptaJournalEditor';
+import { yooptaToPlainText } from '@/lib/yoopta-utils';
 
 interface JournalEntry {
     id: string;
     title: string;
-    content?: any; // Plate.js JSON content
-    markdownContent?: string;
+    yooptaContent?: any;
+    plainTextContent?: string;
     type: "text" | "audio" | "video";
     mood?: string;
     moodIntensity?: number;
@@ -76,9 +74,9 @@ const formatFullDate = (dateString: string) => {
 
 const fetcher = (url: string): Promise<{ entry: JournalEntry }> => fetch(url).then((res) => res.json());
 
-export function PlateJournalView({ id }: PlateJournalViewProps) {
+export function PlateJournalView({ id, initialMode = 'view' }: PlateJournalViewProps & { initialMode?: 'view' | 'edit' }) {
     const router = useRouter();
-    const [isEditing, setIsEditing] = useState(false);
+    const [isEditing, setIsEditing] = useState(initialMode === 'edit');
     const [isSaving, setIsSaving] = useState(false);
     const [editData, setEditData] = useState<Partial<JournalEntry>>({});
     const [editorKey, setEditorKey] = useState(0);
@@ -90,9 +88,15 @@ export function PlateJournalView({ id }: PlateJournalViewProps) {
 
     const entry = data?.entry;
 
-    const editor = usePlateEditor({
-        plugins: EditorKit,
-        value: entry?.content || [{ children: [{ text: '' }], type: 'p' }],
+    const [yooptaContent, setYooptaContent] = useState<any>(entry?.yooptaContent || {
+        '1': {
+            id: '1',
+            type: 'Paragraph',
+            value: [
+                { id: '1-p', type: 'paragraph', children: [{ text: '' }] },
+            ],
+            meta: { order: 0, depth: 0 },
+        },
     });
 
     const handleEdit = () => {
@@ -117,16 +121,15 @@ export function PlateJournalView({ id }: PlateJournalViewProps) {
 
         setIsSaving(true);
         try {
-            const content = editor.children;
-            const markdownContent = serializeMd(editor, { nodes: content });
+            const plainTextContent = yooptaToPlainText(yooptaContent);
 
             const response = await fetch(`/api/journal/${entry.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     title: editData.title,
-                    content,
-                    markdownContent,
+                    yooptaContent,
+                    plainTextContent,
                     mood: editData.mood,
                     moodIntensity: editData.moodIntensity,
                     emotionalTags: editData.emotionalTags,
@@ -181,7 +184,7 @@ export function PlateJournalView({ id }: PlateJournalViewProps) {
             try {
                 await navigator.share({
                     title: entry?.title,
-                    text: entry?.markdownContent?.slice(0, 100) + '...',
+                    text: entry?.plainTextContent?.slice(0, 100) + '...',
                     url: window.location.href,
                 });
             } catch (error) {
@@ -376,28 +379,23 @@ export function PlateJournalView({ id }: PlateJournalViewProps) {
                         <Card className="border-none shadow-sm">
                             <CardContent className="p-6 sm:p-8">
                                 {isEditing ? (
-                                    <Plate key={`edit-${editorKey}`} editor={editor}>
-                                        <EditorContainer>
-                                            <Editor
-                                                variant="demo"
-                                                className="min-h-[400px] p-4 border rounded-lg focus-within:ring-2 focus-within:ring-primary focus-within:border-primary"
-                                            />
-                                        </EditorContainer>
-                                    </Plate>
+                                    <YooptaJournalEditor
+                                        key={`edit-${editorKey}`}
+                                        initialValue={yooptaContent}
+                                        onChange={setYooptaContent}
+                                        className="min-h-[400px] p-4 border rounded-lg focus-within:ring-2 focus-within:ring-primary focus-within:border-primary"
+                                    />
                                 ) : (
                                     <div
                                         className="min-h-[200px] cursor-pointer hover:bg-muted/20 rounded p-4 -m-4 transition-colors"
                                         onClick={handleEdit}
                                     >
-                                        <Plate key={`view-${editorKey}`} editor={editor}>
-                                            <EditorContainer>
-                                                <Editor
-                                                    variant="demo"
-                                                    readOnly
-                                                    className="prose prose-sm sm:prose-base lg:prose-lg max-w-none"
-                                                />
-                                            </EditorContainer>
-                                        </Plate>
+                                        <YooptaJournalEditor
+                                            key={`view-${editorKey}`}
+                                            initialValue={yooptaContent}
+                                            readOnly
+                                            className="prose prose-sm sm:prose-base lg:prose-lg max-w-none"
+                                        />
                                     </div>
                                 )}
                             </CardContent>

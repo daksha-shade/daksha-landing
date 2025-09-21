@@ -54,13 +54,7 @@ export function ChatInterface() {
     const [currentAgent] = useState<AgentRole>("core");
     const [isProcessing] = useState(false);
 
-    const runtime = useChatRuntime({
-        api: "/api/chat",
-        body: {
-            contextSearch: true,
-            webSearch: false,
-        },
-    });
+    const runtime = useChatRuntime();
 
     // Debug: Log runtime state
     console.log('Runtime state:', runtime);

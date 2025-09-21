@@ -18,8 +18,8 @@ import { toast } from "sonner";
 interface JournalEntry {
     id: string;
     title: string;
-    content?: any; // Plate.js JSON content
-    markdownContent?: string;
+    yooptaContent?: any;
+    plainTextContent?: string;
     type: "text" | "audio" | "video";
     mood?: string;
     moodIntensity?: number;
@@ -400,7 +400,7 @@ export function JournalList() {
                                                 <DropdownMenuContent align="end">
                                                     <DropdownMenuItem onClick={(e) => {
                                                         e.stopPropagation();
-                                                        router.push(`/journal/${entry.id}/edit`);
+                                                        router.push(`/journal/${entry.id}?mode=edit`);
                                                     }}>
                                                         Edit
                                                     </DropdownMenuItem>
@@ -427,7 +427,7 @@ export function JournalList() {
 
                                     <CardContent className="pt-0">
                                         <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
-                                            {entry.markdownContent || entry.transcript || "No content"}
+                                            {entry.plainTextContent || entry.transcript || "No content"}
                                         </p>
 
                                         {entry.type === "audio" && entry.duration && (

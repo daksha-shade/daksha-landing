@@ -1,0 +1,1557 @@
+================
+CODE SNIPPETS
+================
+TITLE: Development Server Commands
+DESCRIPTION: Commands to start the development server using different package managers. These commands initiate a local server for development and hot-reloading.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/web/next-example/README.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+npm run dev
+```
+
+LANGUAGE: bash
+CODE:
+```
+yarn dev
+```
+
+LANGUAGE: bash
+CODE:
+```
+pnpm dev
+```
+
+LANGUAGE: bash
+CODE:
+```
+bun dev
+```
+
+--------------------------------
+
+TITLE: Install Yoopta Editor Core and Paragraph Plugin
+DESCRIPTION: Installs the necessary peer dependencies (slate, slate-react, react, react-dom) along with the Yoopta core editor package and the paragraph plugin. This is the minimum setup required to start using Yoopta-Editor.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/README.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+## slate, slate-react, react, react-dom - peer dependencies
+## @yoopta/editor - core package
+yarn add slate slate-react @yoopta/editor @yoopta/paragraph
+# or
+npm install slate slate-react @yoopta/editor @yoopta/paragraph
+```
+
+--------------------------------
+
+TITLE: Initialize Yoopta Editor Component
+DESCRIPTION: Demonstrates the basic setup for using the YooptaEditor component. It shows how to import the Editor and create an editor instance using `createYooptaEditor`. This is the starting point for integrating the editor into a React application.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/README.md#_snippet_1
+
+LANGUAGE: jsx
+CODE:
+```
+import YooptaEditor, { createYooptaEditor } from '@yoopta/editor';
+
+const plugins = [...];
+
+export default function Editor() {
+  const editor = useMemo(() => createYooptaEditor(), []);
+  const [value, setValue] = useState<YooptaContentValue>();
+
+  const onChange = (value: YooptaContentValue, options: YooptaOnChangeOptions) => {
+    setValue(value);
+  };
+
+  return (
+    <div>
+      <YooptaEditor
+        editor={editor}
+        plugins={plugins}
+        value={value}
+        onChange={onChange}
+      />
+    </div>
+  );
+}
+```
+
+--------------------------------
+
+TITLE: yoopta-code Usage Example
+DESCRIPTION: Demonstrates how to import and utilize the yoopta-code module in a JavaScript project. This snippet shows the basic setup for using the library.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/code/README.md#_snippet_0
+
+LANGUAGE: javascript
+CODE:
+```
+const code = require('yoopta-code');
+
+// TODO: DEMONSTRATE API
+```
+
+--------------------------------
+
+TITLE: Next.js API Route Example
+DESCRIPTION: Demonstrates accessing a default API route and its corresponding file location within a Next.js project. API routes are mapped to the '/api/*' path.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/web/next-example/README.md#_snippet_1
+
+LANGUAGE: apidoc
+CODE:
+```
+API Endpoint:
+  GET /api/hello
+
+Description:
+  A sample API endpoint provided by default.
+
+File Location:
+  pages/api/hello.ts
+
+Access:
+  http://localhost:3000/api/hello
+
+Returns:
+  JSON object with a 'name' property, e.g., {"name": "John Doe"}
+```
+
+--------------------------------
+
+TITLE: Install Yoopta Editor
+DESCRIPTION: Installs the core Yoopta Editor package using yarn.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/core/editor/README.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+yarn add @yoopta/editor
+```
+
+--------------------------------
+
+TITLE: Install Yoopta Divider
+DESCRIPTION: Installs the Yoopta Divider package using Yarn.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/divider/README.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+yarn add @yoopta/divider
+```
+
+--------------------------------
+
+TITLE: Install @yoopta/headings Plugin
+DESCRIPTION: Installs the Headings plugin package for Yoopta-Editor using Yarn. This is the first step to integrate heading functionality into your editor.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/headings/README.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+yarn add @yoopta/headings
+```
+
+--------------------------------
+
+TITLE: Start Yoopta Editor Development Mode
+DESCRIPTION: Starts the Yoopta Editor development server in watch mode for specified packages. This allows for focused development on particular parts of the editor. Use the PACKAGES environment variable to specify which packages to run.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/CONTRIBUTING.md#_snippet_1
+
+LANGUAGE: bash
+CODE:
+```
+PACKAGES="<package names>" yarn dev
+```
+
+LANGUAGE: bash
+CODE:
+```
+PACKAGES="@yoopta/editor @yoopta/paragraph" yarn dev
+```
+
+--------------------------------
+
+TITLE: Run Development Server
+DESCRIPTION: Commands to start the Next.js development server using different package managers. This allows for local testing and development.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/development/README.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+npm run dev
+```
+
+LANGUAGE: bash
+CODE:
+```
+yarn dev
+```
+
+LANGUAGE: bash
+CODE:
+```
+pnpm dev
+```
+
+LANGUAGE: bash
+CODE:
+```
+bun dev
+```
+
+--------------------------------
+
+TITLE: Install Yoopta Lists Plugin
+DESCRIPTION: Installs the necessary package for Yoopta Editor's list plugins using Yarn. This is the first step to integrate list functionalities into your editor.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/lists/README.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+yarn add @yoopta/lists
+```
+
+--------------------------------
+
+TITLE: Install Callout Plugin
+DESCRIPTION: Installs the Callout plugin for Yoopta-Editor using yarn. This is the first step to integrate the plugin into your project.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/callout/README.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+yarn add @yoopta/callout
+```
+
+--------------------------------
+
+TITLE: Next.js API Route Example
+DESCRIPTION: Illustrates how API routes are structured and accessed in a Next.js application. The example shows the default API route at /api/hello.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/development/README.md#_snippet_1
+
+LANGUAGE: typescript
+CODE:
+```
+pages/api/hello.ts
+```
+
+--------------------------------
+
+TITLE: Install Blockquote Plugin
+DESCRIPTION: Installs the Blockquote plugin package using yarn. This is the first step to integrate blockquote functionality into your Yoopta-Editor instance.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/blockquote/README.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+yarn add @yoopta/blockquote
+```
+
+--------------------------------
+
+TITLE: Install Yoopta Table Plugin
+DESCRIPTION: Installs the Yoopta Table Plugin using yarn. This is the first step to integrate table functionality into your Yoopta Editor instance.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/table/README.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+yarn add @yoopta/table
+```
+
+--------------------------------
+
+TITLE: Import yoopta-blockquote
+DESCRIPTION: Demonstrates how to import the yoopta-blockquote module. This is a basic setup for using the blockquote functionality.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/core/yoopta-chatGPT-assistant/README.md#_snippet_0
+
+LANGUAGE: javascript
+CODE:
+```
+const blockquote = require('yoopta-blockquote');
+
+// TODO: DEMONSTRATE API
+```
+
+--------------------------------
+
+TITLE: Install Paragraph Plugin
+DESCRIPTION: Installs the Paragraph plugin for Yoopta-Editor using yarn. This is the first step to integrate the plugin into your project.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/paragraph/README.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+yarn add @yoopta/paragraph
+```
+
+--------------------------------
+
+TITLE: Build Yoopta Editor Project
+DESCRIPTION: Builds all packages in the Yoopta Editor project. This command should be run before starting active development to ensure all dependencies are compiled.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/CONTRIBUTING.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+yarn build
+```
+
+--------------------------------
+
+TITLE: YooptaEditor Setup with Marks
+DESCRIPTION: Demonstrates how to import and use custom marks like Bold, Italic, and Underline with the YooptaEditor component. It shows the basic editor setup, state management for content changes, and passing the marks array to the editor's props.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/README.md#_snippet_5
+
+LANGUAGE: jsx
+CODE:
+```
+import { Bold, Italic, CodeMark, Underline, Strike, Highlight } from '@yoopta/marks';
+import { createYooptaEditor } from '@yoopta/editor';
+import { YooptaEditor, YooptaContentValue, YooptaOnChangeOptions } from '@yoopta/editor';
+import { useMemo, useState } from 'react';
+
+// Define the marks to be used in the editor
+const MARKS = [
+  Bold,
+  Italic,
+  CodeMark,
+  Underline,
+  Strike,
+  Highlight
+];
+
+// Placeholder for plugins and tools, assuming they are defined elsewhere
+const plugins = [];
+const TOOLS = [];
+
+export default function Editor() {
+  // Initialize the editor instance using useMemo for performance
+  const editor = useMemo(() => createYooptaEditor(), []);
+  // State to hold the editor's content value
+  const [value, setValue] = useState<YooptaContentValue>();
+
+  // Handler for content changes
+  const onChange = (value: YooptaContentValue, options: YooptaOnChangeOptions) => {
+    setValue(value);
+  };
+
+  return (
+    <div>
+      <YooptaEditor
+        editor={editor}
+        placeholder="Type text.."
+        plugins={plugins}
+        value={value}
+        onChange={onChange}
+        tools={TOOLS}
+        marks={MARKS} // Pass the defined marks to the editor
+      />
+    </div>
+  );
+}
+```
+
+--------------------------------
+
+TITLE: Basic yoopta-video Usage
+DESCRIPTION: Demonstrates how to require the yoopta-video package in a JavaScript environment. This snippet serves as a starting point for integrating video functionality.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/video/README.md#_snippet_0
+
+LANGUAGE: javascript
+CODE:
+```
+const video = require('yoopta-video');
+
+// TODO: DEMONSTRATE API
+```
+
+--------------------------------
+
+TITLE: Integrate Yoopta Editor with Tools
+DESCRIPTION: Demonstrates how to integrate custom tools with the YooptaEditor by passing a `tools` object. This example includes Toolbar, ActionMenu, and LinkTool, showing how to define and pass tool configurations to the editor component.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/README.md#_snippet_4
+
+LANGUAGE: jsx
+CODE:
+```
+// IMPORT TOOLS
+import LinkTool, { DefaultLinkToolRender } from '@yoopta/link-tool';
+import ActionMenu, { DefaultActionMenuRender } from '@yoopta/action-menu-list';
+import Toolbar, { DefaultToolbarRender } from '@yoopta/toolbar';
+
+// Tools should be defined outside component
+const TOOLS = {
+  Toolbar: {
+    tool: Toolbar,
+    render: DefaultToolbarRender,
+  },
+  ActionMenu: {
+    tool: ActionMenu,
+    render: DefaultActionMenuRender,
+  },
+  LinkTool: {
+    tool: LinkTool,
+    render: DefaultLinkToolRender,
+  },
+};
+
+export default function Editor() {
+  const editor = useMemo(() => createYooptaEditor(), []);
+  const [value, setValue] = useState<YooptaContentValue>();
+  const onChange = (value: YooptaContentValue, options: YooptaOnChangeOptions) => {
+    setValue(value);
+  };
+
+  return (
+    <div>
+      <YooptaEditor
+        editor={editor}
+        plugins={plugins}
+        placeholder="Type text.."
+        value={value}
+        onChange={onChange}
+        tools={TOOLS}
+      />
+    </div>
+  );
+}
+```
+
+--------------------------------
+
+TITLE: Install @yoopta/exports Package
+DESCRIPTION: Installs the @yoopta/exports package using Yarn. This package is essential for handling content export and import functionalities within the Yoopta editor.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/core/exports/README.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+yarn add @yoopta/exports
+```
+
+--------------------------------
+
+TITLE: Integrate Yoopta Editor with Plugins
+DESCRIPTION: Shows how to use the YooptaEditor component with specific plugins like Paragraph and Blockquote. This example illustrates passing an array of plugin components to the `plugins` prop, enabling their functionality within the editor.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/README.md#_snippet_3
+
+LANGUAGE: jsx
+CODE:
+```
+import YooptaEditor, { createYooptaEditor } from '@yoopta/editor';
+import Paragraph from '@yoopta/paragraph';
+import Blockquote from '@yoopta/blockquote';
+
+const plugins = [Paragraph, Blockquote];
+
+export default function Editor() {
+  const editor = useMemo(() => createYooptaEditor(), []);
+  const [value, setValue] = useState<YooptaContentValue>();
+  const onChange = (value: YooptaContentValue, options: YooptaOnChangeOptions) => {
+    setValue(value);
+  };
+
+  return (
+    <div>
+      <YooptaEditor
+        editor={editor}
+        placeholder="Type text.."
+        value={value}
+        onChange={onChange}
+        plugins={plugins}
+      />
+    </div>
+  );
+}
+```
+
+--------------------------------
+
+TITLE: Basic Callout Plugin Usage
+DESCRIPTION: Demonstrates how to import and use the Callout plugin within a YooptaEditor component. It shows the basic setup for integrating custom plugins.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/callout/README.md#_snippet_1
+
+LANGUAGE: jsx
+CODE:
+```
+import Callout from '@yoopta/callout';
+
+const plugins = [Callout];
+
+const Editor = () => {
+  return <YooptaEditor plugins={plugins} />;
+};
+```
+
+--------------------------------
+
+TITLE: Extend Yoopta HeadingOne Plugin
+DESCRIPTION: Provides an example of how to extend the HeadingOne plugin to customize its rendering, shortcuts, display options, and HTML attributes. This allows for tailored heading behavior and appearance.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/headings/README.md#_snippet_3
+
+LANGUAGE: typescript
+CODE:
+```
+const plugins = [
+  HeadingOne.extend({
+    renders: {
+      'heading-one': (props) => <YourCustomComponent {...props} />
+    },
+    options: {
+      shortcuts: [`<your custom shortcuts>`],
+      display: {
+        title: `<your custom title>`,
+        description: `<your custom description>`,
+      },
+      HTMLAttributes: {
+        className: '<your classname>',
+        // ...other HTML attributes
+      },
+    },
+  }),
+];
+```
+
+--------------------------------
+
+TITLE: Extend TodoList Plugin
+DESCRIPTION: Shows an example of extending the TodoList plugin to customize its rendering, options, and HTML attributes. This allows for tailored task list functionality and appearance.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/lists/README.md#_snippet_7
+
+LANGUAGE: typescript
+CODE:
+```
+const plugins = [
+  TodoList.extend({
+    renders: {
+      'todo-list': (props) => <YourCustomComponent {...props} />
+    },
+    options: {
+      shortcuts: [`<your custom shortcuts>`],
+      display: {
+        title: `<your custom title>`,
+        description: `<your custom description>`,
+      },
+      HTMLAttributes: {
+        className: '<your classname>',
+        // ...other HTML attributes
+      },
+    },
+  }),
+];
+```
+
+--------------------------------
+
+TITLE: Require yoopta-image Module
+DESCRIPTION: This snippet shows how to import the yoopta-image module into a JavaScript project. It serves as a basic setup for using the module's functionalities. Further API demonstrations are noted as pending.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/image/README.md#_snippet_0
+
+LANGUAGE: javascript
+CODE:
+```
+const image = require('yoopta-image');
+
+// TODO: DEMONSTRATE API
+```
+
+--------------------------------
+
+TITLE: Extend Callout Plugin Functionality
+DESCRIPTION: Provides an example of how to extend the Callout plugin with custom rendering components, updated shortcuts, display properties, and HTML attributes.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/callout/README.md#_snippet_3
+
+LANGUAGE: typescript
+CODE:
+```
+const plugins = [
+  Callout.extend({
+    renders: {
+      callout: (props) => <YourCustomComponent {...props} />
+    },
+    options: {
+      shortcuts: [`<your custom shortcuts>`],
+      display: {
+        title: `<your custom title>`,
+        description: `<your custom description>`,
+      },
+      HTMLAttributes: {
+        className: '<your classname>',
+        // ...other HTML attributes
+      },
+    },
+  });
+];
+```
+
+--------------------------------
+
+TITLE: Basic Paragraph Plugin Usage
+DESCRIPTION: Demonstrates how to import and use the Paragraph plugin with the YooptaEditor component. It shows the basic setup for enabling paragraph functionality.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/paragraph/README.md#_snippet_1
+
+LANGUAGE: jsx
+CODE:
+```
+import Paragraph from '@yoopta/paragraph';
+
+const plugins = [Paragraph];
+
+const Editor = () => {
+  return <YooptaEditor plugins={plugins} />;
+};
+```
+
+--------------------------------
+
+TITLE: Use Yoopta Headings Plugins in Editor
+DESCRIPTION: Demonstrates how to import and use the HeadingOne, HeadingTwo, and HeadingThree plugins with the YooptaEditor component. This setup enables heading functionality within the editor instance.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/headings/README.md#_snippet_1
+
+LANGUAGE: jsx
+CODE:
+```
+import { HeadingOne, HeadingTwo, HeadingThree } from '@yoopta/headings';
+
+const plugins = [HeadingOne, HeadingTwo, HeadingThree];
+
+const Editor = () => {
+  return <YooptaEditor plugins={plugins} />;
+};
+```
+
+--------------------------------
+
+TITLE: Extend NumberedList Plugin
+DESCRIPTION: Provides an example of extending the NumberedList plugin to customize its rendering, options, and HTML attributes. This allows for tailored list behavior and appearance.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/lists/README.md#_snippet_3
+
+LANGUAGE: typescript
+CODE:
+```
+const plugins = [
+  NumberedList.extend({
+    renders: {
+      'numbered-list': (props) => <YourCustomComponent {...props} />
+    },
+    options: {
+      shortcuts: [`<your custom shortcuts>`],
+      display: {
+        title: `<your custom title>`,
+        description: `<your custom description>`,
+      },
+      HTMLAttributes: {
+        className: '<your classname>',
+        // ...other HTML attributes
+      },
+    },
+  }),
+];
+```
+
+--------------------------------
+
+TITLE: Yoopta Editor Usage with List Plugins
+DESCRIPTION: Demonstrates how to import and use the NumberedList, BulletedList, and TodoList plugins with the YooptaEditor component. This setup enables rich text editing with list features.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/lists/README.md#_snippet_1
+
+LANGUAGE: jsx
+CODE:
+```
+import { YooptaEditor } from '@yoopta/editor';
+import { NumberedList, BulletedList, TodoList } from '@yoopta/lists';
+
+const plugins = [NumberedList, BulletedList, TodoList];
+
+const Editor = () => {
+  return <YooptaEditor plugins={plugins} />;
+};
+```
+
+--------------------------------
+
+TITLE: Extend Paragraph Plugin
+DESCRIPTION: Provides an example of how to extend the Paragraph plugin with custom rendering logic, shortcuts, display options, and HTML attributes. This allows for customization of the plugin's behavior and appearance.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/paragraph/README.md#_snippet_3
+
+LANGUAGE: tsx
+CODE:
+```
+const plugins = [
+  Paragraph.extend({
+    renders: {
+      paragraph: (props) => <YourCustomComponent {...props} />
+    },
+    options: {
+      shortcuts: [`<your custom shortcuts>`],
+      display: {
+        title: `<your custom title>`,
+        description: `<your custom description>`,
+      },
+      HTMLAttributes: {
+        className: '<your classname>',
+        // ...other HTML attributes
+      },
+    },
+  });
+];
+```
+
+--------------------------------
+
+TITLE: Get Yoopta Plugin Options (TypeScript)
+DESCRIPTION: Fetches the configuration options for a specific Yoopta editor plugin based on its associated block type. This generic hook allows specifying the expected options type and returns the plugin's configuration. It's crucial for customizing plugin behavior.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/core/editor/README.md#_snippet_8
+
+LANGUAGE: ts
+CODE:
+```
+/**
+ * Hook to get the options for a plugin.
+ * @template TOptions The type of options expected.
+ * @param {string} blockType The block type associated with the plugin.
+ * @returns {PluginOptions<TOptions>} The options of the plugin.
+ */
+useYooptaPluginOptions<TOptions>(blockType);
+```
+
+--------------------------------
+
+TITLE: Get Yoopta Block Data by ID (TypeScript)
+DESCRIPTION: Retrieves the data associated with a specific block in the Yoopta editor using its unique identifier. This hook takes a block ID as input and returns the block's data or undefined if the block is not found. It's essential for accessing and manipulating individual block content.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/core/editor/README.md#_snippet_7
+
+LANGUAGE: ts
+CODE:
+```
+/**
+ * Hook to get the data for a specific block by its ID.
+ * @param {string} blockId The ID of the block.
+ * @returns {YooptaBlockData | undefined} The data of the block, or undefined if not found.
+ */
+useBlockData(blockId);
+```
+
+--------------------------------
+
+TITLE: Resend API Key Configuration
+DESCRIPTION: Instructions for setting up the Resend API key for sending test emails. Requires creating a `.env` file in the project root with the API key.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/development/README.md#_snippet_2
+
+LANGUAGE: env
+CODE:
+```
+# .env file example
+RESEND_API_KEY=your_resend_api_key_here
+```
+
+--------------------------------
+
+TITLE: Default Blockquote Plugin Configuration
+DESCRIPTION: Shows the default configuration object for the Blockquote plugin when initialized. This includes setting display properties like title and description, and defining default keyboard shortcuts.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/blockquote/README.md#_snippet_2
+
+LANGUAGE: javascript
+CODE:
+```
+const Blockquote = new YooptaPlugin({
+  options: {
+    display: {
+      title: 'Blockquote',
+      description: 'Capture quote',
+    },
+    shortcuts: ['>'],
+  },
+});
+```
+
+--------------------------------
+
+TITLE: Import yoopta-accordion
+DESCRIPTION: Demonstrates how to import the yoopta-accordion package. The API usage is marked as a TODO.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/accordion/README.md#_snippet_0
+
+LANGUAGE: javascript
+CODE:
+```
+const accordion = require('yoopta-accordion');
+
+// TODO: DEMONSTRATE API
+```
+
+--------------------------------
+
+TITLE: TodoList Plugin Default Options
+DESCRIPTION: Presents the default configuration for the TodoList plugin, including its display title, description, and default keyboard shortcuts. This plugin facilitates task tracking within the editor.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/lists/README.md#_snippet_6
+
+LANGUAGE: javascript
+CODE:
+```
+const TodoList = new YooptaPlugin({
+  options: {
+    display: {
+      title: 'Todo List',
+      description: 'Track tasks',
+    },
+    shortcuts: ['[]'],
+  },
+});
+```
+
+--------------------------------
+
+TITLE: Yoopta HeadingOne Plugin Default Options
+DESCRIPTION: Shows the default configuration for the HeadingOne plugin, including its display title, description, and keyboard shortcuts. This configuration can be customized when extending the plugin.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/headings/README.md#_snippet_2
+
+LANGUAGE: javascript
+CODE:
+```
+const HeadingOne = new YooptaPlugin({
+  options: {
+    display: {
+      title: 'Heading 1',
+      description: 'Big section heading',
+    },
+    shortcuts: ['h1', '#', '*'],
+  },
+});
+```
+
+--------------------------------
+
+TITLE: Yoopta-Editor Project Structure
+DESCRIPTION: Outlines the directory structure of the Yoopta-Editor project, categorizing core components, extensions, and development tools. This helps developers understand where different functionalities are located within the codebase.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/README.md#_snippet_6
+
+LANGUAGE: text
+CODE:
+```
+packages/
+├── core - core components of the editor
+├── marks - text marks
+├── plugins - editor plugin extensions
+├── tools - tools packages
+└── development - developer playground
+```
+
+--------------------------------
+
+TITLE: Basic Yoopta Editor Usage
+DESCRIPTION: Demonstrates how to import and use the YooptaEditor component with plugins and state management in a React application.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/core/editor/README.md#_snippet_1
+
+LANGUAGE: tsx
+CODE:
+```
+import YooptaEditor, { createYooptaEditor, YooEditor } from '@yoopta/editor';
+// plugins
+import Paragraph from '@yoopta/paragraph';
+
+const plugins = [Paragraph];
+
+const Editor = () => {
+  // create instance
+  const editor: YooEditor = useMemo(() => createYooptaEditor(), []);
+  const [value, setValue] = useState();
+
+  const onChange = (newValue) => setValue(newValue);
+
+  return <YooptaEditor editor={editor} plugins={plugins} value={value} onChange={onChange} />;
+};
+```
+
+--------------------------------
+
+TITLE: Basic Usage
+DESCRIPTION: Demonstrates how to require the yoopta-file module. The specific API usage is marked as a TODO for future implementation.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/file/README.md#_snippet_0
+
+LANGUAGE: javascript
+CODE:
+```
+const file = require('yoopta-file');
+
+// TODO: DEMONSTRATE API
+```
+
+--------------------------------
+
+TITLE: YooptaEditor Blockquote Plugin API
+DESCRIPTION: Documentation for the YooptaEditor Blockquote plugin's core API, focusing on initialization and extension. It details the structure of the plugin object and the parameters accepted by the `extend` method for customization.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/blockquote/README.md#_snippet_4
+
+LANGUAGE: APIDOC
+CODE:
+```
+YooptaPlugin(config: PluginConfig)
+  Initializes a new Yoopta Editor plugin.
+  config: An object containing plugin-specific configurations.
+    options: Object
+      display: Object
+        title: string - The display title for the blockquote feature.
+        description: string - A brief description of the blockquote feature.
+      shortcuts: string[] - An array of keyboard shortcuts to trigger the blockquote.
+    renders: Object - Custom rendering functions for specific HTML elements.
+      blockquote: (props: RenderProps) => React.ReactNode - Renders the blockquote element.
+
+YooptaPlugin.extend(extensionConfig: ExtensionConfig)
+  Extends an existing Yoopta Editor plugin with custom configurations.
+  extensionConfig: An object containing configurations to merge or override.
+    options: Object - Merges or overrides existing options.
+      display: Object - Merges or overrides display properties.
+        title: string - Custom display title.
+        description: string - Custom description.
+      shortcuts: string[] - Overrides or appends shortcuts.
+      HTMLAttributes: Object - Adds or overrides HTML attributes for the blockquote element.
+        className: string - Custom CSS class.
+        ...other HTML attributes
+    renders: Object - Overrides or adds custom rendering functions.
+      blockquote: (props: RenderProps) => React.ReactNode - Custom renderer for blockquote.
+
+Example Usage:
+const MyBlockquotePlugin = new YooptaPlugin({
+  options: {
+    display: { title: 'Quote', description: 'Add a quote' },
+    shortcuts: ['"'],
+  },
+});
+
+const ExtendedBlockquotePlugin = MyBlockquotePlugin.extend({
+  options: {
+    display: { title: 'My Custom Quote' },
+    HTMLAttributes: { className: 'my-blockquote-style' },
+  },
+});
+```
+
+--------------------------------
+
+TITLE: Default Callout Plugin Configuration
+DESCRIPTION: Shows the default configuration for the Callout plugin, including display options like title and description, and default keyboard shortcuts.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/callout/README.md#_snippet_2
+
+LANGUAGE: javascript
+CODE:
+```
+const Callout = new YooptaPlugin({
+  options: {
+    display: {
+      title: 'Callout',
+      description: 'Make writing stand out',
+    },
+    shortcuts: ['<'],
+  },
+});
+```
+
+--------------------------------
+
+TITLE: Yoopta Editor API Reference
+DESCRIPTION: Provides a comprehensive overview of the YooptaEditor instance's methods for manipulating editor content, managing state, and handling events.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/core/editor/README.md#_snippet_3
+
+LANGUAGE: APIDOC
+CODE:
+```
+YooptaEditor Instance API:
+
+Properties:
+  id: string
+  readOnly: boolean
+  path: YooptaPath
+  children: YooptaContentValue
+  blockEditorsMap: YooptaPluginsEditorMap
+  blocks: YooptaBlocks
+  formats: YooptaFormats
+  shortcuts: Record<string, YooptaBlock>
+  plugins: Record<string, Plugin<Record<string, SlateElement>, unknown>>
+  commands: Record<string, (...args: any[]) => any>
+  refElement: HTMLElement | null
+  historyStack: Record<HistoryStackName, HistoryStack[]>
+
+Methods:
+  // Core State Management
+  isEmpty: () => boolean
+  getEditorValue: () => YooptaContentValue
+  setEditorValue: (value: YooptaContentValue) => void
+  batchOperations: (fn: () => void) => void
+  applyTransforms: (transforms: any[]) => void
+
+  // Block Manipulation
+  insertBlock: (block: YooptaBlockData) => void
+  updateBlock: (options: { id: string, data: Partial<YooptaBlockData> }) => void
+  deleteBlock: (options: { id: string }) => void
+  duplicateBlock: (options: { id: string }) => void
+  toggleBlock: (options: { id: string, type: string }) => void
+  increaseBlockDepth: (options: { id: string }) => void
+  decreaseBlockDepth: (options: { id: string }) => void
+  moveBlock: (options: { id: string, targetId: string, position: 'before' | 'after' }) => void
+  focusBlock: (options: { id: string }) => void
+  mergeBlock: () => void
+  splitBlock: (options?: SplitBlockOptions) => void
+  getBlock: (options: GetBlockOptions) => YooptaBlockData | null
+
+  // Path Handling
+  setPath: (path: YooptaPath) => void
+
+  // Event Handling
+  on: <K extends keyof YooptaEventsMap>(event: K, fn: (payload: YooptaEventsMap[K]) => void) => void
+  once: <K extends keyof YooptaEventsMap>(event: K, fn: (payload: YooptaEventsMap[K]) => void) => void
+  off: <K extends keyof YooptaEventsMap>(event: K, fn: (payload: YooptaEventsMap[K]) => void) => void
+  emit: <K extends keyof YooptaEventsMap>(event: K, payload: YooptaEventsMap[K]) => void
+
+  // Focus Management
+  isFocused: () => boolean
+  blur: (options?: EditorBlurOptions) => void
+  focus: () => void
+
+  // Content Parsing
+  getHTML: (content: YooptaContentValue) => string
+  getMarkdown: (content: YooptaContentValue) => string
+  getPlainText: (content: YooptaContentValue) => string
+  getEmail: (content: YooptaContentValue, templateOptions: EmailTemplateOptions) => string
+
+  // History Management
+  isSavingHistory: () => boolean
+  isMergingHistory: () => boolean
+  withoutSavingHistory: <T>(fn: () => T) => T
+  withoutMergingHistory: <T>(fn: () => T) => T
+  withMergingHistory: <T>(fn: () => T) => T
+  withSavingHistory: <T>(fn: () => T) => T
+  redo: () => void
+  undo: () => void
+
+// Note: WithoutFirstArg indicates that the first argument (typically the editor instance itself) is omitted in the exposed API.
+```
+
+--------------------------------
+
+TITLE: Yoopta HeadingThree Plugin Default Options
+DESCRIPTION: Presents the default configuration for the HeadingThree plugin, including its display title, description, and default keyboard shortcuts. These options can be overridden when extending the plugin.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/headings/README.md#_snippet_6
+
+LANGUAGE: javascript
+CODE:
+```
+const HeadingThree = new YooptaPlugin({
+  options: {
+    display: {
+      title: 'Heading 3',
+      description: 'Small section heading',
+    },
+    shortcuts: ['h3', '###'],
+  },
+});
+```
+
+--------------------------------
+
+TITLE: Basic Usage of yoopta-paragraph
+DESCRIPTION: Demonstrates how to require the yoopta-paragraph module. The specific API usage is marked as a TODO.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/tools/action-menu/README.md#_snippet_0
+
+LANGUAGE: javascript
+CODE:
+```
+const paragraph = require('yoopta-paragraph');\n\n// TODO: DEMONSTRATE API
+```
+
+--------------------------------
+
+TITLE: NumberedList Plugin Default Options
+DESCRIPTION: Shows the default configuration for the NumberedList plugin, including its display title, description, and default keyboard shortcuts. This plugin enables ordered lists in the editor.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/lists/README.md#_snippet_2
+
+LANGUAGE: javascript
+CODE:
+```
+const NumberedList = new YooptaPlugin({
+  options: {
+    display: {
+      title: 'Numbered List',
+      description: 'Create list with numbering',
+    },
+    shortcuts: ['1.'],
+  },
+});
+```
+
+--------------------------------
+
+TITLE: Basic Usage of yoopta-paragraph
+DESCRIPTION: Demonstrates how to require the yoopta-paragraph module. The specific API usage is marked as a TODO.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/marks/README.md#_snippet_0
+
+LANGUAGE: javascript
+CODE:
+```
+const paragraph = require('yoopta-paragraph');\n\n// TODO: DEMONSTRATE API
+```
+
+--------------------------------
+
+TITLE: Basic Usage of yoopta-paragraph
+DESCRIPTION: Demonstrates how to require the yoopta-paragraph module. The specific API usage is marked as a TODO.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/tools/link-tool/README.md#_snippet_0
+
+LANGUAGE: javascript
+CODE:
+```
+const paragraph = require('yoopta-paragraph');\n\n// TODO: DEMONSTRATE API
+```
+
+--------------------------------
+
+TITLE: Require Yoopta Code Package
+DESCRIPTION: Demonstrates how to import the `@yoopta/code` package using CommonJS. This is a foundational step for utilizing the package's features. The specific API usage is marked as a future development task.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/core/yoopta-renderer/README.md#_snippet_0
+
+LANGUAGE: javascript
+CODE:
+```
+const blockquote = require('@yoopta/code');
+
+// TODO: DEMONSTRATE API
+```
+
+--------------------------------
+
+TITLE: Basic Usage of yoopta-paragraph
+DESCRIPTION: Demonstrates how to require the yoopta-paragraph module. The specific API usage is marked as a TODO.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/tools/toolbar/README.md#_snippet_0
+
+LANGUAGE: javascript
+CODE:
+```
+const paragraph = require('yoopta-paragraph');\n\n// TODO: DEMONSTRATE API
+```
+
+--------------------------------
+
+TITLE: Require yoopta-embed Package
+DESCRIPTION: This snippet demonstrates how to import the yoopta-embed package using Node.js require syntax. It serves as a basic entry point for using the package's functionalities.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/embed/README.md#_snippet_0
+
+LANGUAGE: javascript
+CODE:
+```
+const embed = require('yoopta-embed');
+
+// TODO: DEMONSTRATE API
+```
+
+--------------------------------
+
+TITLE: YooptaEditor Component API Props
+DESCRIPTION: Defines the available properties for the YooptaEditor component. This includes essential configurations like the editor instance, plugins, marks, value, and event handlers, as well as optional props for customization like autoFocus, className, and placeholder.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/README.md#_snippet_2
+
+LANGUAGE: APIDOC
+CODE:
+```
+YooptaEditor Props:
+
+  editor: YooEditor;
+    - The editor instance required for the component.
+
+  plugins: YooptaPlugin[];
+    - A list of Yoopta plugins to enable specific functionalities.
+
+  marks?: YooptaMark<any>[];
+    - An optional list of marks for text formatting (e.g., bold, italic).
+
+  value?: YooptaContentValue;
+    - The current content value of the editor. Defaults to undefined.
+
+  onChange?: (value: YooptaContentValue, options: YooptaOnChangeOptions) => void;
+    - Callback function triggered when the editor's content changes.
+
+  onPathChange?: (path: YooptaPath) => void;
+    - Callback function triggered when the editor's cursor path changes.
+
+  autoFocus?: boolean;
+    - Determines if the editor should automatically receive focus on mount. Defaults to true.
+
+  className?: string;
+    - A CSS class name to apply to the editor container.
+
+  selectionBoxRoot?: HTMLElement | React.MutableRefObject<HTMLElement | null> | false;
+    - Specifies the root element for selection boxes. Defaults to 'document'.
+
+  children?: React.ReactNode;
+    - Allows nesting other React elements within the editor.
+
+  tools?: Partial<Tools>;
+    - An object containing custom tools to be integrated with the editor.
+
+  placeholder?: string;
+    - Text displayed when the editor is empty.
+
+  readOnly?: boolean;
+    - If true, the editor will be in read-only mode.
+
+  width?: number | string;
+    - Deprecated: Use the 'style' object for width customization.
+
+  style?: number | string;
+    - CSS style object to apply to the editor container. Defaults to { width: '400px', paddingBottom: '100px' }.
+
+  id?: number | string;
+    - A unique identifier for the editor instance, useful for managing multiple editors.
+```
+
+--------------------------------
+
+TITLE: Basic Usage of Blockquote Plugin
+DESCRIPTION: Demonstrates how to import and use the Blockquote plugin within a React YooptaEditor component. It shows the necessary import statement and how to include the plugin in the editor's plugins array.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/blockquote/README.md#_snippet_1
+
+LANGUAGE: jsx
+CODE:
+```
+import Blockquote from '@yoopta/blockquote';
+
+const plugins = [Blockquote];
+
+const Editor = () => {
+  return <YooptaEditor plugins={plugins} />;
+};
+```
+
+--------------------------------
+
+TITLE: Yoopta Divider Commands API
+DESCRIPTION: Provides the interface for interacting with divider elements in the Yoopta editor. Includes methods for building, inserting, deleting, and updating divider blocks.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/divider/README.md#_snippet_1
+
+LANGUAGE: APIDOC
+CODE:
+```
+Yoopta Divider Commands
+
+This module provides commands for managing divider elements within the Yoopta editor.
+
+Methods:
+
+buildDividerElements: (editor: YooEditor, options?: Partial<DividerElementProps>) => DividerElement
+  - Description: Define elements structure for slate value in your block.
+  - Parameters:
+    - editor: The YooEditor instance.
+    - options: Optional properties for the divider element.
+  - Returns: A DividerElement object.
+
+insertDivider: (editor: YooEditor, options?: Partial<DividerInsertOptions>) => void
+  - Description: Insert a divider block at a specific path with options.
+  - Parameters:
+    - editor: The YooEditor instance.
+    - options: Options for inserting the divider.
+      - color: string (Optional)
+      - theme: 'solid' | 'dashed' | 'dotted' | 'gradient' (Optional)
+  - Returns: void
+
+deleteDivider: (editor: YooEditor, blockId: string) => void
+  - Description: Delete a divider block by its ID.
+  - Parameters:
+    - editor: The YooEditor instance.
+    - blockId: The unique identifier of the divider block to delete.
+  - Returns: void
+
+updateDivider: (editor: YooEditor, blockId: string, props: Partial<DividerElementProps>) => void
+  - Description: Update properties of an existing divider block.
+  - Parameters:
+    - editor: The YooEditor instance.
+    - blockId: The unique identifier of the divider block to update.
+    - props: Partial<DividerElementProps> - The properties to update.
+      - color: string (Optional)
+      - theme: 'solid' | 'dashed' | 'dotted' | 'gradient' (Optional)
+  - Returns: void
+```
+
+--------------------------------
+
+TITLE: Yoopta Markdown Export and Import
+DESCRIPTION: Demonstrates how to serialize Yoopta editor content to a Markdown string and deserialize a Markdown string back into Yoopta content. This utilizes the `markdown.serialize` and `markdown.deserialize` functions provided by the `@yoopta/exports` package.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/core/exports/README.md#_snippet_2
+
+LANGUAGE: jsx
+CODE:
+```
+import { markdown } from '@yoopta/exports';
+import { useMemo } from 'react';
+import { createYooptaEditor } from '@yoopta/editor';
+
+const Editor = () => {
+  const editor = useMemo(() => createYooptaEditor(), []);
+
+  // from markdown to @yoopta content
+  const deserializeMarkdown = () => {
+    const markdownString = '# First title';
+    const value = markdown.deserialize(editor, markdownString);
+
+    editor.setEditorValue(value);
+  };
+
+  // from @yoopta content to markdown string
+  const serializeMarkdown = () => {
+    const data = editor.getEditorValue();
+    const markdownString = markdown.serialize(editor, data);
+    console.log('markdown string', markdownString);
+  };
+
+  return (
+    <div>
+      <button onClick={deserializeMarkdown}>Deserialize from markdown to content</button>
+      <button onClick={serializeMarkdown}>Serialize from content to markdown</button>
+
+      {/* Assuming YooptaEditor and plugins are defined elsewhere */}
+      {/* <YooptaEditor editor={editor} plugins={plugins} /> */}
+    </div>
+  );
+};
+
+```
+
+--------------------------------
+
+TITLE: Yoopta Table Plugin API Reference
+DESCRIPTION: Provides detailed descriptions and signatures for the core API methods used to interact with tables in the Yoopta Editor. This includes creating, deleting, and modifying tables, rows, and columns, as well as managing header states and column widths.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/table/README.md#_snippet_2
+
+LANGUAGE: APIDOC
+CODE:
+```
+buildTableElements: (editor: YooEditor, options?: InsertOptions) => TableElement
+  - Description: Define elements structure for slate value in your block.
+  - Parameters:
+    - editor: The Yoopta Editor instance.
+    - options?: InsertOptions: Optional configuration for table creation.
+  - Returns: TableElement: The structure representing the table elements.
+
+insertTable: (editor: YooEditor, options?: InsertOptions) => void
+  - Description: Insert a table block at the current editor position with specified options.
+  - Parameters:
+    - editor: The Yoopta Editor instance.
+    - options?: InsertOptions: Configuration for the new table.
+      - rows: number: The initial number of rows.
+      - columns: number: The initial number of columns.
+      - columnWidth?: number: The default width for columns.
+      - headerColumn?: boolean: Whether to include a header column.
+      - headerRow?: boolean: Whether to include a header row.
+  - Returns: void
+
+deleteTable: (editor: YooEditor, blockId: string) => void
+  - Description: Delete a table block identified by its block ID.
+  - Parameters:
+    - editor: The Yoopta Editor instance.
+    - blockId: string: The unique identifier of the table block to delete.
+  - Returns: void
+
+insertTableRow: (editor: YooEditor, blockId: string, options?: Options) => void
+  - Description: Insert a new table row into an existing table.
+  - Parameters:
+    - editor: The Yoopta Editor instance.
+    - blockId: string: The ID of the table to modify.
+    - options?: Options: Additional options for row insertion.
+      - path?: Location & Span: Specific path for insertion.
+      - select?: boolean: Whether to select the new row.
+      - insertMode?: 'before' | 'after': Position relative to the current row.
+  - Returns: void
+
+deleteTableRow: (editor: YooEditor, blockId: string, options?: DeleteOptions) => void
+  - Description: Delete a table row from an existing table.
+  - Parameters:
+    - editor: The Yoopta Editor instance.
+    - blockId: string: The ID of the table.
+    - options?: DeleteOptions: Options for deleting the row.
+  - Returns: void
+
+moveTableRow: (editor: YooEditor, blockId: string, options: MoveTableOptions) => void
+  - Description: Move a table row to a different position within the table.
+  - Parameters:
+    - editor: The Yoopta Editor instance.
+    - blockId: string: The ID of the table.
+    - options: MoveTableOptions: Configuration for moving the row.
+  - Returns: void
+
+moveTableColumn: (editor: YooEditor, blockId: string, options: MoveTableOptions) => void
+  - Description: Move a table column to a different position within the table.
+  - Parameters:
+    - editor: The Yoopta Editor instance.
+    - blockId: string: The ID of the table.
+    - options: MoveTableOptions: Configuration for moving the column.
+  - Returns: void
+
+insertTableColumn: (editor: YooEditor, blockId: string, options?: Options) => void
+  - Description: Insert a new table column into an existing table.
+  - Parameters:
+    - editor: The Yoopta Editor instance.
+    - blockId: string: The ID of the table.
+    - options?: Options: Additional options for column insertion.
+      - path?: Location & Span: Specific path for insertion.
+      - select?: boolean: Whether to select the new column.
+      - insertMode?: 'before' | 'after': Position relative to the current column.
+  - Returns: void
+
+deleteTableColumn: (editor: YooEditor, blockId: string, options?: DeleteOptions) => void
+  - Description: Delete a table column from an existing table.
+  - Parameters:
+    - editor: The Yoopta Editor instance.
+    - blockId: string: The ID of the table.
+    - options?: DeleteOptions: Options for deleting the column.
+  - Returns: void
+
+updateColumnWidth: (editor: YooEditor, blockId: string, columnIndex: number, width: number) => void
+  - Description: Update the width of a specific column in a table.
+  - Parameters:
+    - editor: The Yoopta Editor instance.
+    - blockId: string: The ID of the table.
+    - columnIndex: number: The index of the column to update.
+    - width: number: The new width for the column.
+  - Returns: void
+
+toggleHeaderRow: (editor: YooEditor, blockId: string) => void
+  - Description: Toggle the header state for the first row of a table.
+  - Parameters:
+    - editor: The Yoopta Editor instance.
+    - blockId: string: The ID of the table.
+  - Returns: void
+
+toggleHeaderColumn: (editor: YooEditor, blockId: string) => void
+  - Description: Toggle the header state for the first column of a table.
+  - Parameters:
+    - editor: The Yoopta Editor instance.
+    - blockId: string: The ID of the table.
+  - Returns: void
+
+```
+
+--------------------------------
+
+TITLE: Yoopta Plain Text Export and Import
+DESCRIPTION: Demonstrates how to serialize Yoopta editor content to a plain text string and deserialize a plain text string back into Yoopta content. This functionality is accessed via the `plainText.serialize` and `plainText.deserialize` methods from the `@yoopta/exports` package.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/core/exports/README.md#_snippet_3
+
+LANGUAGE: jsx
+CODE:
+```
+import { plainText } from '@yoopta/exports';
+import { useMemo } from 'react';
+import { createYooptaEditor } from '@yoopta/editor';
+
+const Editor = () => {
+  const editor = useMemo(() => createYooptaEditor(), []);
+
+  // from plain text to @yoopta content
+  const deserializeText = () => {
+    const textString = '# First title'; // Note: Markdown-like input is used here for demonstration
+    const value = plainText.deserialize(editor, textString);
+
+    editor.setEditorValue(value);
+  };
+
+  // from @yoopta content to plain text string
+  const serializeText = () => {
+    const data = editor.getEditorValue();
+    const textString = plainText.serialize(editor, data);
+    console.log('plain text string', textString);
+  };
+
+  return (
+    <div>
+      <button onClick={deserializeText}>Deserialize from plain text to content</button>
+      <button onClick={serializeText}>Serialize from content to plain text</button>
+
+      {/* Assuming YooptaEditor and plugins are defined elsewhere */}
+      {/* <YooptaEditor editor={editor} plugins={plugins} /> */}
+    </div>
+  );
+};
+
+```
+
+--------------------------------
+
+TITLE: Yoopta HeadingTwo Plugin Default Options
+DESCRIPTION: Details the default settings for the HeadingTwo plugin, specifying its display title, descriptive text, and associated keyboard shortcuts. These defaults can be modified via the extend method.
+
+SOURCE: https://github.com/yoopta-editor/yoopta-editor/blob/master/packages/plugins/headings/README.md#_snippet_4
+
+LANGUAGE: javascript
+CODE:
+```
+const HeadingTwo = new YooptaPlugin({
+  options: {
+    display: {
+      title: 'Heading 2',
+      description: 'Medium section heading',
+    },
+    shortcuts: ['h2', '##'],
+  },
+});
+```

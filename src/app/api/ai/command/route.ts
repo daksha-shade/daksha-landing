@@ -94,7 +94,7 @@ function smoothStream<TOOLS extends ToolSet>({
           console.info(buffer, 'finished');
 
           if (buffer.length > 0) {
-            controller.enqueue({ textDelta: buffer, type: 'text-delta' });
+            controller.enqueue({ text: buffer, type: 'text-delta' } as any);
             buffer = '';
           }
 
@@ -102,12 +102,13 @@ function smoothStream<TOOLS extends ToolSet>({
           return;
         }
 
-        buffer += chunk.textDelta;
+        // In latest ai SDK, text field is `text` for 'text-delta'
+        buffer += (chunk as any).text ?? '';
 
         let match;
 
         while ((match = detectChunk(buffer)) != null) {
-          controller.enqueue({ textDelta: match, type: 'text-delta' });
+          controller.enqueue({ text: match, type: 'text-delta' } as any);
           buffer = buffer.slice(match.length);
 
           const _delayInMs =
@@ -129,7 +130,7 @@ const CHUNKING_REGEXPS = {
 };
 
 export async function POST(req: NextRequest) {
-  const { apiKey: key, messages, system } = await req.json();
+  const { apiKey: key, messages, system } = (await req.json()) as any;
 
   const apiKey = key || process.env.OPENAI_API_KEY;
 
@@ -198,13 +199,12 @@ export async function POST(req: NextRequest) {
         },
         delayInMs: () => (isInCodeBlock || isInTable ? 100 : 30),
       }),
-      maxTokens: 2048,
       messages: convertToCoreMessages(messages),
       model: openai('gpt-4o'),
       system: system,
     });
 
-    return result.toDataStreamResponse();
+    return result.toTextStreamResponse();
   } catch {
     return NextResponse.json(
       { error: 'Failed to process AI request' },

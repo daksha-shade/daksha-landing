@@ -47,13 +47,11 @@ export default function UseCasesSection() {
             </p>
           </div>
           
-          <Button 
-            href="/usecases"
-            size="lg"
-            className="font-medium"
-          >
-            <ArrowRight className="w-4 h-4 mr-2" />
-            Explore All Use Cases
+          <Button asChild size="lg" className="font-medium">
+            <a href="/usecases">
+              <ArrowRight className="w-4 h-4 mr-2" />
+              Explore All Use Cases
+            </a>
           </Button>
         </div>
       </div>

@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const body = await req.json().catch(() => ({}));
+        const body = (await req.json().catch(() => ({}))) as any;
         const { deleteFirst = false } = body;
 
         if (deleteFirst) {

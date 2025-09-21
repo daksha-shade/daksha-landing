@@ -20,5 +20,5 @@ export default async function JournalEntryPage({ params, searchParams }: Props) 
   const { id } = await params;
   const { mode } = await searchParams;
 
-  return <PlateJournalView id={id} />;
+  return <PlateJournalView id={id} initialMode={mode === 'edit' ? 'edit' : 'view'} />;
 }

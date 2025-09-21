@@ -45,8 +45,8 @@ export async function GET(req: NextRequest) {
       .select({
         id: journalEntries.id,
         title: journalEntries.title,
-        content: journalEntries.content,
-        markdownContent: journalEntries.markdownContent,
+        yooptaContent: journalEntries.yooptaContent,
+        plainTextContent: journalEntries.plainTextContent,
         type: journalEntries.type,
         mood: journalEntries.mood,
         moodIntensity: journalEntries.moodIntensity,
@@ -57,6 +57,7 @@ export async function GET(req: NextRequest) {
         audioUrl: journalEntries.audioUrl,
         videoUrl: journalEntries.videoUrl,
         imageUrls: journalEntries.imageUrls,
+        attachmentUrls: journalEntries.attachmentUrls,
         duration: journalEntries.duration,
         transcript: journalEntries.transcript,
         aiSummary: journalEntries.aiSummary,
@@ -82,8 +83,8 @@ export async function GET(req: NextRequest) {
     // Process entries to handle null values and ensure proper format
     const processedEntries = entries.map(entry => ({
       ...entry,
-      content: entry.content || null,
-      markdownContent: entry.markdownContent || '',
+      yooptaContent: entry.yooptaContent || null,
+      plainTextContent: entry.plainTextContent || '',
       emotionalTags: entry.emotionalTags || [],
       tags: entry.tags || [],
       imageUrls: entry.imageUrls || [],
@@ -113,11 +114,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await req.json();
+    const body = (await req.json()) as any;
     const {
       title,
-      content, // This will be JSON from Plate.js
-      markdownContent,
+      yooptaContent, // This will be JSON from Yoopta Editor
+      plainTextContent,
       type = "text",
       mood,
       moodIntensity,
@@ -135,7 +136,7 @@ export async function POST(req: NextRequest) {
       generateAI = true
     } = body;
 
-    if (!title || (!content && !audioUrl && !videoUrl)) {
+    if (!title || (!yooptaContent && !audioUrl && !videoUrl)) {
       return NextResponse.json(
         { error: "Title and content (or media) are required" },
         { status: 400 }
@@ -146,12 +147,12 @@ export async function POST(req: NextRequest) {
     const now = new Date();
     const journalDate = entryDate ? new Date(entryDate) : now;
 
-    // Handle content - expect JSON from Plate.js
-    const plateContent = typeof content === 'object' ? content : null;
-    const finalMarkdownContent = markdownContent || transcript || '';
+    // Handle content - expect JSON from Yoopta Editor
+    const finalYooptaContent = typeof yooptaContent === 'object' ? yooptaContent : null;
+    const finalPlainTextContent = plainTextContent || transcript || '';
 
     // Generate embedding for semantic search
-    const textForEmbedding = finalMarkdownContent || title;
+    const textForEmbedding = finalPlainTextContent || title;
     const embedding = await embedText(textForEmbedding);
 
     // Generate AI analysis if requested
@@ -182,8 +183,8 @@ export async function POST(req: NextRequest) {
       id,
       userId: user.id,
       title,
-      content: plateContent,
-      markdownContent: finalMarkdownContent,
+      yooptaContent: finalYooptaContent,
+      plainTextContent: finalPlainTextContent,
       type,
       mood,
       moodIntensity,
@@ -215,7 +216,7 @@ export async function POST(req: NextRequest) {
       mood: moodIntensity,
       emotions: emotionalTags,
       tags,
-      wordCount: finalMarkdownContent?.split(' ').length || 0
+      wordCount: finalPlainTextContent?.split(' ').length || 0
     });
 
     return NextResponse.json({
@@ -267,8 +268,8 @@ async function updateJournalStreak(userId: string, entryDate: Date) {
 
       const daysDiff = Math.floor((entryDay.getTime() - lastEntryDay.getTime()) / (1000 * 60 * 60 * 24));
 
-      let newCurrentStreak = streak.currentStreak;
-      let newStreakStartDate = streak.streakStartDate;
+      let newCurrentStreak: number = (streak.currentStreak ?? 0) as number;
+      let newStreakStartDate = streak.streakStartDate ?? entryDate;
 
       if (daysDiff === 1) {
         // Consecutive day
@@ -280,14 +281,14 @@ async function updateJournalStreak(userId: string, entryDate: Date) {
       }
       // If daysDiff === 0, it's the same day, don't change streak
 
-      const newLongestStreak = Math.max(streak.longestStreak, newCurrentStreak);
+      const newLongestStreak = Math.max((streak.longestStreak ?? 0) as number, newCurrentStreak);
 
       await db
         .update(journalStreaks)
         .set({
           currentStreak: newCurrentStreak,
           longestStreak: newLongestStreak,
-          totalEntries: streak.totalEntries + 1,
+          totalEntries: (streak.totalEntries ?? 0) + 1,
           lastEntryDate: entryDate,
           streakStartDate: newStreakStartDate,
           updatedAt: new Date(),
@@ -337,12 +338,12 @@ async function updateDailyAnalytics(
     } else {
       // Update existing record
       const current = existing[0];
-      const newEntryCount = current.entryCount + 1;
-      const newWordCount = current.wordCount + data.wordCount;
+      const newEntryCount = (current.entryCount ?? 0) + 1;
+      const newWordCount = (current.wordCount ?? 0) + data.wordCount;
 
       let newAverageMood = current.averageMood;
-      if (data.mood && current.averageMood) {
-        newAverageMood = (current.averageMood * current.entryCount + data.mood) / newEntryCount;
+      if (typeof data.mood === 'number' && typeof current.averageMood === 'number') {
+        newAverageMood = (current.averageMood * (current.entryCount ?? 0) + data.mood) / newEntryCount;
       } else if (data.mood) {
         newAverageMood = data.mood;
       }

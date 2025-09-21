@@ -62,7 +62,7 @@ export default function HeroSection() {
           </Button>
           <Button asChild variant="notion" size="lg" className="font-medium">
             <Link href="/app">
-              Preview
+              Open
             </Link>
           </Button>
         </div>

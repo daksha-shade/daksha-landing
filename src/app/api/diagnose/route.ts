@@ -14,7 +14,7 @@ export async function GET() {
     };
 
     // Now test database connection with timeout
-    let dbTest = { status: "not_tested" };
+    let dbTest: { status: string; responseTime?: string; error?: string } = { status: "not_tested" };
     
     try {
       console.log("Testing database connection...");

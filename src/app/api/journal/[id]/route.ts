@@ -51,10 +51,10 @@ export async function PUT(
         }
 
         const { id } = await params;
-        const body = await req.json();
+        const body = (await req.json()) as any;
         const {
             title,
-            content,
+            yooptaContent,
             plainTextContent,
             mood,
             moodIntensity,
@@ -94,11 +94,11 @@ export async function PUT(
 
         // Update fields if provided
         if (title !== undefined) updateData.title = title;
-        if (content !== undefined) {
-            // Store Plate.js JSON content directly
-            updateData.content = typeof content === 'object' ? content : null;
+        if (yooptaContent !== undefined) {
+            // Store Yoopta Editor JSON content directly
+            updateData.yooptaContent = typeof yooptaContent === 'object' ? yooptaContent : null;
         }
-        if (body.markdownContent !== undefined) updateData.markdownContent = body.markdownContent;
+        if (plainTextContent !== undefined) updateData.plainTextContent = plainTextContent;
         if (mood !== undefined) updateData.mood = mood;
         if (moodIntensity !== undefined) updateData.moodIntensity = moodIntensity;
         if (emotionalTags !== undefined) updateData.emotionalTags = emotionalTags;
@@ -114,14 +114,14 @@ export async function PUT(
         if (entryDate !== undefined) updateData.entryDate = new Date(entryDate);
 
         // Regenerate embedding if content changed
-        if (content !== undefined || body.markdownContent !== undefined || transcript !== undefined) {
-            const textForEmbedding = body.markdownContent || transcript || title || existingEntry[0].title;
+        if (yooptaContent !== undefined || plainTextContent !== undefined || transcript !== undefined) {
+            const textForEmbedding = plainTextContent || transcript || title || existingEntry[0].title;
             updateData.embedding = await embedText(textForEmbedding);
         }
 
         // Regenerate AI insights if requested
         if (regenerateAI) {
-            const textForAI = body.markdownContent || transcript || existingEntry[0].markdownContent;
+            const textForAI = plainTextContent || transcript || existingEntry[0].plainTextContent;
             if (textForAI) {
                 try {
                     const aiAnalysis = await generateAIInsights(textForAI, {

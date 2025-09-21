@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
                 throw new Error("Failed to upload generated audio");
             }
 
-            const uploadResult = await uploadResponse.json();
+            const uploadResult = (await uploadResponse.json()) as any;
 
             return NextResponse.json({
                 audioUrl: uploadResult.file.url,

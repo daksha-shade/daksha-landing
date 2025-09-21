@@ -39,8 +39,8 @@ export const journalEntries = pgTable("journal_entries", {
   id: text("id").primaryKey(),
   userId: text("user_id").notNull(),
   title: text("title").notNull(),
-  content: jsonb("content"), // Plate.js JSON content for editing
-  markdownContent: text("markdown_content"), // Markdown version for LLMs and search
+  yooptaContent: jsonb("yoopta_content"), // Yoopta Editor JSON content for editing
+  plainTextContent: text("plain_text_content"), // Plain text version for LLMs and search
   type: text("type").notNull().default("text"), // text, audio, video
 
   // Mood and emotional data

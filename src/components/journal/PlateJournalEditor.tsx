@@ -1,25 +1,23 @@
 'use client';
 
 import * as React from 'react';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plate, usePlateEditor } from 'platejs/react';
-import { serializeMd } from '@platejs/markdown';
 import { ArrowLeft, Save, Loader2, Sparkles, MapPin, Cloud, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Editor, EditorContainer } from '@/components/ui/editor';
-import { EditorKit } from '@/components/editor/editor-kit';
 import { MoodSelector } from './MoodSelector';
 import { TagInput } from './TagInput';
 import { toast } from 'sonner';
+import YooptaJournalEditor from './YooptaJournalEditor';
+import { yooptaToPlainText } from '@/lib/yoopta-utils';
 
 interface JournalEntry {
     id: string;
     title: string;
-    content?: any; // Plate.js JSON content
-    markdownContent?: string;
+    yooptaContent?: any;
+    plainTextContent?: string;
     type: "text" | "audio" | "video";
     mood?: string;
     moodIntensity?: number;
@@ -46,12 +44,20 @@ interface PlateJournalEditorProps {
     onCancel?: () => void;
 }
 
-const defaultValue = [
-    {
-        children: [{ text: 'Start writing your thoughts...' }],
-        type: 'p',
+const defaultValue = {
+    '1': {
+        id: '1',
+        type: 'Paragraph',
+        value: [
+            {
+                id: '1-p',
+                type: 'paragraph',
+                children: [{ text: 'Start writing your thoughts...' }],
+            },
+        ],
+        meta: { order: 0, depth: 0 },
     },
-];
+} as const;
 
 export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: PlateJournalEditorProps) {
     const router = useRouter();
@@ -69,27 +75,23 @@ export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: P
         weather: entry?.weather || '',
     });
 
-    const editor = usePlateEditor({
-        plugins: EditorKit,
-        value: entry?.content || defaultValue,
-    });
+    const [yooptaContent, setYooptaContent] = useState<any>(entry?.yooptaContent || defaultValue);
 
     // Auto-save functionality
     const handleAutoSave = useCallback(async () => {
-        if (!formData.title.trim() || !editor.children.length) return;
+        if (!formData.title.trim() || !yooptaContent) return;
         if (isNew) return; // Don't auto-save new entries
 
         try {
-            const content = editor.children;
-            const markdownContent = serializeMd(editor, { nodes: content });
+            const plainTextContent = yooptaToPlainText(yooptaContent);
 
             const response = await fetch(`/api/journal/${entry?.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     title: formData.title,
-                    content,
-                    markdownContent,
+                    yooptaContent,
+                    plainTextContent,
                     mood: formData.mood,
                     moodIntensity: formData.moodIntensity,
                     emotionalTags: formData.emotionalTags,
@@ -106,7 +108,7 @@ export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: P
         } catch (error) {
             console.error('Auto-save failed:', error);
         }
-    }, [formData, editor, entry?.id, isNew]);
+    }, [formData, yooptaContent, entry?.id, isNew]);
 
     // Auto-save every 30 seconds
     useEffect(() => {
@@ -116,16 +118,10 @@ export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: P
     }, [handleAutoSave, isNew]);
 
     const handleSave = async () => {
-        if (!formData.title.trim()) {
-            toast.error('Please enter a title for your journal entry');
-            return;
-        }
-
-        const content = editor.children;
-        const markdownContent = serializeMd(editor, { nodes: content });
-
-        if (!markdownContent.trim()) {
-            toast.error('Please write some content for your journal entry');
+        const plainTextContent = yooptaToPlainText(yooptaContent);
+        const titleToUse = formData.title.trim() || (plainTextContent.trim().slice(0, 60) || 'Untitled entry');
+        if (!plainTextContent.trim() && !formData.title.trim()) {
+            toast.error('Please add a title or some content for your journal entry');
             return;
         }
 
@@ -137,9 +133,9 @@ export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: P
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        title: formData.title,
-                        content,
-                        markdownContent,
+                        title: titleToUse,
+                        yooptaContent,
+                        plainTextContent,
                         type: 'text',
                         mood: formData.mood,
                         moodIntensity: formData.moodIntensity,
@@ -156,7 +152,7 @@ export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: P
                     throw new Error('Failed to create journal entry');
                 }
 
-                const result = await response.json();
+                const result: any = await response.json();
                 toast.success('Journal entry created successfully!');
 
                 // Redirect to the new entry
@@ -169,9 +165,9 @@ export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: P
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        title: formData.title,
-                        content,
-                        markdownContent,
+                        title: titleToUse,
+                        yooptaContent,
+                        plainTextContent,
                         mood: formData.mood,
                         moodIntensity: formData.moodIntensity,
                         emotionalTags: formData.emotionalTags,
@@ -192,8 +188,8 @@ export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: P
                 if (onSave) {
                     await onSave({
                         title: formData.title,
-                        content,
-                        markdownContent,
+                        yooptaContent,
+                        plainTextContent,
                         ...formData,
                     });
                 }
@@ -212,8 +208,8 @@ export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: P
             return;
         }
 
-        const markdownContent = serializeMd(editor, { nodes: editor.children });
-        if (!markdownContent.trim()) {
+        const plainTextContent = yooptaToPlainText(yooptaContent);
+        if (!plainTextContent.trim()) {
             toast.error('Please add some content before analyzing');
             return;
         }
@@ -224,7 +220,7 @@ export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: P
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    content: markdownContent,
+                    content: plainTextContent,
                     mood: formData.mood,
                     emotionalTags: formData.emotionalTags,
                 }),
@@ -318,16 +314,13 @@ export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: P
                             placeholder="What's on your mind?"
                         />
 
-                        {/* Plate.js Editor */}
+                        {/* Yoopta Editor */}
                         <div className="min-h-[400px]">
-                            <Plate editor={editor}>
-                                <EditorContainer>
-                                    <Editor
-                                        variant="demo"
-                                        className="min-h-[400px] p-4 border rounded-lg focus-within:ring-2 focus-within:ring-primary focus-within:border-primary"
-                                    />
-                                </EditorContainer>
-                            </Plate>
+                            <YooptaJournalEditor
+                                initialValue={yooptaContent}
+                                onChange={setYooptaContent}
+                                className="min-h-[400px] p-4 border rounded-lg focus-within:ring-2 focus-within:ring-primary focus-within:border-primary"
+                            />
                         </div>
                     </div>
 

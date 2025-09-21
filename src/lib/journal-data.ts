@@ -2,6 +2,8 @@ export type JournalEntry = {
   id: string
   type: 'text' | 'audio' | 'video' | 'mixed'
   title: string
+  yooptaContent?: any
+  plainTextContent?: string
   content?: string
   audioUrl?: string
   videoUrl?: string

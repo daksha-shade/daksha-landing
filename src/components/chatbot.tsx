@@ -8,7 +8,8 @@ import { Button } from './ui/button';
 import { PlusIcon, MessageSquareIcon } from 'lucide-react';
 
 export function Chatbot() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading, reload } = useChat();
+  const chat = useChat() as any;
+  const { messages, input, handleInputChange, handleSubmit, isLoading, reload } = chat;
 
   const handleNewChat = () => {
     window.location.reload();

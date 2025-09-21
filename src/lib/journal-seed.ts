@@ -67,15 +67,38 @@ const SAMPLE_TEMPLATES = [
     }
 ];
 
-// Helper function to create proper Plate.js JSON content
-const createPlateContent = (text: string) => {
-    const paragraphs = text.split('\n\n').map(paragraph => ({
-        type: 'p',
-        children: [{ text: paragraph }]
-    }));
-
-    return paragraphs;
+// Helper: build minimal Yoopta content with paragraphs (YooptaContentValue)
+const createYooptaContent = (text: string) => {
+    const mapping: Record<string, any> = {};
+    const paragraphs = text.split('\n\n').filter(Boolean);
+    paragraphs.forEach((paragraph, index) => {
+        const id = String(index + 1);
+        mapping[id] = {
+            id,
+            type: 'Paragraph',
+            value: [
+                {
+                    id: `${id}-p`,
+                    type: 'paragraph',
+                    children: [{ text: paragraph }],
+                },
+            ],
+            meta: { order: index, depth: 0 },
+        };
+    });
+    if (paragraphs.length === 0) {
+        mapping['1'] = {
+            id: '1',
+            type: 'Paragraph',
+            value: [{ id: '1-p', type: 'paragraph', children: [{ text: '' }] }],
+            meta: { order: 0, depth: 0 },
+        };
+    }
+    return mapping;
 };
+
+// Back-compat for existing SAMPLE_ENTRIES using Plate-like content
+const createPlateContent = (text: string) => text;
 
 const SAMPLE_ENTRIES = [
     {
@@ -204,15 +227,23 @@ export async function seedJournalData(userId: string, forceReseed = false) {
             // Create entries over the past week
             const entryDate = new Date(now.getTime() - (i * 24 * 60 * 60 * 1000));
 
+            // Normalize to Yoopta + plain text
+            const plain = (entry as any).plainTextContent
+                || (entry as any).markdownContent
+                || (Array.isArray((entry as any).content)
+                    ? (entry as any).content.map((p: any) => (p?.children?.[0]?.text || '')).join('\n\n')
+                    : '');
+            const yooptaValue = (entry as any).yooptaContent || createYooptaContent(plain);
+
             // Generate embedding
-            const embedding = await embedText(entry.plainTextContent);
+            const embedding = await embedText(plain);
 
             await db.insert(journalEntries).values({
                 id: crypto.randomUUID(),
                 userId,
                 title: entry.title,
-                content: entry.content, // Store as JSON object
-                markdownContent: entry.markdownContent,
+                yooptaContent: yooptaValue,
+                plainTextContent: plain,
                 type: entry.type,
                 mood: entry.mood,
                 moodIntensity: entry.moodIntensity,
@@ -257,7 +288,13 @@ export async function seedJournalData(userId: string, forceReseed = false) {
                     userId,
                     date: analyticsDate,
                     entryCount: 1,
-                    wordCount: entry.plainTextContent.split(' ').length,
+                    wordCount: (entry as any).plainTextContent
+                        ? (entry as any).plainTextContent.split(' ').length
+                        : ((entry as any).markdownContent
+                            ? (entry as any).markdownContent.split(' ').length
+                            : (Array.isArray((entry as any).content)
+                                ? (entry as any).content.map((p: any) => (p?.children?.[0]?.text || '')).join(' ').split(' ').length
+                                : 0)),
                     averageMood: entry.moodIntensity,
                     dominantEmotions: entry.emotionalTags,
                     topTags: entry.tags,

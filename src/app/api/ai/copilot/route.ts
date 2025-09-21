@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
     model = 'gpt-4o-mini',
     prompt,
     system,
-  } = await req.json();
+  } = (await req.json()) as any;
 
   const apiKey = key || process.env.OPENAI_API_KEY;
 
@@ -26,7 +26,6 @@ export async function POST(req: NextRequest) {
   try {
     const result = await generateText({
       abortSignal: req.signal,
-      maxTokens: 50,
       model: openai(model),
       prompt: prompt,
       system,

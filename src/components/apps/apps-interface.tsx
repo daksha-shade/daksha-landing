@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Grid3X3, Plus, Check, X, Settings, ExternalLink } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import {

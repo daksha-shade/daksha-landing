@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const body = await req.json();
+        const body = (await req.json()) as any;
         const { name, description, prompts, category } = body;
 
         if (!name || !prompts || !Array.isArray(prompts)) {

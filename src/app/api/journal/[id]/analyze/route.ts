@@ -16,8 +16,8 @@ export async function POST(
         }
 
         const { id } = await params;
-        const body = await req.json();
-        const { content, mood, emotionalTags } = body;
+        const body = (await req.json()) as any;
+        const { plainTextContent: content, mood, emotionalTags } = body;
 
         if (!content || typeof content !== 'string') {
             return NextResponse.json(
