@@ -1,44 +1,21 @@
-
-
-
-
-
-
+<!-- 
 journal page
 
-
+ -->
 
 daksha apps
 
-
-
-
-
 notes
-
-
-
 planner
-
-
-
 connect apps
-
-
-
-
-
 keep
-
-
-
 calender
 
 
 
-dashboard - show memories from memories vaulte - connected (google photos) and create showcase for that like google photos does for us - and show some plans from the planner like today you have a meeting shedules - this is the todo for your today - have you completed - get the most important tasks from goals app and show on desktop dashboard the percentage so that users can brainstorm and which thing to do - create a thougts apps where users can store there thoughts and ideas
+<!-- dashboard - show memories from memories vaulte - connected (google photos) and create showcase for that like google photos does for us - and show some plans from the planner like today you have a meeting shedules - this is the todo for your today - have you completed - get the most important tasks from goals app and show on desktop dashboard the percentage so that users can brainstorm and which thing to do - create a thougts apps where users can store there thoughts and ideas -->
 
-also add two things in the dashboard - one a thought of the day and a quote of the day - and a suggestion of the day - like you should do this today (like let's write a poem today and publish on vani) or you should do that today - like a personal assistant
+<!-- also add two things in the dashboard - one a thought of the day and a quote of the day - and a suggestion of the day - like you should do this today (like let's write a poem today and publish on vani) or you should do that today - like a personal assistant -->
 
 
 create an app import that will import your other apps data to daksha (photos, calender, forms and others)
@@ -95,10 +72,10 @@ fetch this and create db schema to keep the chat history and also keep the embed
 ---
 
 
-in /journal page every data is hardcoded we have used openai-api drizzle postgres with pgvector - and platjs for texteditor in /journal/text 
+<!-- in /journal page every data is hardcoded we have used openai-api drizzle postgres with pgvector - and platjs for texteditor in /journal/text 
 keep thr ui same and create the backend of the application and also fetch the users in the db and seed the sample jounals with all the features that can be added to the db schema about jounalling the features that we may use in the feature as the purpose of the website 
 connect the frontend to the be and also keep the vector embedding of the jounal - use r2 endpoints see  the .env.local file and /upload and also add the audio and video recording and uploading feature use openai api key tts and stt features
-dont make any mistakes keep ui consistant and working 
+dont make any mistakes keep ui consistant and working  -->
 
 
 ---
@@ -107,4 +84,11 @@ Add semantic search in /jornals make the audio uploading transcribing and also a
 
 ---
 
-https://context7.com/yoopta-editor/yoopta-editor port to yoopta editor from platjs
+<!-- https://context7.com/yoopta-editor/yoopta-editor port to yoopta editor from platjs
+
+--- -->
+
+
+use https://context7.com/llmstxt/assistant-ui_llms_txt mcp or fetch https://context7.com/llmstxt/assistant-ui_llms_txt/llms.txt?tokens=100000  and gather info about assistant ui 
+
+and create the agents and all the features that are there in the assistant ui - like file upload and all and also create the context file feature in /context page and also create the vector embedding of the context file and save it in qdrant and also save it in supabase db - use drizzle orm to create the db schema and all - use openai embedding model to create the vector embedding and save it in qdrant and also save the context file in supabase db - in /chat we must able to fetch the context from the context file and use it as a priorety context over other context so that it can be used in the chat page to answer the questions search for online docs for creating the agents .

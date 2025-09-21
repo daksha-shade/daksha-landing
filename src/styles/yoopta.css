@@ -1,0 +1,23 @@
+.yoopta-editor-container {
+  --yoopta-bg: var(--popover);
+  --yoopta-fg: var(--popover-foreground);
+  --yoopta-border: var(--border);
+}
+/* Toolbars and menus (dark mode friendly) */
+.yoopta-editor-container [role="menu"],
+.yoopta-editor-container [data-yoopta-ui],
+.yoopta-editor-container .yoopta-toolbar,
+.yoopta-editor-container .yoopta-menu,
+.yoopta-editor-container .yoopta-popover {
+  background: var(--yoopta-bg) !important;
+  color: var(--yoopta-fg) !important;
+  border-color: var(--yoopta-border) !important;
+}
+.yoopta-editor-container .yoopta-toolbar button,
+.yoopta-editor-container [role="menuitem"] {
+  color: var(--yoopta-fg) !important;
+}
+.yoopta-editor-container .yoopta-toolbar button:hover,
+.yoopta-editor-container [role="menuitem"]:hover {
+  background: color-mix(in oklab, var(--yoopta-bg) 90%, black 10%) !important;
+}

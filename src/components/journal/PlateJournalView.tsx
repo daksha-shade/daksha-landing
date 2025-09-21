@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import useSWR from 'swr';
 import { ArrowLeft, Edit3, Share, Trash2, MapPin, Cloud, BarChart3, Loader2, MoreVertical, Save, X } from 'lucide-react';
@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 import { MoodSelector } from './MoodSelector';
 import { TagInput } from './TagInput';
 import { toast } from 'sonner';
@@ -102,6 +103,16 @@ export function PlateJournalView({ id, initialMode = 'view' }: PlateJournalViewP
         },
     });
 
+    // Ensure content updates when entry data loads (e.g., on hard reload)
+    useEffect(() => {
+        if (!isEditing && entry?.yooptaContent) {
+            setYooptaContent(entry.yooptaContent);
+            // force re-render of read-only editor to pick up new content
+            setEditorKey((k) => k + 1);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [entry?.id, isEditing]);
+
     const handleEdit = () => {
         if (entry) {
             setEditData({
@@ -113,6 +124,9 @@ export function PlateJournalView({ id, initialMode = 'view' }: PlateJournalViewP
                 location: entry.location || '',
                 weather: entry.weather || '',
             });
+            if (entry.yooptaContent) {
+                setYooptaContent(entry.yooptaContent);
+            }
             // Force editor re-render with new content
             setEditorKey(prev => prev + 1);
             setIsEditing(true);
@@ -225,8 +239,7 @@ export function PlateJournalView({ id, initialMode = 'view' }: PlateJournalViewP
     };
 
     const handleDelete = async () => {
-        if (!entry || !confirm('Are you sure you want to delete this journal entry?')) return;
-
+        if (!entry) return;
         try {
             const response = await fetch(`/api/journal/${entry.id}`, { method: 'DELETE' });
             if (response.ok) {
@@ -328,10 +341,26 @@ export function PlateJournalView({ id, initialMode = 'view' }: PlateJournalViewP
                                             <Share className="h-4 w-4" />
                                             <span className="hidden md:inline">Share</span>
                                         </Button>
-                                        <Button variant="outline" size="sm" onClick={handleDelete} className="gap-2 text-destructive hover:text-destructive">
-                                            <Trash2 className="h-4 w-4" />
-                                            <span className="hidden md:inline">Delete</span>
-                                        </Button>
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button variant="outline" size="sm" className="gap-2 text-destructive hover:text-destructive">
+                                                <Trash2 className="h-4 w-4" />
+                                                <span className="hidden md:inline">Delete</span>
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Delete this entry?</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    This action cannot be undone. This will permanently delete your journal entry.
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                <AlertDialogAction className="bg-destructive hover:bg-destructive/90" onClick={handleDelete}>Delete</AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
                                     </div>
 
                                     <Button onClick={handleEdit} size="sm" className="gap-2">

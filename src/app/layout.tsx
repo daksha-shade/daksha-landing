@@ -4,6 +4,7 @@ import { stackServerApp } from "../stack";
 import { UserSyncProvider } from "@/components/auth/UserSyncProvider";
 import { Inter, JetBrains_Mono, Crimson_Text } from "next/font/google";
 import "./globals.css";
+import "@/styles/yoopta.css";
 
 const inter = Inter({
   variable: "--font-inter",

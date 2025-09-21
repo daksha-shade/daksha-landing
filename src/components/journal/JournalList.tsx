@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 
@@ -170,13 +171,11 @@ export function JournalList() {
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm("Are you sure you want to delete this journal entry?")) return;
-
         try {
             const response = await fetch(`/api/journal/${id}`, { method: "DELETE" });
             if (response.ok) {
                 toast.success("Journal entry deleted");
-                mutate(); // Refresh data
+                mutate();
             } else {
                 toast.error("Failed to delete entry");
             }
@@ -419,30 +418,37 @@ export function JournalList() {
                                                         <MoreHorizontal className="h-4 w-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        router.push(`/journal/${entry.id}?mode=edit`);
-                                                    }}>
-                                                        Edit
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
-                                                        Share
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
-                                                        Export
-                                                    </DropdownMenuItem>
-                                                    <Separator />
-                                                    <DropdownMenuItem
-                                                        className="text-destructive"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleDelete(entry.id);
-                                                        }}
-                                                    >
-                                                        Delete
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    router.push(`/journal/${entry.id}?mode=edit`);
+                                                }}>
+                                                    Edit
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+                                                    Share
+                                                </DropdownMenuItem>
+                                                <Separator />
+                                                <AlertDialog>
+                                                    <AlertDialogTrigger asChild>
+                                                        <DropdownMenuItem className="text-destructive" onClick={(e) => e.stopPropagation()}>
+                                                            Delete
+                                                        </DropdownMenuItem>
+                                                    </AlertDialogTrigger>
+                                                    <AlertDialogContent>
+                                                        <AlertDialogHeader>
+                                                            <AlertDialogTitle>Delete journal entry?</AlertDialogTitle>
+                                                            <AlertDialogDescription>
+                                                                This action cannot be undone. This will permanently delete your entry.
+                                                            </AlertDialogDescription>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogFooter>
+                                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                            <AlertDialogAction className="bg-destructive hover:bg-destructive/90" onClick={(e) => { e.stopPropagation(); handleDelete(entry.id); }}>Delete</AlertDialogAction>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
+                                            </DropdownMenuContent>
                                             </DropdownMenu>
                                         </div>
                                     </CardHeader>

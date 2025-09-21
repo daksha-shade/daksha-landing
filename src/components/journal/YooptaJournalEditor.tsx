@@ -33,6 +33,7 @@ const PLUGINS = [
     Callout,
     Divider,
     Code,
+    Table,
     // You can enable more advanced blocks as needed:
     // Table, Embed, Image, Video, File, Accordion,
 ];
