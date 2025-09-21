@@ -183,11 +183,63 @@ export function TextJournalEditor() {
 
     return (
         <div className={`min-h-screen transition-all duration-300 ${isFocusMode ? 'bg-background' : ''}`}>
-            {/* Header - Hidden in focus mode unless showMenuBar is true */}
+            {/* Header - Mobile-first responsive design */}
             {(!isFocusMode || showMenuBar) && (
-                <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b">
-                    <div className="max-w-7xl mx-auto px-4 py-3">
-                        <div className="flex items-center justify-between">
+                <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+                    <div className="container mx-auto px-4 py-3">
+                        {/* Mobile Header */}
+                        <div className="flex items-center justify-between md:hidden">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => router.push('/journal')}
+                                className="gap-2"
+                            >
+                                <ArrowLeft className="w-4 h-4" />
+                                <span>Back</span>
+                            </Button>
+
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                {isTyping ? (
+                                    <span className="flex items-center gap-1">
+                                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                        Typing...
+                                    </span>
+                                ) : (
+                                    <span>{wordCount} words</span>
+                                )}
+                            </div>
+
+                            <div className="flex items-center gap-1">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setIsFocusMode(!isFocusMode)}
+                                    className="p-2"
+                                >
+                                    {isFocusMode ? <Minimize2 className="w-4 h-4" /> : <Focus className="w-4 h-4" />}
+                                </Button>
+
+                                <Button
+                                    onClick={handleSave}
+                                    disabled={isSaving}
+                                    size="sm"
+                                    className="gap-1"
+                                >
+                                    {isSaving ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                        <>
+                                            <Save className="w-4 h-4" />
+                                            <span className="hidden xs:inline">Save</span>
+                                        </>
+                                    )}
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* Desktop Header */}
+                        <div className="hidden md:flex items-center justify-between">
                             <div className="flex items-center gap-4">
                                 <Button
                                     variant="ghost"
@@ -308,9 +360,9 @@ export function TextJournalEditor() {
             )}
 
             {/* Main Content */}
-            <div className={`mx-auto px-4 transition-all duration-300 ${isFocusMode ? 'max-w-4xl py-4' : 'max-w-5xl py-8'
+            <div className={`container mx-auto px-4 transition-all duration-300 ${isFocusMode ? 'max-w-4xl py-4' : 'max-w-5xl py-6 md:py-8'
                 }`}>
-                <div className="space-y-6">
+                <div className="space-y-4 md:space-y-6">
                     {/* Title */}
                     <div>
                         <Input
@@ -318,16 +370,16 @@ export function TextJournalEditor() {
                             placeholder="Give your entry a title..."
                             value={entry.title}
                             onChange={(e) => setEntry(prev => ({ ...prev, title: e.target.value }))}
-                            className={`w-full font-bold bg-transparent border-none outline-none focus-visible:ring-0 shadow-none text-foreground transition-all duration-300 ${isFocusMode ? 'text-3xl' : 'text-4xl'
+                            className={`w-full font-bold bg-transparent border-none outline-none focus-visible:ring-0 shadow-none text-foreground transition-all duration-300 h-auto ${isFocusMode ? 'text-2xl md:text-3xl' : 'text-2xl md:text-4xl'
                                 }`}
                         />
                     </div>
 
                     {/* Metadata Section - Hidden in focus mode */}
                     {!isFocusMode && (
-                        <Card className="bg-muted/30">
+                        <Card className="bg-muted/30 border-none shadow-sm">
                             <CardContent className="p-4 space-y-4">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                     <MoodSelector
                                         mood={entry.mood}
                                         moodIntensity={entry.moodIntensity}
@@ -348,16 +400,18 @@ export function TextJournalEditor() {
                                     />
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <Input
                                         placeholder="Location (optional)"
                                         value={entry.location}
                                         onChange={(e) => setEntry(prev => ({ ...prev, location: e.target.value }))}
+                                        className="h-9"
                                     />
                                     <Input
                                         placeholder="Weather (optional)"
                                         value={entry.weather}
                                         onChange={(e) => setEntry(prev => ({ ...prev, weather: e.target.value }))}
+                                        className="h-9"
                                     />
                                 </div>
                             </CardContent>
@@ -366,23 +420,23 @@ export function TextJournalEditor() {
 
                     {/* Rich Text Editor */}
                     <div className={`transition-all duration-300 ${isFocusMode
-                        ? 'rounded-none shadow-none min-h-[calc(100vh-200px)]'
-                        : 'min-h-[600px]'
+                        ? 'rounded-none shadow-none min-h-[calc(100vh-140px)]'
+                        : 'min-h-[400px] md:min-h-[600px]'
                         }`}>
                         <TiptapEditor
                             content={typeof entry.content === 'object' && entry.content !== null ? JSON.stringify(entry.content) : (entry.content || '')}
                             onChange={handleContentChange}
                             placeholder="Start writing your thoughts..."
-                            className={isFocusMode ? 'border-none shadow-none' : ''}
-                            showWordCount={true}
+                            className={isFocusMode ? 'border-none shadow-none' : 'border-none shadow-sm'}
+                            showWordCount={!isFocusMode}
                         />
                     </div>
                 </div>
             </div>
 
-            {/* Focus Mode Keyboard Shortcuts Hint */}
+            {/* Focus Mode Keyboard Shortcuts Hint - Hidden on mobile */}
             {isFocusMode && (
-                <div className="fixed bottom-4 left-4 z-20">
+                <div className="fixed bottom-4 left-4 z-20 hidden md:block">
                     <div className="bg-background/90 backdrop-blur-sm shadow-lg rounded-lg p-3 text-xs text-muted-foreground border">
                         <div className="space-y-1">
                             <div><kbd className="px-1 py-0.5 bg-muted rounded text-xs">Ctrl+S</kbd> Save</div>

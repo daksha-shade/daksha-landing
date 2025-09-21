@@ -235,12 +235,15 @@ export function TiptapEditor({
                 className="min-h-[200px] max-w-none"
             />
             {showWordCount && (
-                <div className="border-t px-4 py-2 text-xs text-muted-foreground flex justify-between">
+                <div className="border-t px-4 py-2 text-xs text-muted-foreground flex flex-col sm:flex-row sm:justify-between gap-1">
                     <span>
-                        {editor.storage.characterCount?.characters() || 0} characters, {' '}
-                        {editor.storage.characterCount?.words() || 0} words
+                        <span className="sm:hidden">{editor.storage.characterCount?.words() || 0} words</span>
+                        <span className="hidden sm:inline">
+                            {editor.storage.characterCount?.characters() || 0} characters, {' '}
+                            {editor.storage.characterCount?.words() || 0} words
+                        </span>
                     </span>
-                    <span>
+                    <span className="hidden sm:inline">
                         Press Ctrl+S to save
                     </span>
                 </div>
