@@ -18,8 +18,8 @@ import { toast } from "sonner";
 interface JournalEntry {
     id: string;
     title: string;
-    content?: any; // JSON content from Tiptap
-    plainTextContent?: string;
+    content?: any; // Plate.js JSON content
+    markdownContent?: string;
     type: "text" | "audio" | "video";
     mood?: string;
     moodIntensity?: number;
@@ -427,7 +427,7 @@ export function JournalList() {
 
                                     <CardContent className="pt-0">
                                         <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
-                                            {entry.plainTextContent || (typeof entry.content === 'string' ? entry.content : '') || entry.transcript || "No content"}
+                                            {entry.markdownContent || entry.transcript || "No content"}
                                         </p>
 
                                         {entry.type === "audio" && entry.duration && (

@@ -39,8 +39,8 @@ export const journalEntries = pgTable("journal_entries", {
   id: text("id").primaryKey(),
   userId: text("user_id").notNull(),
   title: text("title").notNull(),
-  content: text("content"), // Rich text content (HTML/JSON from Plate.js)
-  plainTextContent: text("plain_text_content"), // Plain text version for search
+  content: jsonb("content"), // Plate.js JSON content for editing
+  markdownContent: text("markdown_content"), // Markdown version for LLMs and search
   type: text("type").notNull().default("text"), // text, audio, video
 
   // Mood and emotional data

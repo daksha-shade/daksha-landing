@@ -95,10 +95,10 @@ export async function PUT(
         // Update fields if provided
         if (title !== undefined) updateData.title = title;
         if (content !== undefined) {
-            // Ensure content is stored as JSON string if it's an object
-            updateData.content = typeof content === 'object' ? JSON.stringify(content) : content;
+            // Store Plate.js JSON content directly
+            updateData.content = typeof content === 'object' ? content : null;
         }
-        if (plainTextContent !== undefined) updateData.plainTextContent = plainTextContent;
+        if (body.markdownContent !== undefined) updateData.markdownContent = body.markdownContent;
         if (mood !== undefined) updateData.mood = mood;
         if (moodIntensity !== undefined) updateData.moodIntensity = moodIntensity;
         if (emotionalTags !== undefined) updateData.emotionalTags = emotionalTags;
@@ -114,14 +114,14 @@ export async function PUT(
         if (entryDate !== undefined) updateData.entryDate = new Date(entryDate);
 
         // Regenerate embedding if content changed
-        if (content !== undefined || plainTextContent !== undefined || transcript !== undefined) {
-            const textForEmbedding = plainTextContent || content || transcript || title || existingEntry[0].title;
+        if (content !== undefined || body.markdownContent !== undefined || transcript !== undefined) {
+            const textForEmbedding = body.markdownContent || transcript || title || existingEntry[0].title;
             updateData.embedding = await embedText(textForEmbedding);
         }
 
         // Regenerate AI insights if requested
         if (regenerateAI) {
-            const textForAI = plainTextContent || content || transcript || existingEntry[0].plainTextContent || existingEntry[0].content;
+            const textForAI = body.markdownContent || transcript || existingEntry[0].markdownContent;
             if (textForAI) {
                 try {
                     const aiAnalysis = await generateAIInsights(textForAI, {

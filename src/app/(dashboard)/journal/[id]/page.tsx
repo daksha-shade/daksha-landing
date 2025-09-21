@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { JournalEntryView } from '@/components/journal/JournalEntryView';
+import { PlateJournalView } from '@/components/journal/PlateJournalView';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -20,5 +20,5 @@ export default async function JournalEntryPage({ params, searchParams }: Props) 
   const { id } = await params;
   const { mode } = await searchParams;
 
-  return <JournalEntryView id={id} initialMode={mode} />;
+  return <PlateJournalView id={id} />;
 }

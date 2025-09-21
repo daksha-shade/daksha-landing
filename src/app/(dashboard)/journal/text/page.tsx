@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { TextJournalEditor } from '@/components/journal/TextJournalEditor';
+import { PlateJournalEditor } from '@/components/journal/PlateJournalEditor';
 
 export const metadata: Metadata = {
     title: 'Text Journal - Daksha',
@@ -13,5 +13,5 @@ export const metadata: Metadata = {
 };
 
 export default function TextJournalPage() {
-    return <TextJournalEditor />;
+    return <PlateJournalEditor isNew={true} />;
 }

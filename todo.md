@@ -104,3 +104,7 @@ dont make any mistakes keep ui consistant and working
 ---
 
 Add semantic search in /jornals make the audio uploading transcribing and also add the text editor and also add the audio and video recording and uploading feature use openai api key tts and stt features
+
+---
+
+https://context7.com/yoopta-editor/yoopta-editor port to yoopta editor from platjs

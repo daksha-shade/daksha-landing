@@ -1,110 +1,103 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { GetObjectCommand } from '@aws-sdk/client-s3';
+import { stackServerApp } from '@/stack';
+import { uploadToR2, generateFileKey, getFileTypeFromMimeType } from '@/lib/r2-upload';
 
-// Initialize S3 client for Cloudflare R2
-const s3Client = new S3Client({
-  region: 'auto', // Cloudflare R2 uses 'auto' as region
-  endpoint: process.env.R2_ENDPOINT,
-  credentials: {
-    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
-  },
-});
-
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    const formData = await request.formData();
+    const user = await stackServerApp.getUser({ or: 'return-null' });
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const formData = await req.formData();
     const file = formData.get('file') as File;
 
     if (!file) {
-      return NextResponse.json(
-        { error: 'No file provided' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
-    // Generate unique filename with timestamp
-    const timestamp = Date.now();
-    const fileName = `${timestamp}-${file.name}`;
+    // Validate file size (max 50MB)
+    const maxSize = 50 * 1024 * 1024; // 50MB
+    if (file.size > maxSize) {
+      return NextResponse.json({ error: 'File too large. Maximum size is 50MB.' }, { status: 400 });
+    }
+
+    // Validate file type
+    const allowedTypes = [
+      'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+      'video/mp4', 'video/webm', 'video/quicktime',
+      'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/mpeg',
+      'application/pdf', 'text/plain', 'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      return NextResponse.json({ error: 'File type not supported' }, { status: 400 });
+    }
+
+    // Generate file key
+    const fileType = getFileTypeFromMimeType(file.type);
+    const key = generateFileKey(user.id, fileType, file.name);
 
     // Convert file to buffer
     const buffer = Buffer.from(await file.arrayBuffer());
 
     // Upload to R2
-    const command = new PutObjectCommand({
-      Bucket: process.env.R2_BUCKET!,
-      Key: fileName,
-      Body: buffer,
-      ContentType: file.type,
-      ContentLength: buffer.length,
+    const result = await uploadToR2(buffer, key, file.type, {
+      userId: user.id,
+      originalName: file.name,
+      uploadedAt: new Date().toISOString(),
     });
 
-    await s3Client.send(command);
-
-    // Determine the best permanent URL for database storage
-    let permanentUrl: string;
-    let temporaryUrl: string;
-    
-    // Generate presigned URL for temporary access (24 hours)
-    const getObjectCommand = new GetObjectCommand({
-      Bucket: process.env.R2_BUCKET!,
-      Key: fileName,
-    });
-    
-    temporaryUrl = await getSignedUrl(s3Client, getObjectCommand, { 
-      expiresIn: 86400 // 24 hours
-    });
-
-    // Determine permanent URL strategy
-    if (process.env.R2_PUBLIC_DOMAIN && process.env.R2_USE_PROXY_URLS !== 'true') {
-      // Use custom domain if configured
-      permanentUrl = `${process.env.R2_PUBLIC_DOMAIN}/${fileName}`;
-    } else {
-      // Use proxy URL through our app as permanent solution
-      permanentUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3001'}/api/files/${fileName}`;
-    }
-
-    // Return success response with file info optimized for database storage
     return NextResponse.json({
       success: true,
-      message: 'File uploaded successfully',
       file: {
-        name: fileName,
-        originalName: file.name,
+        url: result.publicUrl,
+        key: result.key,
+        type: fileType,
+        mimeType: file.type,
         size: file.size,
-        type: file.type,
-        // Primary URL for database storage (permanent)
-        url: permanentUrl,
-        // Alternative URLs for different use cases
-        permanentUrl: permanentUrl,
-        temporaryUrl: temporaryUrl,
-        proxyUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3001'}/api/files/${fileName}`,
-        directUrl: `${process.env.R2_ENDPOINT}/${process.env.R2_BUCKET}/${fileName}`, // Requires auth
+        name: file.name,
       },
     });
-
   } catch (error) {
     console.error('Upload error:', error);
     return NextResponse.json(
-      { 
-        error: 'Failed to upload file',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
+      { error: 'Failed to upload file' },
       { status: 500 }
     );
   }
 }
 
-// Handle OPTIONS for CORS
-export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    },
-  });
+export async function DELETE(req: NextRequest) {
+  try {
+    const user = await stackServerApp.getUser({ or: 'return-null' });
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const key = searchParams.get('key');
+
+    if (!key) {
+      return NextResponse.json({ error: 'No file key provided' }, { status: 400 });
+    }
+
+    // Verify the file belongs to the user
+    if (!key.startsWith(`journal/${user.id}/`)) {
+      return NextResponse.json({ error: 'Unauthorized to delete this file' }, { status: 403 });
+    }
+
+    // Delete from R2
+    const { deleteFromR2 } = await import('@/lib/r2-upload');
+    await deleteFromR2(key);
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Delete error:', error);
+    return NextResponse.json(
+      { error: 'Failed to delete file' },
+      { status: 500 }
+    );
+  }
 }

@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
         id: journalEntries.id,
         title: journalEntries.title,
         content: journalEntries.content,
-        plainTextContent: journalEntries.plainTextContent,
+        markdownContent: journalEntries.markdownContent,
         type: journalEntries.type,
         mood: journalEntries.mood,
         moodIntensity: journalEntries.moodIntensity,
@@ -79,8 +79,20 @@ export async function GET(req: NextRequest) {
 
     const total = totalResult[0]?.count || 0;
 
+    // Process entries to handle null values and ensure proper format
+    const processedEntries = entries.map(entry => ({
+      ...entry,
+      content: entry.content || null,
+      markdownContent: entry.markdownContent || '',
+      emotionalTags: entry.emotionalTags || [],
+      tags: entry.tags || [],
+      imageUrls: entry.imageUrls || [],
+      attachmentUrls: entry.attachmentUrls || [],
+      aiInsights: entry.aiInsights || [],
+    }));
+
     return NextResponse.json({
-      entries,
+      entries: processedEntries,
       pagination: {
         total,
         limit,
@@ -104,8 +116,8 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const {
       title,
-      content, // This will be JSON from Tiptap
-      plainTextContent,
+      content, // This will be JSON from Plate.js
+      markdownContent,
       type = "text",
       mood,
       moodIntensity,
@@ -134,8 +146,12 @@ export async function POST(req: NextRequest) {
     const now = new Date();
     const journalDate = entryDate ? new Date(entryDate) : now;
 
+    // Handle content - expect JSON from Plate.js
+    const plateContent = typeof content === 'object' ? content : null;
+    const finalMarkdownContent = markdownContent || transcript || '';
+
     // Generate embedding for semantic search
-    const textForEmbedding = plainTextContent || content || transcript || title;
+    const textForEmbedding = finalMarkdownContent || title;
     const embedding = await embedText(textForEmbedding);
 
     // Generate AI analysis if requested
@@ -161,16 +177,13 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Ensure content is stored as JSON string if it's an object
-    const contentToStore = typeof content === 'object' ? JSON.stringify(content) : content;
-
     // Insert journal entry
     await db.insert(journalEntries).values({
       id,
       userId: user.id,
       title,
-      content: contentToStore,
-      plainTextContent,
+      content: plateContent,
+      markdownContent: finalMarkdownContent,
       type,
       mood,
       moodIntensity,
@@ -202,7 +215,7 @@ export async function POST(req: NextRequest) {
       mood: moodIntensity,
       emotions: emotionalTags,
       tags,
-      wordCount: plainTextContent?.split(' ').length || 0
+      wordCount: finalMarkdownContent?.split(' ').length || 0
     });
 
     return NextResponse.json({
