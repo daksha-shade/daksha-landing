@@ -234,6 +234,18 @@ export function JournalList() {
                                 </p>
                             </div>
                         </div>
+                        {/* Search */}
+                        <div className="w-full sm:w-80">
+                            <div className="relative">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    placeholder="Search entries..."
+                                    className="pl-9"
+                                />
+                            </div>
+                        </div>
                         <Dialog>
                             <DialogTrigger asChild>
                                 <Button className="gap-2">
@@ -348,10 +360,20 @@ export function JournalList() {
                 </div>
 
                 {isLoading ? (
-                    <div className="flex items-center justify-center py-8">
-                        <Loader2 className="h-6 w-6 animate-spin mr-2" />
-                        <span>Loading journal entries...</span>
-                    </div>
+                    <>
+                        <div className={viewMode === "grid" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" : "space-y-3"}>
+                            {[...Array(6)].map((_, i) => (
+                                <div key={i} className="border rounded-lg p-4 animate-pulse">
+                                    <div className="h-5 w-1/2 bg-muted rounded mb-3" />
+                                    <div className="space-y-2">
+                                        <div className="h-3 bg-muted rounded" />
+                                        <div className="h-3 bg-muted rounded w-5/6" />
+                                        <div className="h-3 bg-muted rounded w-2/3" />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </>
                 ) : (
                     <>
                         <div className={viewMode === "grid" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" : "space-y-3"}>

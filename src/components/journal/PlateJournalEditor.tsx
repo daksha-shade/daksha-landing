@@ -64,6 +64,7 @@ export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: P
     const [isSaving, setIsSaving] = useState(false);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [lastSaved, setLastSaved] = useState<Date | null>(null);
+    const [draftSavedAt, setDraftSavedAt] = useState<Date | null>(null);
 
     const [formData, setFormData] = useState({
         title: entry?.title || '',
@@ -76,6 +77,22 @@ export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: P
     });
 
     const [yooptaContent, setYooptaContent] = useState<any>(entry?.yooptaContent || defaultValue);
+
+    // Load draft for new entries
+    useEffect(() => {
+        if (!isNew) return;
+        try {
+            const raw = localStorage.getItem('journal-draft');
+            if (!raw) return;
+            const draft = JSON.parse(raw);
+            if (draft?.title) {
+                setFormData((prev) => ({ ...prev, title: draft.title }));
+            }
+            if (draft?.yooptaContent) {
+                setYooptaContent(draft.yooptaContent);
+            }
+        } catch {}
+    }, [isNew]);
 
     // Auto-save functionality
     const handleAutoSave = useCallback(async () => {
@@ -117,6 +134,49 @@ export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: P
         return () => clearInterval(interval);
     }, [handleAutoSave, isNew]);
 
+    // Local draft save for new entries
+    useEffect(() => {
+        if (!isNew) return;
+        const id = setTimeout(() => {
+            try {
+                localStorage.setItem(
+                    'journal-draft',
+                    JSON.stringify({ title: formData.title, yooptaContent })
+                );
+                setDraftSavedAt(new Date());
+            } catch {}
+        }, 600);
+        return () => clearTimeout(id);
+    }, [isNew, formData.title, yooptaContent]);
+
+    // Warn on navigation with unsaved changes (new entries)
+    useEffect(() => {
+        if (!isNew) return;
+        const handler = (e: BeforeUnloadEvent) => {
+            const plain = yooptaToPlainText(yooptaContent).trim();
+            if (formData.title.trim() || plain) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        };
+        window.addEventListener('beforeunload', handler);
+        return () => window.removeEventListener('beforeunload', handler);
+    }, [isNew, formData.title, yooptaContent]);
+
+    // Keyboard shortcut: Cmd/Ctrl+S to save
+    useEffect(() => {
+        const onKey = (e: KeyboardEvent) => {
+            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
+                e.preventDefault();
+                if (!isSaving) {
+                    handleSave();
+                }
+            }
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [isSaving, formData, yooptaContent]);
+
     const handleSave = async () => {
         const plainTextContent = yooptaToPlainText(yooptaContent);
         const titleToUse = formData.title.trim() || (plainTextContent.trim().slice(0, 60) || 'Untitled entry');
@@ -154,6 +214,7 @@ export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: P
 
                 const result: any = await response.json();
                 toast.success('Journal entry created successfully!');
+                try { localStorage.removeItem('journal-draft'); } catch {}
 
                 // Redirect to the new entry
                 setTimeout(() => {
@@ -187,7 +248,6 @@ export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: P
 
                 if (onSave) {
                     await onSave({
-                        title: formData.title,
                         yooptaContent,
                         plainTextContent,
                         ...formData,
@@ -256,8 +316,11 @@ export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: P
                         </Button>
 
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                            {lastSaved && !isNew && (
+                            {!isNew && lastSaved && (
                                 <span>Saved {lastSaved.toLocaleTimeString()}</span>
+                            )}
+                            {isNew && draftSavedAt && (
+                                <span>Draft saved {draftSavedAt.toLocaleTimeString()}</span>
                             )}
                         </div>
 
@@ -303,31 +366,31 @@ export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: P
             </div>
 
             <div className="container mx-auto px-4 py-6">
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px] gap-8">
                     {/* Main Editor */}
                     <div className="lg:col-span-3 space-y-4">
                         {/* Title */}
                         <Input
                             value={formData.title}
                             onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                            className="text-xl sm:text-2xl font-bold border-none p-0 focus-visible:ring-0 shadow-none bg-transparent h-auto"
+                            className="text-3xl md:text-4xl font-semibold border-none p-0 focus-visible:ring-0 shadow-none bg-transparent h-auto tracking-tight placeholder:text-muted-foreground/60"
                             placeholder="What's on your mind?"
                         />
 
                         {/* Yoopta Editor */}
-                        <div className="min-h-[400px]">
+                        <div className="min-h-[400px] rounded-xl border bg-background/30">
                             <YooptaJournalEditor
                                 initialValue={yooptaContent}
                                 onChange={setYooptaContent}
-                                className="min-h-[400px] p-4 border rounded-lg focus-within:ring-2 focus-within:ring-primary focus-within:border-primary"
+                                className="min-h-[400px] p-5"
                             />
                         </div>
                     </div>
 
                     {/* Sidebar */}
-                    <div className="space-y-4">
+                    <div className="space-y-4 xl:sticky xl:top-24 h-fit">
                         {/* Mood & Emotions */}
-                        <Card className="border-none shadow-sm">
+                        <Card className="border rounded-xl">
                             <CardContent className="p-4">
                                 <MoodSelector
                                     mood={formData.mood}
@@ -346,7 +409,7 @@ export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: P
                         </Card>
 
                         {/* Tags */}
-                        <Card className="border-none shadow-sm">
+                        <Card className="border rounded-xl">
                             <CardContent className="p-4">
                                 <TagInput
                                     tags={formData.tags}
@@ -356,7 +419,7 @@ export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: P
                         </Card>
 
                         {/* Context */}
-                        <Card className="border-none shadow-sm">
+                        <Card className="border rounded-xl">
                             <CardHeader className="pb-3">
                                 <CardTitle className="text-sm font-medium">Context</CardTitle>
                             </CardHeader>
@@ -397,6 +460,25 @@ export function PlateJournalEditor({ entry, isNew = false, onSave, onCancel }: P
                             </CardContent>
                         </Card>
                     </div>
+                </div>
+            </div>
+            {/* Mobile sticky actions */}
+            <div className="fixed bottom-4 left-4 right-4 z-20 sm:hidden">
+                <div className="flex gap-2 rounded-full border bg-background/95 backdrop-blur p-2 shadow-lg">
+                    {!isNew && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleAnalyzeWithAI}
+                            disabled={isAnalyzing}
+                            className="flex-1"
+                        >
+                            {isAnalyzing ? 'Analyzing…' : 'AI Analyze'}
+                        </Button>
+                    )}
+                    <Button onClick={handleSave} disabled={isSaving} size="sm" className="flex-1">
+                        {isSaving ? 'Saving…' : 'Save'}
+                    </Button>
                 </div>
             </div>
         </div>
