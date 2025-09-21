@@ -10,6 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { TiptapEditor } from '@/components/journal/TiptapEditor';
 import { MoodSelector } from '@/components/journal/MoodSelector';
 import { TagInput } from '@/components/journal/TagInput';
+import { MarkdownShortcuts } from '@/components/journal/MarkdownShortcuts';
 import { toast } from 'sonner';
 import useSWR from 'swr';
 
@@ -57,7 +58,15 @@ export function TextJournalEditor() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    ...entry,
+                    title: entry.title,
+                    content: entry.content, // JSON object
+                    plainTextContent: entry.plainTextContent,
+                    mood: entry.mood,
+                    moodIntensity: entry.moodIntensity,
+                    emotionalTags: entry.emotionalTags,
+                    tags: entry.tags,
+                    location: entry.location,
+                    weather: entry.weather,
                     type: 'text',
                     entryDate: new Date().toISOString(),
                     generateAI: false, // Don't generate AI for auto-saves
@@ -95,7 +104,15 @@ export function TextJournalEditor() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    ...entry,
+                    title: entry.title,
+                    content: entry.content, // JSON object
+                    plainTextContent: entry.plainTextContent,
+                    mood: entry.mood,
+                    moodIntensity: entry.moodIntensity,
+                    emotionalTags: entry.emotionalTags,
+                    tags: entry.tags,
+                    location: entry.location,
+                    weather: entry.weather,
                     type: 'text',
                     entryDate: new Date().toISOString(),
                     generateAI: true,
@@ -123,13 +140,29 @@ export function TextJournalEditor() {
     }, [entry, router]);
 
     const handleContentChange = useCallback((content: string, plainText: string) => {
-        setEntry(prev => ({ ...prev, content, plainTextContent: plainText }));
-        setWordCount(plainText.split(/\s+/).filter(word => word.length > 0).length);
-        setIsTyping(true);
+        try {
+            // Parse JSON content properly
+            const contentObj = typeof content === 'string' ? JSON.parse(content) : content;
+            setEntry(prev => ({
+                ...prev,
+                content: contentObj,
+                plainTextContent: plainText
+            }));
+            setWordCount(plainText.split(/\s+/).filter(word => word.length > 0).length);
+            setIsTyping(true);
 
-        // Clear typing indicator after 1 second of no changes
-        const timer = setTimeout(() => setIsTyping(false), 1000);
-        return () => clearTimeout(timer);
+            // Clear typing indicator after 1 second of no changes
+            const timer = setTimeout(() => setIsTyping(false), 1000);
+            return () => clearTimeout(timer);
+        } catch (error) {
+            console.error('Error parsing content JSON:', error);
+            // Fallback to storing as-is
+            setEntry(prev => ({
+                ...prev,
+                content: content,
+                plainTextContent: plainText
+            }));
+        }
     }, []);
 
     // Handle keyboard shortcuts
@@ -220,6 +253,8 @@ export function TextJournalEditor() {
                                         </>
                                     )}
                                 </Button>
+
+                                <MarkdownShortcuts />
 
                                 <Button
                                     onClick={handleSave}
@@ -331,14 +366,15 @@ export function TextJournalEditor() {
 
                     {/* Rich Text Editor */}
                     <div className={`transition-all duration-300 ${isFocusMode
-                            ? 'rounded-none shadow-none min-h-[calc(100vh-200px)]'
-                            : 'min-h-[600px]'
+                        ? 'rounded-none shadow-none min-h-[calc(100vh-200px)]'
+                        : 'min-h-[600px]'
                         }`}>
                         <TiptapEditor
-                            content={entry.content}
+                            content={typeof entry.content === 'object' && entry.content !== null ? JSON.stringify(entry.content) : (entry.content || '')}
                             onChange={handleContentChange}
                             placeholder="Start writing your thoughts..."
                             className={isFocusMode ? 'border-none shadow-none' : ''}
+                            showWordCount={true}
                         />
                     </div>
                 </div>

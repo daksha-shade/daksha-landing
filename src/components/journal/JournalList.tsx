@@ -18,7 +18,7 @@ import { toast } from "sonner";
 interface JournalEntry {
     id: string;
     title: string;
-    content?: string;
+    content?: any; // JSON content from Tiptap
     plainTextContent?: string;
     type: "text" | "audio" | "video";
     mood?: string;
@@ -34,6 +34,11 @@ interface JournalEntry {
     transcript?: string;
     aiSummary?: string;
     aiInsights?: string[];
+    aiSentiment?: {
+        overall: string;
+        confidence: number;
+        emotions: Array<{ emotion: string; intensity: number }>;
+    };
     entryDate: string;
     createdAt: string;
     updatedAt: string;
@@ -86,7 +91,7 @@ const formatDate = (dateString: string) => {
     }
 };
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+const fetcher = (url: string): Promise<JournalResponse> => fetch(url).then((res) => res.json());
 
 export function JournalList() {
     const router = useRouter();
@@ -141,6 +146,29 @@ export function JournalList() {
         }
     };
 
+    const deleteAndReseedData = async () => {
+        if (!confirm("Are you sure you want to delete ALL journal entries and reseed with sample data? This cannot be undone.")) {
+            return;
+        }
+
+        try {
+            const response = await fetch("/api/journal/seed", {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ deleteFirst: true })
+            });
+            if (response.ok) {
+                toast.success("All journal data deleted and reseeded!");
+                mutate(); // Refresh data
+            } else {
+                toast.error("Failed to delete and reseed data");
+            }
+        } catch (error) {
+            console.error("Error deleting and reseeding data:", error);
+            toast.error("Failed to delete and reseed data");
+        }
+    };
+
     const handleDelete = async (id: string) => {
         if (!confirm("Are you sure you want to delete this journal entry?")) return;
 
@@ -192,83 +220,91 @@ export function JournalList() {
     }
 
     return (
-        <div className="container mx-auto p-6 space-y-6">
-            <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <Edit3 className="h-6 w-6 text-primary" />
-                        <h1 className="text-3xl font-bold tracking-tight">Journal</h1>
-                    </div>
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <Button>
-                                <Plus className="h-4 w-4 mr-2" />
-                                New Entry
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Create New Entry</DialogTitle>
-                            </DialogHeader>
-                            <div className="grid gap-3 py-4">
-                                <Button
-                                    variant="outline"
-                                    className="justify-start h-auto p-4"
-                                    onClick={() => router.push('/journal/text')}
-                                >
-                                    <FileText className="h-5 w-5 mr-3" />
-                                    <div className="text-left">
-                                        <div className="font-medium">Text Entry</div>
-                                        <div className="text-sm text-muted-foreground">Write your thoughts and ideas</div>
-                                    </div>
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    className="justify-start h-auto p-4"
-                                    onClick={() => router.push('/journal/audio')}
-                                >
-                                    <Mic className="h-5 w-5 mr-3" />
-                                    <div className="text-left">
-                                        <div className="font-medium">Audio Journal</div>
-                                        <div className="text-sm text-muted-foreground">Record your voice and feelings</div>
-                                    </div>
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    className="justify-start h-auto p-4"
-                                    onClick={() => router.push('/journal/video')}
-                                >
-                                    <Video className="h-5 w-5 mr-3" />
-                                    <div className="text-left">
-                                        <div className="font-medium">Video Journal</div>
-                                        <div className="text-sm text-muted-foreground">Capture moments and emotions</div>
-                                    </div>
-                                </Button>
+        <div className="min-h-screen bg-background">
+            <div className="container mx-auto px-4 py-6 space-y-6">
+                {/* Header */}
+                <div className="space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                            <Edit3 className="h-6 w-6 text-primary" />
+                            <div>
+                                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Journal</h1>
+                                <p className="text-sm text-muted-foreground sm:hidden">
+                                    Your personal space for thoughts and reflections
+                                </p>
                             </div>
-                        </DialogContent>
-                    </Dialog>
+                        </div>
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <Button className="gap-2">
+                                    <Plus className="h-4 w-4" />
+                                    <span className="hidden sm:inline">New Entry</span>
+                                    <span className="sm:hidden">New</span>
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-md">
+                                <DialogHeader>
+                                    <DialogTitle>Create New Entry</DialogTitle>
+                                </DialogHeader>
+                                <div className="grid gap-3 py-4">
+                                    <Button
+                                        variant="outline"
+                                        className="justify-start h-auto p-4"
+                                        onClick={() => router.push('/journal/text')}
+                                    >
+                                        <FileText className="h-5 w-5 mr-3" />
+                                        <div className="text-left">
+                                            <div className="font-medium">Text Entry</div>
+                                            <div className="text-sm text-muted-foreground">Write your thoughts and ideas</div>
+                                        </div>
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        className="justify-start h-auto p-4"
+                                        onClick={() => router.push('/journal/audio')}
+                                    >
+                                        <Mic className="h-5 w-5 mr-3" />
+                                        <div className="text-left">
+                                            <div className="font-medium">Audio Journal</div>
+                                            <div className="text-sm text-muted-foreground">Record your voice and feelings</div>
+                                        </div>
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        className="justify-start h-auto p-4"
+                                        onClick={() => router.push('/journal/video')}
+                                    >
+                                        <Video className="h-5 w-5 mr-3" />
+                                        <div className="text-left">
+                                            <div className="font-medium">Video Journal</div>
+                                            <div className="text-sm text-muted-foreground">Capture moments and emotions</div>
+                                        </div>
+                                    </Button>
+                                </div>
+                            </DialogContent>
+                        </Dialog>
+                    </div>
+                    <p className="text-muted-foreground hidden sm:block">
+                        Your personal space for thoughts, memories, and reflections
+                    </p>
                 </div>
-                <p className="text-muted-foreground">
-                    Your personal space for thoughts, memories, and reflections
-                </p>
-            </div>
 
-            <Card className="border-0 p-0 my-2 bg-transparent">
-                <CardContent className="p-0 m-0">
-                    <div className="flex flex-col sm:flex-row gap-4 p-0 m-0 items-start sm:items-center justify-between">
-                        <div className="flex flex-col sm:flex-row gap-3 flex-1">
-                            <div className="relative flex-1 max-w-sm">
+                {/* Filters & Search */}
+                <div className="space-y-4">
+                    <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                        <div className="flex flex-col sm:flex-row gap-3 flex-1 w-full sm:w-auto">
+                            <div className="relative flex-1 sm:max-w-sm">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                 <Input
-                                    placeholder="Search entries with semantic understanding..."
+                                    placeholder="Search entries..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     className="pl-9"
                                 />
                             </div>
 
-                            <Tabs value={filterType} onValueChange={(value) => setFilterType(value)}>
-                                <TabsList>
+                            <Tabs value={filterType} onValueChange={(value) => setFilterType(value)} className="w-full sm:w-auto">
+                                <TabsList className="grid w-full grid-cols-4 sm:w-auto">
                                     <TabsTrigger value="all">All</TabsTrigger>
                                     <TabsTrigger value="text">Text</TabsTrigger>
                                     <TabsTrigger value="audio">Audio</TabsTrigger>
@@ -277,18 +313,18 @@ export function JournalList() {
                             </Tabs>
                         </div>
 
-                        <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground whitespace-nowrap">
-                                <span>
+                        <div className="flex items-center justify-between w-full sm:w-auto gap-4">
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                <span className="hidden sm:inline">
                                     <span className="font-semibold">{stats.total}</span> Total
                                 </span>
-                                <span>·</span>
+                                <span className="hidden sm:inline">·</span>
                                 <span>
                                     <span className="font-semibold">{stats.thisWeek}</span> This Week
                                 </span>
-                                <span>·</span>
-                                <span>
-                                    <span className="font-semibold">{filteredEntries.length}</span> Filtered
+                                <span className="hidden sm:inline">·</span>
+                                <span className="hidden sm:inline">
+                                    <span className="font-semibold">{filteredEntries.length}</span> Showing
                                 </span>
                             </div>
                             <div className="flex items-center gap-1 border rounded-md p-1">
@@ -309,168 +345,174 @@ export function JournalList() {
                             </div>
                         </div>
                     </div>
-                </CardContent>
-            </Card>
-
-            {isLoading ? (
-                <div className="flex items-center justify-center py-8">
-                    <Loader2 className="h-6 w-6 animate-spin mr-2" />
-                    <span>Loading journal entries...</span>
                 </div>
-            ) : (
-                <>
-                    <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" : "space-y-4"}>
-                        {visibleEntries.map((entry) => (
-                            <Card
-                                key={entry.id}
-                                className="group cursor-pointer hover:shadow-md transition-shadow"
-                                onClick={() => router.push(`/journal/${entry.id}`)}
-                            >
-                                <CardHeader className="pb-3">
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex items-center gap-3 flex-1">
-                                            <div className="p-2 rounded-md bg-muted">
-                                                {getTypeIcon(entry.type)}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <CardTitle className="text-base truncate">
-                                                    {entry.title}
-                                                </CardTitle>
-                                                <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
-                                                    {entry.mood && (
-                                                        <>
-                                                            <div className={`w-2 h-2 rounded-full ${getMoodColor(entry.mood)}`} />
-                                                            <span className="capitalize">{entry.mood}</span>
-                                                            <span>•</span>
-                                                        </>
-                                                    )}
-                                                    <span>
-                                                        {formatDate(entry.entryDate)}
-                                                    </span>
+
+                {isLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                        <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                        <span>Loading journal entries...</span>
+                    </div>
+                ) : (
+                    <>
+                        <div className={viewMode === "grid" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" : "space-y-3"}>
+                            {visibleEntries.map((entry) => (
+                                <Card
+                                    key={entry.id}
+                                    className="group cursor-pointer hover:shadow-md transition-shadow"
+                                    onClick={() => router.push(`/journal/${entry.id}`)}
+                                >
+                                    <CardHeader className="pb-3">
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex items-center gap-3 flex-1">
+                                                <div className="p-2 rounded-md bg-muted">
+                                                    {getTypeIcon(entry.type)}
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <CardTitle className="text-base truncate">
+                                                        {entry.title}
+                                                    </CardTitle>
+                                                    <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
+                                                        {entry.mood && (
+                                                            <>
+                                                                <div className={`w-2 h-2 rounded-full ${getMoodColor(entry.mood)}`} />
+                                                                <span className="capitalize">{entry.mood}</span>
+                                                                <span>•</span>
+                                                            </>
+                                                        )}
+                                                        <span>
+                                                            {formatDate(entry.entryDate)}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="opacity-0 group-hover:opacity-100"
-                                                    onClick={(e) => e.stopPropagation()}
-                                                >
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuItem onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    router.push(`/journal/${entry.id}?mode=edit`);
-                                                }}>
-                                                    Edit
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
-                                                    Share
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
-                                                    Export
-                                                </DropdownMenuItem>
-                                                <Separator />
-                                                <DropdownMenuItem
-                                                    className="text-destructive"
-                                                    onClick={(e) => {
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="opacity-0 group-hover:opacity-100"
+                                                        onClick={(e) => e.stopPropagation()}
+                                                    >
+                                                        <MoreHorizontal className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuItem onClick={(e) => {
                                                         e.stopPropagation();
-                                                        handleDelete(entry.id);
-                                                    }}
-                                                >
-                                                    Delete
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </div>
-                                </CardHeader>
+                                                        router.push(`/journal/${entry.id}/edit`);
+                                                    }}>
+                                                        Edit
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+                                                        Share
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+                                                        Export
+                                                    </DropdownMenuItem>
+                                                    <Separator />
+                                                    <DropdownMenuItem
+                                                        className="text-destructive"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleDelete(entry.id);
+                                                        }}
+                                                    >
+                                                        Delete
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </div>
+                                    </CardHeader>
 
-                                <CardContent className="pt-0">
-                                    <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
-                                        {entry.plainTextContent || entry.content || entry.transcript || "No content"}
-                                    </p>
+                                    <CardContent className="pt-0">
+                                        <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+                                            {entry.plainTextContent || (typeof entry.content === 'string' ? entry.content : '') || entry.transcript || "No content"}
+                                        </p>
 
-                                    {entry.type === "audio" && entry.duration && (
-                                        <div className="flex items-center gap-2 mt-3 p-2 bg-muted rounded-md">
-                                            <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                                                <Mic className="h-3 w-3" />
-                                            </Button>
-                                            <div className="flex-1 h-1 bg-border rounded-full">
-                                                <div className="h-full w-1/3 bg-primary rounded-full"></div>
+                                        {entry.type === "audio" && entry.duration && (
+                                            <div className="flex items-center gap-2 mt-3 p-2 bg-muted rounded-md">
+                                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                                    <Mic className="h-3 w-3" />
+                                                </Button>
+                                                <div className="flex-1 h-1 bg-border rounded-full">
+                                                    <div className="h-full w-1/3 bg-primary rounded-full"></div>
+                                                </div>
+                                                <span className="text-xs text-muted-foreground">{formatDuration(entry.duration)}</span>
                                             </div>
-                                            <span className="text-xs text-muted-foreground">{formatDuration(entry.duration)}</span>
-                                        </div>
-                                    )}
+                                        )}
 
-                                    {entry.tags && entry.tags.length > 0 && (
-                                        <div className="flex flex-wrap gap-1 mt-3">
-                                            {entry.tags.slice(0, 3).map((tag, tagIndex) => (
-                                                <Badge key={tagIndex} variant="secondary" className="text-xs">
-                                                    {tag}
-                                                </Badge>
-                                            ))}
-                                            {entry.tags.length > 3 && (
-                                                <Badge variant="secondary" className="text-xs">
-                                                    +{entry.tags.length - 3}
-                                                </Badge>
-                                            )}
-                                        </div>
+                                        {entry.tags && entry.tags.length > 0 && (
+                                            <div className="flex flex-wrap gap-1 mt-3">
+                                                {entry.tags.slice(0, 3).map((tag, tagIndex) => (
+                                                    <Badge key={tagIndex} variant="secondary" className="text-xs">
+                                                        {tag}
+                                                    </Badge>
+                                                ))}
+                                                {entry.tags.length > 3 && (
+                                                    <Badge variant="secondary" className="text-xs">
+                                                        +{entry.tags.length - 3}
+                                                    </Badge>
+                                                )}
+                                            </div>
+                                        )}
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+
+                        {hasMoreEntries && (
+                            <div className="flex justify-center">
+                                <Button
+                                    onClick={loadMore}
+                                    disabled={isLoadingMore}
+                                    variant="outline"
+                                >
+                                    {isLoadingMore ? (
+                                        <>
+                                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                            Loading...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <ChevronDown className="h-4 w-4 mr-2" />
+                                            Load More Entries
+                                        </>
                                     )}
+                                </Button>
+                            </div>
+                        )}
+
+                        {filteredEntries.length === 0 && !isLoading && (
+                            <Card>
+                                <CardContent className="p-12 text-center">
+                                    <Edit3 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                                    <h3 className="text-lg font-semibold mb-2">No entries found</h3>
+                                    <p className="text-muted-foreground text-sm mb-4">
+                                        {searchQuery || filterType !== "all"
+                                            ? "Try adjusting your search or filters"
+                                            : journalEntries.length === 0
+                                                ? "Start your journaling journey by creating your first entry"
+                                                : "No entries match your current filters"
+                                        }
+                                    </p>
+                                    <div className="flex gap-2 justify-center">
+                                        {journalEntries.length === 0 ? (
+                                            <Button onClick={seedData} variant="outline" className="mt-2">
+                                                Load Sample Entries
+                                            </Button>
+                                        ) : (
+                                            <Button onClick={deleteAndReseedData} variant="outline" className="mt-2 text-destructive hover:text-destructive">
+                                                Delete All & Reseed
+                                            </Button>
+                                        )}
+                                    </div>
                                 </CardContent>
                             </Card>
-                        ))}
-                    </div>
-
-                    {hasMoreEntries && (
-                        <div className="flex justify-center">
-                            <Button
-                                onClick={loadMore}
-                                disabled={isLoadingMore}
-                                variant="outline"
-                            >
-                                {isLoadingMore ? (
-                                    <>
-                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                        Loading...
-                                    </>
-                                ) : (
-                                    <>
-                                        <ChevronDown className="h-4 w-4 mr-2" />
-                                        Load More Entries
-                                    </>
-                                )}
-                            </Button>
-                        </div>
-                    )}
-
-                    {filteredEntries.length === 0 && !isLoading && (
-                        <Card>
-                            <CardContent className="p-12 text-center">
-                                <Edit3 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                                <h3 className="text-lg font-semibold mb-2">No entries found</h3>
-                                <p className="text-muted-foreground text-sm mb-4">
-                                    {searchQuery || filterType !== "all"
-                                        ? "Try adjusting your search or filters"
-                                        : journalEntries.length === 0
-                                            ? "Start your journaling journey by creating your first entry"
-                                            : "No entries match your current filters"
-                                    }
-                                </p>
-                                {journalEntries.length === 0 && (
-                                    <Button onClick={seedData} variant="outline" className="mt-2">
-                                        Load Sample Entries
-                                    </Button>
-                                )}
-                            </CardContent>
-                        </Card>
-                    )}
-                </>
-            )}
+                        )}
+                    </>
+                )}
+            </div>
         </div>
     );
 }

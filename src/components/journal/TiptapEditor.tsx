@@ -10,6 +10,8 @@ import Link from '@tiptap/extension-link';
 import Highlight from '@tiptap/extension-highlight';
 import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
+// Table extensions temporarily removed due to import issues
+import CharacterCount from '@tiptap/extension-character-count';
 import { useCallback, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { TiptapToolbar } from './TiptapToolbar';
@@ -20,6 +22,7 @@ interface TiptapEditorProps {
     placeholder?: string;
     className?: string;
     editable?: boolean;
+    showWordCount?: boolean;
 }
 
 export function TiptapEditor({
@@ -27,9 +30,11 @@ export function TiptapEditor({
     onChange,
     placeholder = "Start writing...",
     className,
-    editable = true
+    editable = true,
+    showWordCount = false
 }: TiptapEditorProps) {
     const editor = useEditor({
+        immediatelyRender: false,
         extensions: [
             StarterKit.configure({
                 bulletList: {
@@ -40,6 +45,11 @@ export function TiptapEditor({
                     keepMarks: true,
                     keepAttributes: false,
                 },
+                codeBlock: {
+                    HTMLAttributes: {
+                        class: 'bg-muted p-4 rounded-md text-sm font-mono',
+                    },
+                },
             }),
             Placeholder.configure({
                 placeholder,
@@ -48,27 +58,34 @@ export function TiptapEditor({
             TaskList,
             TaskItem.configure({
                 nested: true,
+                HTMLAttributes: {
+                    class: 'flex items-start gap-2',
+                },
             }),
             Link.configure({
                 openOnClick: false,
                 HTMLAttributes: {
-                    class: 'text-primary underline underline-offset-4 hover:text-primary/80',
+                    class: 'text-primary underline underline-offset-4 hover:text-primary/80 cursor-pointer',
                 },
             }),
             Highlight.configure({
                 multicolor: true,
+                HTMLAttributes: {
+                    class: 'bg-yellow-200 dark:bg-yellow-800 px-1 rounded',
+                },
             }),
             Underline,
             TextAlign.configure({
                 types: ['heading', 'paragraph'],
             }),
+            CharacterCount,
         ],
         content,
         editable,
         onUpdate: ({ editor }) => {
-            const html = editor.getHTML();
+            const json = editor.getJSON();
             const text = editor.getText();
-            onChange(html, text);
+            onChange(JSON.stringify(json), text);
         },
         editorProps: {
             attributes: {
@@ -94,8 +111,19 @@ export function TiptapEditor({
 
     // Update editor content when prop changes
     useEffect(() => {
-        if (editor && content !== editor.getHTML()) {
-            editor.commands.setContent(content);
+        if (editor && content) {
+            try {
+                const currentContent = JSON.stringify(editor.getJSON());
+                if (content !== currentContent) {
+                    const parsedContent = typeof content === 'string' ? JSON.parse(content) : content;
+                    editor.commands.setContent(parsedContent);
+                }
+            } catch (error) {
+                // If content is not valid JSON, treat as HTML/text
+                if (content !== editor.getHTML()) {
+                    editor.commands.setContent(content);
+                }
+            }
         }
     }, [content, editor]);
 
@@ -122,6 +150,61 @@ export function TiptapEditor({
                         editor?.chain().focus().setLink({ href: url }).run();
                     }
                     break;
+                case 'e':
+                    event.preventDefault();
+                    editor?.chain().focus().toggleCode().run();
+                    break;
+                case 'h':
+                    event.preventDefault();
+                    editor?.chain().focus().toggleHighlight().run();
+                    break;
+                case '1':
+                    event.preventDefault();
+                    editor?.chain().focus().toggleHeading({ level: 1 }).run();
+                    break;
+                case '2':
+                    event.preventDefault();
+                    editor?.chain().focus().toggleHeading({ level: 2 }).run();
+                    break;
+                case '3':
+                    event.preventDefault();
+                    editor?.chain().focus().toggleHeading({ level: 3 }).run();
+                    break;
+            }
+        }
+
+        // Handle markdown-style shortcuts without modifier keys
+        if (!event.ctrlKey && !event.metaKey && !event.altKey) {
+            const { selection } = editor?.state || {};
+            if (selection && selection.empty) {
+                const { $from } = selection;
+                const textBefore = $from.parent.textBetween(0, $from.parentOffset);
+
+                if (event.key === ' ') {
+                    // Auto-format markdown shortcuts
+                    if (textBefore === '#') {
+                        event.preventDefault();
+                        editor?.chain().focus().deleteRange({ from: $from.pos - 1, to: $from.pos }).toggleHeading({ level: 1 }).run();
+                    } else if (textBefore === '##') {
+                        event.preventDefault();
+                        editor?.chain().focus().deleteRange({ from: $from.pos - 2, to: $from.pos }).toggleHeading({ level: 2 }).run();
+                    } else if (textBefore === '###') {
+                        event.preventDefault();
+                        editor?.chain().focus().deleteRange({ from: $from.pos - 3, to: $from.pos }).toggleHeading({ level: 3 }).run();
+                    } else if (textBefore === '-' || textBefore === '*') {
+                        event.preventDefault();
+                        editor?.chain().focus().deleteRange({ from: $from.pos - 1, to: $from.pos }).toggleBulletList().run();
+                    } else if (textBefore === '1.') {
+                        event.preventDefault();
+                        editor?.chain().focus().deleteRange({ from: $from.pos - 2, to: $from.pos }).toggleOrderedList().run();
+                    } else if (textBefore === '[]') {
+                        event.preventDefault();
+                        editor?.chain().focus().deleteRange({ from: $from.pos - 2, to: $from.pos }).toggleTaskList().run();
+                    } else if (textBefore === '>') {
+                        event.preventDefault();
+                        editor?.chain().focus().deleteRange({ from: $from.pos - 1, to: $from.pos }).toggleBlockquote().run();
+                    }
+                }
             }
         }
     }, [editor]);
@@ -151,6 +234,17 @@ export function TiptapEditor({
                 editor={editor}
                 className="min-h-[200px] max-w-none"
             />
+            {showWordCount && (
+                <div className="border-t px-4 py-2 text-xs text-muted-foreground flex justify-between">
+                    <span>
+                        {editor.storage.characterCount?.characters() || 0} characters, {' '}
+                        {editor.storage.characterCount?.words() || 0} words
+                    </span>
+                    <span>
+                        Press Ctrl+S to save
+                    </span>
+                </div>
+            )}
         </div>
     );
 }

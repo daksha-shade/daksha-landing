@@ -65,9 +65,14 @@ export const journalEntries = pgTable("journal_entries", {
   transcriptConfidence: real("transcript_confidence"), // 0-1 confidence score
 
   // AI analysis
-  aiSummary: text("ai_summary"), // AI-generated summary
+  aiSummary: text("ai_summary"), // AI-generated summary in markdown
   aiInsights: jsonb("ai_insights").$type<string[]>(), // AI-generated insights
   aiQuestions: jsonb("ai_questions").$type<string[]>(), // AI-suggested reflection questions
+  aiSentiment: jsonb("ai_sentiment").$type<{
+    overall: string;
+    confidence: number;
+    emotions: Array<{ emotion: string; intensity: number }>;
+  }>(), // AI sentiment analysis
 
   // Privacy and sharing
   isPrivate: boolean("is_private").default(true),

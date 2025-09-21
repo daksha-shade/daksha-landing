@@ -17,7 +17,7 @@ import {
     Redo,
     Link,
     Unlink,
-    Highlight,
+    Highlighter,
     AlignLeft,
     AlignCenter,
     AlignRight,
@@ -138,7 +138,7 @@ export function TiptapToolbar({ editor }: TiptapToolbarProps) {
                 isActive={editor.isActive('highlight')}
                 title="Highlight"
             >
-                <Highlight className="h-4 w-4" />
+                <Highlighter className="h-4 w-4" />
             </ToolbarButton>
 
             <Separator orientation="vertical" className="h-6 mx-1" />

@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const {
       title,
-      content,
+      content, // This will be JSON from Tiptap
       plainTextContent,
       type = "text",
       mood,
@@ -138,30 +138,38 @@ export async function POST(req: NextRequest) {
     const textForEmbedding = plainTextContent || content || transcript || title;
     const embedding = await embedText(textForEmbedding);
 
-    // Generate AI insights if requested
-    let aiSummary, aiInsights, aiQuestions;
+    // Generate AI analysis if requested
+    let aiSummary, aiInsights, aiQuestions, aiSentiment;
     if (generateAI && textForEmbedding) {
       try {
-        const aiAnalysis = await generateAIInsights(textForEmbedding, {
+        const { generateAISummaryAndSentiment } = await import("@/lib/journal-ai-analysis");
+        const aiAnalysis = await generateAISummaryAndSentiment(textForEmbedding, {
           mood,
           emotionalTags,
           type
         });
         aiSummary = aiAnalysis.summary;
         aiInsights = aiAnalysis.insights;
-        aiQuestions = aiAnalysis.questions;
+        aiSentiment = aiAnalysis.sentiment;
+        // Generate some reflection questions based on insights
+        aiQuestions = aiAnalysis.insights.map(insight =>
+          `How does this insight about "${insight.toLowerCase()}" relate to your current goals?`
+        );
       } catch (error) {
         console.error("AI analysis failed:", error);
         // Continue without AI analysis
       }
     }
 
+    // Ensure content is stored as JSON string if it's an object
+    const contentToStore = typeof content === 'object' ? JSON.stringify(content) : content;
+
     // Insert journal entry
     await db.insert(journalEntries).values({
       id,
       userId: user.id,
       title,
-      content,
+      content: contentToStore,
       plainTextContent,
       type,
       mood,
@@ -179,6 +187,7 @@ export async function POST(req: NextRequest) {
       aiSummary,
       aiInsights,
       aiQuestions,
+      aiSentiment,
       embedding,
       entryDate: journalDate,
       createdAt: now,
@@ -201,7 +210,8 @@ export async function POST(req: NextRequest) {
       message: "Journal entry created successfully",
       aiSummary,
       aiInsights,
-      aiQuestions
+      aiQuestions,
+      aiSentiment
     });
   } catch (error) {
     console.error("Journal POST error:", error);

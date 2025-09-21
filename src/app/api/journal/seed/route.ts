@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stackServerApp } from "@/stack";
-import { seedJournalData } from "@/lib/journal-seed";
+import { seedJournalData, deleteAllJournalData } from "@/lib/journal-seed";
 
 export async function POST(req: NextRequest) {
     try {
@@ -9,10 +9,17 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        await seedJournalData(user.id);
+        const body = await req.json().catch(() => ({}));
+        const { deleteFirst = false } = body;
+
+        if (deleteFirst) {
+            await deleteAllJournalData(user.id);
+        }
+
+        await seedJournalData(user.id, deleteFirst);
 
         return NextResponse.json({
-            message: "Journal data seeded successfully",
+            message: deleteFirst ? "Journal data deleted and reseeded successfully" : "Journal data seeded successfully",
             userId: user.id
         });
     } catch (error) {

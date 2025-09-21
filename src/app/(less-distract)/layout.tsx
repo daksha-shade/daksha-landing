@@ -34,7 +34,7 @@ export default function DashboardLayout({
           
           {/* Main Content */}
           <main className="flex-1 min-h-[calc(100vh-4rem)]   transition-all duration-300 md:ml-0 pt-16" style={{ marginLeft: 'var(--sidebar-width, 0px)' }}>
-            <div className="px-4 md:px-8 py-4">
+            <div className="">
               {children}
             </div>
           </main>

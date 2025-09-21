@@ -94,7 +94,10 @@ export async function PUT(
 
         // Update fields if provided
         if (title !== undefined) updateData.title = title;
-        if (content !== undefined) updateData.content = content;
+        if (content !== undefined) {
+            // Ensure content is stored as JSON string if it's an object
+            updateData.content = typeof content === 'object' ? JSON.stringify(content) : content;
+        }
         if (plainTextContent !== undefined) updateData.plainTextContent = plainTextContent;
         if (mood !== undefined) updateData.mood = mood;
         if (moodIntensity !== undefined) updateData.moodIntensity = moodIntensity;

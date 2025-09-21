@@ -67,10 +67,26 @@ const SAMPLE_TEMPLATES = [
     }
 ];
 
+// Helper function to create proper Tiptap JSON content
+const createTiptapContent = (text: string) => {
+    const paragraphs = text.split('\n\n').map(paragraph => ({
+        type: 'paragraph',
+        content: paragraph.split('\n').map(line => ({
+            type: 'text',
+            text: line
+        }))
+    }));
+
+    return {
+        type: 'doc',
+        content: paragraphs
+    };
+};
+
 const SAMPLE_ENTRIES = [
     {
         title: "Morning Coffee Reflections",
-        content: "Sitting with my coffee this morning, I'm struck by how peaceful the early hours are. The world feels full of possibility when it's quiet like this. I've been thinking about the conversation I had with Sarah yesterday about taking more risks in life. She's right that I tend to play it safe, but maybe that's not always serving me well.\n\nI want to be more intentional about stepping outside my comfort zone this week. Small steps, but meaningful ones.",
+        content: createTiptapContent("Sitting with my coffee this morning, I'm struck by how peaceful the early hours are. The world feels full of possibility when it's quiet like this. I've been thinking about the conversation I had with Sarah yesterday about taking more risks in life. She's right that I tend to play it safe, but maybe that's not always serving me well.\n\nI want to be more intentional about stepping outside my comfort zone this week. Small steps, but meaningful ones."),
         plainTextContent: "Sitting with my coffee this morning, I'm struck by how peaceful the early hours are. The world feels full of possibility when it's quiet like this. I've been thinking about the conversation I had with Sarah yesterday about taking more risks in life. She's right that I tend to play it safe, but maybe that's not always serving me well. I want to be more intentional about stepping outside my comfort zone this week. Small steps, but meaningful ones.",
         type: "text",
         mood: "contemplative",
@@ -82,7 +98,7 @@ const SAMPLE_ENTRIES = [
     },
     {
         title: "Gratitude for Small Moments",
-        content: "Today I'm grateful for:\n\n1. The way the sunlight streamed through my kitchen window this morning\n2. My neighbor's friendly wave when I was getting the mail\n3. Finding that book I'd been looking for at the library\n4. The perfect temperature for my evening walk\n5. My cat's purring while I read before bed\n\nIt's amazing how much joy can be found in these tiny, everyday moments when I actually pay attention to them.",
+        content: createTiptapContent("Today I'm grateful for:\n\n1. The way the sunlight streamed through my kitchen window this morning\n2. My neighbor's friendly wave when I was getting the mail\n3. Finding that book I'd been looking for at the library\n4. The perfect temperature for my evening walk\n5. My cat's purring while I read before bed\n\nIt's amazing how much joy can be found in these tiny, everyday moments when I actually pay attention to them."),
         plainTextContent: "Today I'm grateful for: The way the sunlight streamed through my kitchen window this morning, my neighbor's friendly wave when I was getting the mail, finding that book I'd been looking for at the library, the perfect temperature for my evening walk, my cat's purring while I read before bed. It's amazing how much joy can be found in these tiny, everyday moments when I actually pay attention to them.",
         type: "text",
         mood: "grateful",
@@ -93,7 +109,7 @@ const SAMPLE_ENTRIES = [
     },
     {
         title: "Challenging Day at Work",
-        content: "Work was particularly stressful today. The project deadline got moved up, and I felt overwhelmed trying to coordinate with the team. I noticed I was getting short with people, which isn't like me. \n\nTaking a step back now, I realize I was putting too much pressure on myself to have all the answers. It's okay to ask for help and to admit when something feels too big to handle alone. Tomorrow I'm going to reach out to my manager about redistributing some of the workload.\n\nI'm proud of myself for recognizing these feelings instead of just pushing through them.",
+        content: createTiptapContent("Work was particularly stressful today. The project deadline got moved up, and I felt overwhelmed trying to coordinate with the team. I noticed I was getting short with people, which isn't like me.\n\nTaking a step back now, I realize I was putting too much pressure on myself to have all the answers. It's okay to ask for help and to admit when something feels too big to handle alone. Tomorrow I'm going to reach out to my manager about redistributing some of the workload.\n\nI'm proud of myself for recognizing these feelings instead of just pushing through them."),
         plainTextContent: "Work was particularly stressful today. The project deadline got moved up, and I felt overwhelmed trying to coordinate with the team. I noticed I was getting short with people, which isn't like me. Taking a step back now, I realize I was putting too much pressure on myself to have all the answers. It's okay to ask for help and to admit when something feels too big to handle alone. Tomorrow I'm going to reach out to my manager about redistributing some of the workload. I'm proud of myself for recognizing these feelings instead of just pushing through them.",
         type: "text",
         mood: "stressed",
@@ -104,7 +120,7 @@ const SAMPLE_ENTRIES = [
     },
     {
         title: "Weekend Adventure",
-        content: "Went hiking with friends today at the state park. It felt so good to be outdoors and moving my body after a week of sitting at my desk. The trail was more challenging than expected, but that made reaching the summit even more rewarding.\n\nWe sat at the top for almost an hour, just talking and enjoying the view. These are the moments that remind me what's really important - connection, nature, and being present. I want to make sure I prioritize more experiences like this.\n\nAlready planning our next adventure!",
+        content: createTiptapContent("Went hiking with friends today at the state park. It felt so good to be outdoors and moving my body after a week of sitting at my desk. The trail was more challenging than expected, but that made reaching the summit even more rewarding.\n\nWe sat at the top for almost an hour, just talking and enjoying the view. These are the moments that remind me what's really important - connection, nature, and being present. I want to make sure I prioritize more experiences like this.\n\nAlready planning our next adventure!"),
         plainTextContent: "Went hiking with friends today at the state park. It felt so good to be outdoors and moving my body after a week of sitting at my desk. The trail was more challenging than expected, but that made reaching the summit even more rewarding. We sat at the top for almost an hour, just talking and enjoying the view. These are the moments that remind me what's really important - connection, nature, and being present. I want to make sure I prioritize more experiences like this. Already planning our next adventure!",
         type: "text",
         mood: "energized",
@@ -116,7 +132,7 @@ const SAMPLE_ENTRIES = [
     },
     {
         title: "Late Night Thoughts",
-        content: "Can't sleep tonight. My mind keeps racing with thoughts about the future. Sometimes I feel like I'm exactly where I'm supposed to be, and other times I wonder if I'm wasting time or missing opportunities.\n\nI think this restlessness is actually a good sign though - it means I'm not settling for complacency. I'm growing and changing, and that can feel uncomfortable sometimes. Maybe the uncertainty is part of the journey.\n\nGoing to try some deep breathing and see if I can quiet my mind enough to rest.",
+        content: createTiptapContent("Can't sleep tonight. My mind keeps racing with thoughts about the future. Sometimes I feel like I'm exactly where I'm supposed to be, and other times I wonder if I'm wasting time or missing opportunities.\n\nI think this restlessness is actually a good sign though - it means I'm not settling for complacency. I'm growing and changing, and that can feel uncomfortable sometimes. Maybe the uncertainty is part of the journey.\n\nGoing to try some deep breathing and see if I can quiet my mind enough to rest."),
         plainTextContent: "Can't sleep tonight. My mind keeps racing with thoughts about the future. Sometimes I feel like I'm exactly where I'm supposed to be, and other times I wonder if I'm wasting time or missing opportunities. I think this restlessness is actually a good sign though - it means I'm not settling for complacency. I'm growing and changing, and that can feel uncomfortable sometimes. Maybe the uncertainty is part of the journey. Going to try some deep breathing and see if I can quiet my mind enough to rest.",
         type: "text",
         mood: "anxious",
@@ -127,20 +143,45 @@ const SAMPLE_ENTRIES = [
     }
 ];
 
-export async function seedJournalData(userId: string) {
+export async function deleteAllJournalData(userId: string) {
+    try {
+        console.log("Deleting all journal data for user:", userId);
+
+        // Delete journal entries
+        await db.delete(journalEntries).where(eq(journalEntries.userId, userId));
+
+        // Delete journal streaks
+        await db.delete(journalStreaks).where(eq(journalStreaks.userId, userId));
+
+        // Delete journal analytics
+        await db.delete(journalAnalytics).where(eq(journalAnalytics.userId, userId));
+
+        // Delete user-created templates (keep system templates)
+        await db.delete(journalTemplates).where(eq(journalTemplates.userId, userId));
+
+        console.log("All journal data deleted successfully!");
+    } catch (error) {
+        console.error("Error deleting journal data:", error);
+        throw error;
+    }
+}
+
+export async function seedJournalData(userId: string, forceReseed = false) {
     try {
         console.log("Seeding journal data for user:", userId);
 
-        // Check if user already has journal entries
-        const existingEntries = await db
-            .select()
-            .from(journalEntries)
-            .where(eq(journalEntries.userId, userId))
-            .limit(1);
+        // Check if user already has journal entries (unless forcing reseed)
+        if (!forceReseed) {
+            const existingEntries = await db
+                .select()
+                .from(journalEntries)
+                .where(eq(journalEntries.userId, userId))
+                .limit(1);
 
-        if (existingEntries.length > 0) {
-            console.log("User already has journal entries, skipping seed");
-            return;
+            if (existingEntries.length > 0) {
+                console.log("User already has journal entries, skipping seed");
+                return;
+            }
         }
 
         // Seed templates (system templates)
@@ -176,7 +217,7 @@ export async function seedJournalData(userId: string) {
                 id: crypto.randomUUID(),
                 userId,
                 title: entry.title,
-                content: entry.content,
+                content: JSON.stringify(entry.content), // Store as JSON string
                 plainTextContent: entry.plainTextContent,
                 type: entry.type,
                 mood: entry.mood,

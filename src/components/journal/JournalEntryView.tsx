@@ -3,20 +3,18 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import useSWR from 'swr';
-import { ArrowLeft, Edit3, Save, Calendar, Clock, Heart, Tag, Share, Download, Trash2, Play, Mic, Video, Loader2 } from 'lucide-react';
+import { ArrowLeft, Edit3, Calendar, Clock, Heart, Tag, Share, Download, Trash2, MapPin, Cloud, BarChart3, Loader2, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
-import { TiptapEditor } from './TiptapEditor';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
 
 interface JournalEntry {
     id: string;
     title: string;
-    content?: string;
+    content?: any; // JSON content from Tiptap
     plainTextContent?: string;
     type: "text" | "audio" | "video";
     mood?: string;
@@ -32,6 +30,11 @@ interface JournalEntry {
     transcript?: string;
     aiSummary?: string;
     aiInsights?: string[];
+    aiSentiment?: {
+        overall: string;
+        confidence: number;
+        emotions: Array<{ emotion: string; intensity: number }>;
+    };
     entryDate: string;
     createdAt: string;
     updatedAt: string;
@@ -77,68 +80,44 @@ const formatFullDate = (dateString: string) => {
     });
 };
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+const fetcher = (url: string): Promise<{ entry: JournalEntry }> => fetch(url).then((res) => res.json());
+
+// Helper function to render rich content from JSON
+const renderContent = (content: any, plainTextContent?: string) => {
+    if (!content && !plainTextContent) return <p className="text-muted-foreground italic">No content</p>;
+
+    // If we have plainTextContent, use it for display (it's more reliable)
+    if (plainTextContent) {
+        return plainTextContent.split('\n').map((paragraph, index) => (
+            <p key={index} className="mb-4 leading-relaxed">
+                {paragraph || '\u00A0'} {/* Non-breaking space for empty lines */}
+            </p>
+        ));
+    }
+
+    // Fallback to content if no plainTextContent
+    if (typeof content === 'string') {
+        return content.split('\n').map((paragraph, index) => (
+            <p key={index} className="mb-4 leading-relaxed">
+                {paragraph || '\u00A0'}
+            </p>
+        ));
+    }
+
+    return <p className="text-muted-foreground italic">Content format not supported</p>;
+};
 
 export function JournalEntryView({ id, initialMode }: JournalEntryViewProps) {
     const router = useRouter();
-    const [isEditing, setIsEditing] = useState(initialMode === 'edit');
-    const [editedTitle, setEditedTitle] = useState('');
-    const [editedContent, setEditedContent] = useState('');
-    const [isSaving, setIsSaving] = useState(false);
 
     const { data, error, isLoading, mutate } = useSWR<{ entry: JournalEntry }>(
         `/api/journal/${id}`,
-        fetcher,
-        {
-            onSuccess: (data) => {
-                if (data.entry) {
-                    setEditedTitle(data.entry.title);
-                    setEditedContent(data.entry.plainTextContent || data.entry.content || '');
-                }
-            }
-        }
+        fetcher
     );
 
     const entry = data?.entry;
 
-    const handleSave = async () => {
-        if (!entry) return;
 
-        setIsSaving(true);
-        try {
-            const response = await fetch(`/api/journal/${entry.id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    title: editedTitle,
-                    plainTextContent: editedContent,
-                    content: editedContent,
-                    regenerateAI: true
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to update journal entry');
-            }
-
-            toast.success('Journal entry updated successfully!');
-            setIsEditing(false);
-            mutate(); // Refresh data
-        } catch (error) {
-            console.error('Save failed:', error);
-            toast.error('Failed to save changes. Please try again.');
-        } finally {
-            setIsSaving(false);
-        }
-    };
-
-    const handleCancel = () => {
-        if (entry) {
-            setEditedTitle(entry.title);
-            setEditedContent(entry.plainTextContent || entry.content || '');
-        }
-        setIsEditing(false);
-    };
 
     const handleDelete = async () => {
         if (!entry || !confirm('Are you sure you want to delete this journal entry?')) return;
@@ -157,14 +136,25 @@ export function JournalEntryView({ id, initialMode }: JournalEntryViewProps) {
         }
     };
 
-    const getTypeIcon = (type: string) => {
-        switch (type) {
-            case 'text': return <Edit3 className="h-4 w-4" />;
-            case 'audio': return <Mic className="h-4 w-4" />;
-            case 'video': return <Video className="h-4 w-4" />;
-            default: return <Edit3 className="h-4 w-4" />;
+    const handleShare = async () => {
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: entry?.title,
+                    text: entry?.plainTextContent?.slice(0, 100) + '...',
+                    url: window.location.href,
+                });
+            } catch (error) {
+                // User cancelled sharing
+            }
+        } else {
+            // Fallback: copy to clipboard
+            navigator.clipboard.writeText(window.location.href);
+            toast.success('Link copied to clipboard');
         }
     };
+
+
 
     if (isLoading) {
         return (
@@ -196,211 +186,195 @@ export function JournalEntryView({ id, initialMode }: JournalEntryViewProps) {
     }
 
     return (
-        <div className="min-h-screen">
-            <div className="container mx-auto">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-3">
+        <div className="min-h-screen bg-background">
+            {/* Mobile-first Header */}
+            <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+                <div className="container mx-auto px-4 py-3">
+                    <div className="flex items-center justify-between">
                         <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => router.push('/journal')}
+                            className="gap-2"
                         >
-                            <ArrowLeft className="h-4 w-4 mr-2" />
-                            Back
+                            <ArrowLeft className="h-4 w-4" />
+                            <span className="hidden sm:inline">Back</span>
                         </Button>
-                        <Separator orientation="vertical" className="h-6" />
+
                         <div className="flex items-center gap-2">
-                            <Edit3 className="h-5 w-5 text-primary" />
-                            <span className="font-medium">Journal Entry</span>
+                            {/* Desktop Actions */}
+                            <div className="hidden sm:flex items-center gap-2">
+                                <Button variant="outline" size="sm" onClick={handleShare} className="gap-2">
+                                    <Share className="h-4 w-4" />
+                                    <span className="hidden md:inline">Share</span>
+                                </Button>
+                                <Button variant="outline" size="sm" onClick={handleDelete} className="gap-2 text-destructive hover:text-destructive">
+                                    <Trash2 className="h-4 w-4" />
+                                    <span className="hidden md:inline">Delete</span>
+                                </Button>
+                            </div>
+
+                            <Button onClick={() => router.push(`/journal/${id}/edit`)} size="sm" className="gap-2">
+                                <Edit3 className="h-4 w-4" />
+                                <span className="hidden sm:inline">Edit</span>
+                            </Button>
+
+                            {/* Mobile Menu */}
+                            <div className="sm:hidden">
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" size="sm">
+                                            <MoreVertical className="h-4 w-4" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onClick={handleShare}>
+                                            <Share className="h-4 w-4 mr-2" />
+                                            Share
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onClick={handleDelete} className="text-destructive">
+                                            <Trash2 className="h-4 w-4 mr-2" />
+                                            Delete
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
                         </div>
                     </div>
-
-                    <div className="flex items-center gap-2">
-                        {isEditing ? (
-                            <>
-                                <Button variant="outline" onClick={handleCancel}>
-                                    Cancel
-                                </Button>
-                                <Button onClick={handleSave} disabled={isSaving}>
-                                    {isSaving ? (
-                                        <>
-                                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                            Saving...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Save className="h-4 w-4 mr-2" />
-                                            Save
-                                        </>
-                                    )}
-                                </Button>
-                            </>
-                        ) : (
-                            <>
-                                <Button variant="outline" size="sm">
-                                    <Share className="h-4 w-4 mr-2" />
-                                    Share
-                                </Button>
-                                <Button variant="outline" size="sm">
-                                    <Download className="h-4 w-4 mr-2" />
-                                    Export
-                                </Button>
-                                <Button variant="outline" size="sm" onClick={handleDelete} className="text-destructive">
-                                    <Trash2 className="h-4 w-4 mr-2" />
-                                    Delete
-                                </Button>
-                                <Button onClick={() => setIsEditing(true)}>
-                                    <Edit3 className="h-4 w-4 mr-2" />
-                                    Edit
-                                </Button>
-                            </>
-                        )}
-                    </div>
                 </div>
+            </div>
 
-                {/* Entry Content */}
-                <div className="space-y-6">
-                    {/* Title */}
-                    <Card className='border-none shadow-none bg-accent'>
-                        <CardContent className="py-4">
-                            {isEditing ? (
-                                <Input
-                                    value={editedTitle}
-                                    onChange={(e) => setEditedTitle(e.target.value)}
-                                    className="text-2xl font-bold border-none p-0 focus-visible:ring-0 shadow-none bg-transparent"
-                                    placeholder="Entry title..."
-                                />
-                            ) : (
-                                <h1 className="text-2xl font-bold">{entry.title}</h1>
+            <div className="container mx-auto px-4 py-6">
+                <div className="max-w-4xl mx-auto space-y-6">
+                    {/* Title & Metadata */}
+                    <div className="space-y-4">
+                        <h1 className="text-2xl sm:text-3xl font-bold leading-tight">{entry.title}</h1>
+
+                        {/* Metadata Row */}
+                        <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                            <div className="flex items-center gap-1">
+                                <Calendar className="h-4 w-4" />
+                                <span>{formatFullDate(entry.entryDate)}</span>
+                            </div>
+
+                            {entry.mood && (
+                                <div className="flex items-center gap-2">
+                                    <span className={`w-3 h-3 rounded-full ${getMoodColor(entry.mood)}`} />
+                                    <span className="capitalize">{entry.mood}</span>
+                                    {entry.moodIntensity && <span className="text-xs">({entry.moodIntensity}/10)</span>}
+                                </div>
                             )}
 
-                            {/* Metadata */}
-                            <div className="flex flex-wrap items-center gap-6 mt-2 mb-2 text-sm text-muted-foreground">
+                            {entry.location && (
                                 <div className="flex items-center gap-1">
-                                    <Calendar className="h-4 w-4" />
-                                    <span>{formatFullDate(entry.entryDate)}</span>
+                                    <MapPin className="h-4 w-4" />
+                                    <span>{entry.location}</span>
                                 </div>
+                            )}
 
+                            {entry.weather && (
                                 <div className="flex items-center gap-1">
-                                    {getTypeIcon(entry.type)}
-                                    <span className="capitalize">{entry.type}{entry.duration && ` (${formatDuration(entry.duration)})`}</span>
+                                    <Cloud className="h-4 w-4" />
+                                    <span>{entry.weather}</span>
                                 </div>
+                            )}
+                        </div>
 
-                                {entry.mood && (
-                                    <div className="flex items-center gap-1">
-                                        <span className={`w-3 h-3 rounded-full ${getMoodColor(entry.mood)}`} />
-                                        <span className="capitalize">{entry.mood}</span>
-                                        {entry.moodIntensity && <span>({entry.moodIntensity}/10)</span>}
-                                    </div>
-                                )}
+                        {/* Tags */}
+                        {entry.tags && entry.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                                {entry.tags.map((tag, index) => (
+                                    <Badge key={index} variant="secondary" className="text-xs">
+                                        {tag}
+                                    </Badge>
+                                ))}
+                            </div>
+                        )}
 
-                                {entry.tags && entry.tags.length > 0 && (
-                                    <div className="flex items-center gap-1">
-                                        <Tag className="h-4 w-4" />
-                                        <div className="flex flex-wrap gap-1">
-                                            {entry.tags.map((tag, index) => (
-                                                <Badge key={index} variant="secondary" className="text-xs">
-                                                    {tag}
-                                                </Badge>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
+                        {/* Emotional Tags */}
+                        {entry.emotionalTags && entry.emotionalTags.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                                {entry.emotionalTags.map((tag, index) => (
+                                    <Badge key={index} variant="outline" className="text-xs">
+                                        {tag}
+                                    </Badge>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Main Content */}
+                    <Card className="border-none shadow-sm">
+                        <CardContent className="p-6 sm:p-8">
+                            <div className="prose prose-sm sm:prose-base max-w-none">
+                                {renderContent(entry.content, entry.plainTextContent)}
                             </div>
                         </CardContent>
                     </Card>
 
-                    {/* Main Content */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <Edit3 className="h-5 w-5" />
-                                Content
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            {isEditing ? (
-                                entry.type === 'text' ? (
-                                    <TiptapEditor
-                                        content={editedContent}
-                                        onChange={(content, plainText) => setEditedContent(plainText)}
-                                        placeholder="Write your thoughts..."
-                                        className="border-none shadow-none"
-                                    />
-                                ) : (
-                                    <Textarea
-                                        value={editedContent}
-                                        onChange={(e) => setEditedContent(e.target.value)}
-                                        className="min-h-[400px] resize-none border-none p-0 focus-visible:ring-0 shadow-none"
-                                        placeholder="Edit your content..."
-                                    />
-                                )
-                            ) : (
-                                <div className="prose prose-sm max-w-none">
-                                    {(entry.plainTextContent || entry.content || entry.transcript || "No content").split('\n').map((paragraph, index) => (
-                                        <p key={index} className="mb-4 leading-relaxed">
-                                            {paragraph}
-                                        </p>
-                                    ))}
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
-
-                    {/* Audio/Video Player */}
-                    {(entry.type === 'audio' || entry.type === 'video') && (
-                        <Card>
+                    {/* AI Analysis */}
+                    {(entry.aiSummary || entry.aiSentiment || (entry.aiInsights && entry.aiInsights.length > 0)) && (
+                        <Card className="border-none shadow-sm">
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <Clock className="h-5 w-5" />
-                                    {entry.type === 'audio' ? 'Audio Recording' : 'Video Recording'}
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="bg-muted rounded-lg p-8 text-center">
-                                    <div className="flex items-center justify-center gap-4 mb-4">
-                                        <Button variant="outline" size="sm">
-                                            <Play className="h-4 w-4 mr-2" />
-                                            Play
-                                        </Button>
-                                        {entry.duration && (
-                                            <span className="text-sm text-muted-foreground">
-                                                Duration: {formatDuration(entry.duration)}
-                                            </span>
-                                        )}
-                                    </div>
-                                    <div className="w-full bg-border rounded-full h-2">
-                                        <div className="bg-primary h-2 rounded-full w-0"></div>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    )}
-
-                    {/* AI Insights */}
-                    {entry.aiSummary && (
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <Heart className="h-5 w-5" />
+                                <CardTitle className="flex items-center gap-2 text-lg">
+                                    <BarChart3 className="h-5 w-5" />
                                     AI Insights
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div>
-                                    <h4 className="font-medium mb-2">Summary</h4>
-                                    <p className="text-sm text-muted-foreground">{entry.aiSummary}</p>
-                                </div>
+                            <CardContent className="space-y-6">
+                                {entry.aiSummary && (
+                                    <div>
+                                        <h4 className="font-medium text-sm uppercase tracking-wide text-muted-foreground mb-3">Summary</h4>
+                                        <div className="prose prose-sm max-w-none">
+                                            <div dangerouslySetInnerHTML={{ __html: entry.aiSummary }} />
+                                        </div>
+                                    </div>
+                                )}
+
+                                {entry.aiSentiment && (
+                                    <div>
+                                        <h4 className="font-medium text-sm uppercase tracking-wide text-muted-foreground mb-3">Sentiment Analysis</h4>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-sm">Overall Sentiment</span>
+                                                    <Badge variant="outline" className="capitalize">
+                                                        {entry.aiSentiment.overall}
+                                                    </Badge>
+                                                </div>
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-sm">Confidence</span>
+                                                    <span className="text-sm font-medium">
+                                                        {Math.round(entry.aiSentiment.confidence * 100)}%
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            {entry.aiSentiment.emotions && entry.aiSentiment.emotions.length > 0 && (
+                                                <div>
+                                                    <span className="text-sm font-medium mb-2 block">Top Emotions</span>
+                                                    <div className="space-y-1">
+                                                        {entry.aiSentiment.emotions.slice(0, 4).map((emotion, index) => (
+                                                            <div key={index} className="flex items-center justify-between text-sm">
+                                                                <span className="capitalize">{emotion.emotion}</span>
+                                                                <span className="text-muted-foreground">{Math.round(emotion.intensity * 100)}%</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
 
                                 {entry.aiInsights && entry.aiInsights.length > 0 && (
                                     <div>
-                                        <h4 className="font-medium mb-2">Key Insights</h4>
-                                        <ul className="space-y-1">
+                                        <h4 className="font-medium text-sm uppercase tracking-wide text-muted-foreground mb-3">Key Insights</h4>
+                                        <ul className="space-y-3">
                                             {entry.aiInsights.map((insight, index) => (
-                                                <li key={index} className="text-sm text-muted-foreground flex items-start gap-2">
-                                                    <span className="text-primary">•</span>
-                                                    {insight}
+                                                <li key={index} className="flex items-start gap-3">
+                                                    <span className="text-primary mt-2 w-1.5 h-1.5 rounded-full bg-current flex-shrink-0"></span>
+                                                    <span className="text-sm leading-relaxed">{insight}</span>
                                                 </li>
                                             ))}
                                         </ul>
