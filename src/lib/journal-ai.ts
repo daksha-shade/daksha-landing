@@ -47,8 +47,17 @@ Be empathetic, supportive, and focus on personal growth and self-awareness.
             maxTokens: 500,
         });
 
-        // Parse the JSON response
-        const parsed = JSON.parse(result.text);
+        // Parse the JSON response, handling markdown code blocks
+        let jsonText = result.text.trim();
+
+        // Remove markdown code blocks if present
+        if (jsonText.startsWith('```json')) {
+            jsonText = jsonText.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+        } else if (jsonText.startsWith('```')) {
+            jsonText = jsonText.replace(/^```\s*/, '').replace(/\s*```$/, '');
+        }
+
+        const parsed = JSON.parse(jsonText);
 
         return {
             summary: parsed.summary || "No summary generated",
