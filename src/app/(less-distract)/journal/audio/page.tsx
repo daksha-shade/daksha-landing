@@ -1,10 +1,11 @@
 "use client"
 
-import { useState, useEffect } from 'react'
-import { ArrowLeft, Save, Mic, Pause, CircleStop, FileText, MessageCircle, Send } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { ArrowLeft, Save, Mic, Pause, CircleStop } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { toast } from 'sonner'
 
 export default function AudioJournalPage() {
   const [title, setTitle] = useState("")
@@ -14,20 +15,15 @@ export default function AudioJournalPage() {
   const [hasRecording, setHasRecording] = useState(false)
   const [transcript, setTranscript] = useState("")
   const [showTranscript, setShowTranscript] = useState(false)
-  const [aiQuestion, setAiQuestion] = useState("")
-  const [aiResponse, setAiResponse] = useState("")
-  const [isProcessingAI, setIsProcessingAI] = useState(false)
 
-  // Timer effect
-  useEffect(() => {
-    let interval: NodeJS.Timeout
-    if (isRecording && !isPaused) {
-      interval = setInterval(() => {
-        setRecordingTime(prev => prev + 1)
-      }, 1000)
-    }
-    return () => clearInterval(interval)
-  }, [isRecording, isPaused])
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+  const chunksRef = useRef<Blob[]>([])
+  const intervalRef = useRef<any>(null)
+  const blobRef = useRef<Blob | null>(null)
+  const mimeType = 'audio/webm'
+  const [localPlaybackUrl, setLocalPlaybackUrl] = useState<string | null>(null)
+
+  useEffect(() => () => clearInterval(intervalRef.current), [])
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
@@ -35,263 +31,154 @@ export default function AudioJournalPage() {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
   }
 
-  const startRecording = () => {
-    setIsRecording(true)
-    setIsPaused(false)
-    setRecordingTime(0)
-    setHasRecording(false)
+  const startTimer = () => {
+    clearInterval(intervalRef.current)
+    intervalRef.current = setInterval(() => setRecordingTime(t => t + 1), 1000)
+  }
+  const stopTimer = () => clearInterval(intervalRef.current)
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const mr = new MediaRecorder(stream, { mimeType })
+      chunksRef.current = []
+      mr.ondataavailable = (e) => { if (e.data && e.data.size > 0) chunksRef.current.push(e.data) }
+      mr.onstop = async () => {
+        const blob = new Blob(chunksRef.current, { type: mimeType })
+        blobRef.current = blob
+        setHasRecording(true)
+        try { setLocalPlaybackUrl(URL.createObjectURL(blob)) } catch {}
+        await transcribe(blob)
+      }
+      mediaRecorderRef.current = mr
+      mr.start(250)
+      setRecordingTime(0)
+      setIsRecording(true)
+      setIsPaused(false)
+      startTimer()
+    } catch (e) {
+      console.error(e)
+      toast.error('Microphone permission denied')
+    }
   }
 
   const pauseRecording = () => {
-    setIsPaused(!isPaused)
+    const mr = mediaRecorderRef.current
+    if (!mr) return
+    if (isPaused) {
+      mr.resume(); setIsPaused(false); startTimer()
+    } else {
+      mr.pause(); setIsPaused(true); stopTimer()
+    }
   }
 
-  const stopRecording = async () => {
+  const stopRecording = () => {
+    const mr = mediaRecorderRef.current
+    if (!mr) return
+    mr.stop()
+    mr.stream.getTracks().forEach(t => t.stop())
     setIsRecording(false)
     setIsPaused(false)
-    setHasRecording(true)
+    stopTimer()
+  }
 
-    // In a real implementation, you would:
-    // 1. Stop the MediaRecorder
-    // 2. Upload the audio file to R2
-    // 3. Send it for transcription
-
+  const transcribe = async (blob: Blob) => {
     try {
-      // Simulate audio file upload and transcription
-      const formData = new FormData()
-      // formData.append('audio', audioBlob) // You'd get this from MediaRecorder
-      formData.append('action', 'transcribe')
-
-      // For now, simulate the process
-      setTimeout(async () => {
-        setTranscript("This is a sample transcript of your audio recording. In a real implementation, this would be generated using OpenAI Whisper API.")
-      }, 2000)
-
-    } catch (error) {
-      console.error('Error processing audio:', error)
-      setTranscript("Error generating transcript")
+      const fd = new FormData()
+      fd.append('audio', new File([blob], `recording-${Date.now()}.webm`, { type: mimeType }))
+      fd.append('action', 'transcribe')
+      const res = await fetch('/api/journal/audio', { method: 'POST', body: fd })
+      if (res.ok) {
+        const data = await res.json()
+        setTranscript(data.transcript || '')
+      } else {
+        toast.error('Transcription failed')
+      }
+    } catch (e) {
+      console.error(e); toast.error('Transcription error')
     }
+  }
+
+  const uploadToR2 = async (blob: Blob) => {
+    const fd = new FormData()
+    fd.append('file', new File([blob], `journal-audio-${Date.now()}.webm`, { type: mimeType }))
+    const res = await fetch('/api/upload', { method: 'POST', body: fd })
+    if (!res.ok) throw new Error('Upload failed')
+    const json = await res.json()
+    return json.file?.url as string
   }
 
   const handleSave = async () => {
-    if (!title.trim()) {
-      alert("Please enter a title for your audio journal")
-      return
-    }
-
-    if (!hasRecording) {
-      alert("Please record some audio first")
-      return
-    }
-
     try {
+      if (!blobRef.current) { toast.error('No recording found'); return }
+      const audioUrl = await uploadToR2(blobRef.current)
       const response = await fetch('/api/journal', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: title.trim(),
+          title: title.trim() || 'Audio Journal',
           type: 'audio',
           duration: recordingTime,
-          transcript: transcript,
+          transcript,
           plainTextContent: transcript,
-          // audioUrl: audioUrl, // You'd get this from the upload
+          audioUrl,
           entryDate: new Date().toISOString(),
-          generateAI: true
-        }),
+          generateAI: true,
+        })
       })
-
-      if (!response.ok) {
-        throw new Error('Failed to save audio journal')
-      }
-
+      if (!response.ok) throw new Error('Save failed')
       const result = await response.json()
-      console.log('Audio journal saved:', result)
-      window.location.href = '/journal'
-    } catch (error) {
-      console.error('Save failed:', error)
-      alert('Failed to save audio journal. Please try again.')
-    }
-  }
-
-  const handleAIQuestion = async () => {
-    if (!aiQuestion.trim()) return
-
-    setIsProcessingAI(true)
-    // Simulate AI processing
-    setTimeout(() => {
-      setAiResponse(`Based on your audio recording about "${title}", here's my analysis: ${aiQuestion} - This is a simulated AI response. In a real implementation, this would analyze your audio content and provide contextual insights.`)
-      setIsProcessingAI(false)
-    }, 2000)
+      toast.success('Journal saved')
+      window.location.href = `/journal/${result.id}`
+    } catch (e) { console.error(e); toast.error('Save failed') }
   }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Minimal Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border/10">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => window.location.href = '/journal'}
-          className="gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back
+      <div className="flex items-center justify-between p-4 border-b">
+        <Button variant="ghost" size="sm" onClick={() => (window.location.href = '/journal')} className="gap-2">
+          <ArrowLeft className="w-4 h-4" /> Back
         </Button>
-        <Button
-          onClick={handleSave}
-          size="sm"
-          className="gap-2"
-          disabled={!hasRecording}
-        >
-          <Save className="w-4 h-4" />
-          Save
+        <Button onClick={handleSave} size="sm" className="gap-2" disabled={!hasRecording}>
+          <Save className="w-4 h-4" /> Save
         </Button>
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col items-center justify-center p-6 max-w-2xl mx-auto w-full">
         <div className="w-full space-y-8 text-center">
-          {/* Title */}
-          <Input
-            placeholder="Audio journal title..."
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="text-2xl font-light border-0 focus:ring-0 text-center placeholder:text-muted-foreground/40"
-          />
-
-          {/* Recording Interface */}
+          <Input placeholder="Audio journal title..." value={title} onChange={(e) => setTitle(e.target.value)} className="text-2xl font-light border-0 focus:ring-0 text-center placeholder:text-muted-foreground/40" />
           <div className="space-y-8">
-            {/* Timer */}
-            <div className="text-6xl font-mono font-light text-muted-foreground">
-              {formatTime(recordingTime)}
-            </div>
-
-            {/* Recording Button */}
+            <div className="text-6xl font-mono font-light text-muted-foreground">{formatTime(recordingTime)}</div>
             <div className="flex justify-center">
-              <div className={`w-32 h-32 rounded-full flex items-center justify-center transition-all duration-300 ${isRecording && !isPaused ? 'bg-red-500 scale-110 animate-pulse' :
-                isRecording && isPaused ? 'bg-yellow-500' :
-                  'bg-muted/20 hover:bg-muted/30'
-                }`}>
+              <div className={`w-32 h-32 rounded-full flex items-center justify-center transition-all duration-300 ${isRecording && !isPaused ? 'bg-red-500 scale-110 animate-pulse' : isRecording && isPaused ? 'bg-yellow-500' : 'bg-muted/20 hover:bg-muted/30'}`}>
                 {!isRecording ? (
-                  <Button
-                    onClick={startRecording}
-                    variant="ghost"
-                    size="lg"
-                    className="w-20 h-20 rounded-full text-foreground hover:bg-transparent"
-                  >
-                    <Mic className="w-10 h-10" />
-                  </Button>
+                  <Button onClick={startRecording} variant="ghost" size="lg" className="w-20 h-20 rounded-full"><Mic className="w-10 h-10" /></Button>
                 ) : (
-                  <Button
-                    onClick={pauseRecording}
-                    variant="ghost"
-                    size="lg"
-                    className="w-20 h-20 rounded-full text-white hover:bg-transparent"
-                  >
-                    <Pause className="w-10 h-10" />
-                  </Button>
+                  <Button onClick={pauseRecording} variant="ghost" size="lg" className="w-20 h-20 rounded-full text-white"><Pause className="w-10 h-10" /></Button>
                 )}
               </div>
             </div>
-
-            {/* Status */}
             <div className="space-y-2">
-              <p className="text-lg text-muted-foreground">
-                {isRecording && !isPaused ? 'Recording...' :
-                  isRecording && isPaused ? 'Paused' :
-                    hasRecording ? 'Recording complete' :
-                      'Tap to start recording'}
-              </p>
-
+              <div className="text-sm text-muted-foreground">{isRecording ? (isPaused ? 'Paused' : 'Recording...') : hasRecording ? 'Ready to save' : 'Tap to start recording'}</div>
               {isRecording && (
-                <Button
-                  onClick={stopRecording}
-                  variant="outline"
-                  size="sm"
-                  className="gap-2"
-                >
-                  <CircleStop className="w-4 h-4" />
-                  Stop Recording
-                </Button>
+                <Button variant="ghost" size="sm" onClick={stopRecording} className="gap-2"><CircleStop className="w-4 h-4" /> Stop</Button>
               )}
             </div>
-
-            {/* Transcript and AI Section */}
-            {hasRecording && (
-              <div className="space-y-6 mt-8">
-                {/* Transcript */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <FileText className="w-5 h-5" />
-                      Transcript
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {transcript ? (
-                      <div className="space-y-3">
-                        <Button
-                          variant="outline"
-                          onClick={() => setShowTranscript(!showTranscript)}
-                          className="w-full"
-                        >
-                          {showTranscript ? 'Hide' : 'Show'} Transcript
-                        </Button>
-                        {showTranscript && (
-                          <div className="p-4 bg-muted/20 rounded-lg">
-                            <p className="text-sm leading-relaxed">{transcript}</p>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <p className="text-muted-foreground text-sm">Generating transcript...</p>
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* AI Chat */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <MessageCircle className="w-5 h-5" />
-                      Ask AI about your recording
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="Ask something about your audio recording..."
-                        value={aiQuestion}
-                        onChange={(e) => setAiQuestion(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && handleAIQuestion()}
-                      />
-                      <Button
-                        onClick={handleAIQuestion}
-                        disabled={isProcessingAI || !aiQuestion.trim()}
-                        size="sm"
-                      >
-                        <Send className="w-4 h-4" />
-                      </Button>
-                    </div>
-
-                    {aiResponse && (
-                      <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
-                        <p className="text-sm leading-relaxed">{aiResponse}</p>
-                      </div>
-                    )}
-
-                    {isProcessingAI && (
-                      <div className="p-4 bg-muted/20 rounded-lg">
-                        <p className="text-sm text-muted-foreground">AI is analyzing your recording...</p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-            )}
           </div>
+
+          {hasRecording && (
+            <div className="space-y-4">
+              {localPlaybackUrl && (
+                <audio src={localPlaybackUrl} controls className="w-full" />
+              )}
+              <Button variant="outline" size="sm" onClick={() => setShowTranscript(s => !s)}>{showTranscript ? 'Hide transcript' : 'Show transcript'}</Button>
+              {showTranscript && (
+                <Card>
+                  <CardHeader><CardTitle className="text-left text-sm">Transcript</CardTitle></CardHeader>
+                  <CardContent className="text-left text-sm text-muted-foreground whitespace-pre-wrap">{transcript || 'Processing...'}</CardContent>
+                </Card>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

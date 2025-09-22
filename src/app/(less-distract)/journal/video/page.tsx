@@ -1,10 +1,11 @@
 "use client"
 
-import { useState, useEffect } from 'react'
-import { ArrowLeft, Save, Video, Pause, CircleStop, RotateCcw, Mic, MicOff, FileText, MessageCircle, Send } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { ArrowLeft, Save, Video as VideoIcon, Pause, CircleStop, RotateCcw, Mic, MicOff, FileText, MessageCircle, Send } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { toast } from 'sonner'
 
 export default function FullScreenVideoJournalPage() {
   const [title, setTitle] = useState("")
@@ -20,6 +21,13 @@ export default function FullScreenVideoJournalPage() {
   const [aiQuestion, setAiQuestion] = useState("")
   const [aiResponse, setAiResponse] = useState("")
   const [isProcessingAI, setIsProcessingAI] = useState(false)
+  const videoRef = useRef<HTMLVideoElement | null>(null)
+  const streamRef = useRef<MediaStream | null>(null)
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+  const chunksRef = useRef<Blob[]>([])
+  const blobRef = useRef<Blob | null>(null)
+  const intervalRef = useRef<any>(null)
+  const mimeType = 'video/webm'
 
   // Timer effect
   useEffect(() => {
@@ -49,25 +57,52 @@ export default function FullScreenVideoJournalPage() {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
   }
 
-  const startRecording = () => {
-    setIsRecording(true)
-    setIsPaused(false)
-    setRecordingTime(0)
-    setHasRecording(false)
+  const startRecording = async () => {
+    try {
+      const constraints: MediaStreamConstraints = {
+        video: { facingMode: cameraFacing },
+        audio: !isMuted,
+      }
+      const stream = await navigator.mediaDevices.getUserMedia(constraints)
+      streamRef.current = stream
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream
+        await videoRef.current.play()
+      }
+      const mr = new MediaRecorder(stream, { mimeType })
+      chunksRef.current = []
+      mr.ondataavailable = (e) => { if (e.data && e.data.size > 0) chunksRef.current.push(e.data) }
+      mr.onstop = async () => {
+        const blob = new Blob(chunksRef.current, { type: mimeType })
+        blobRef.current = blob
+        setHasRecording(true)
+        await transcribe(blob)
+      }
+      mediaRecorderRef.current = mr
+      mr.start(250)
+      setRecordingTime(0)
+      setIsRecording(true)
+      setIsPaused(false)
+    } catch (e) {
+      console.error(e); toast.error('Camera or microphone permission denied')
+    }
   }
 
   const pauseRecording = () => {
-    setIsPaused(!isPaused)
+    const mr = mediaRecorderRef.current
+    if (!mr) return
+    if (isPaused) {
+      mr.resume(); setIsPaused(false)
+    } else { mr.pause(); setIsPaused(true) }
   }
 
   const stopRecording = () => {
+    const mr = mediaRecorderRef.current
+    if (!mr) return
+    mr.stop()
+    streamRef.current?.getTracks().forEach(t => t.stop())
     setIsRecording(false)
     setIsPaused(false)
-    setHasRecording(true)
-    // Simulate transcript generation
-    setTimeout(() => {
-      setTranscript("This is a sample transcript of your video recording. In a real implementation, this would be generated using speech-to-text technology from the video's audio track.")
-    }, 1000)
     setShowControls(true)
   }
 
@@ -79,46 +114,61 @@ export default function FullScreenVideoJournalPage() {
     setIsMuted(!isMuted)
   }
 
-  const handleSave = async () => {
-    if (!title.trim()) {
-      alert("Please enter a title for your video journal")
-      return
-    }
+  const uploadToR2 = async (blob: Blob) => {
+    const fd = new FormData()
+    fd.append('file', new File([blob], `journal-video-${Date.now()}.webm`, { type: mimeType }))
+    const res = await fetch('/api/upload', { method: 'POST', body: fd })
+    if (!res.ok) throw new Error('Upload failed')
+    const json = await res.json()
+    return json.file?.url as string
+  }
 
-    if (!hasRecording) {
-      alert("Please record a video first")
-      return
-    }
-
+  const transcribe = async (blob: Blob) => {
     try {
-      const response = await fetch('/api/journal', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      const fd = new FormData()
+      fd.append('audio', new File([blob], `recording-${Date.now()}.webm`, { type: mimeType }))
+      fd.append('action', 'transcribe')
+      const res = await fetch('/api/journal/audio', { method: 'POST', body: fd })
+      if (res.ok) {
+        const data = await res.json()
+        setTranscript(data.transcript || '')
+      }
+    } catch (e) { console.error(e) }
+  }
+
+  const handleAIQuestion = async () => {
+    if (!aiQuestion.trim()) return
+    setIsProcessingAI(true)
+    try {
+      // Placeholder hook; you can route this to /api/chat with transcript as context.
+      setAiResponse(`I'll analyze this recording after it's saved. Question: ${aiQuestion}`)
+    } finally {
+      setIsProcessingAI(false)
+    }
+  }
+
+  const handleSave = async () => {
+    try {
+      if (!blobRef.current) { toast.error('No recording found'); return }
+      const videoUrl = await uploadToR2(blobRef.current)
+      const res = await fetch('/api/journal', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: title.trim(),
+          title: title.trim() || 'Video Journal',
           type: 'video',
           duration: recordingTime,
-          transcript: transcript,
+          transcript,
           plainTextContent: transcript,
-          // videoUrl: videoUrl, // You'd get this from the upload
+          videoUrl,
           entryDate: new Date().toISOString(),
-          generateAI: true
-        }),
+          generateAI: true,
+        })
       })
-
-      if (!response.ok) {
-        throw new Error('Failed to save video journal')
-      }
-
-      const result = await response.json()
-      console.log('Video journal saved:', result)
-      window.location.href = '/journal'
-    } catch (error) {
-      console.error('Save failed:', error)
-      alert('Failed to save video journal. Please try again.')
-    }
+      if (!res.ok) throw new Error('Save failed')
+      const json = await res.json()
+      toast.success('Journal saved')
+      window.location.href = `/journal/${json.id}`
+    } catch (e) { console.error(e); toast.error('Save failed') }
   }
 
   const handleAIQuestion = async () => {
@@ -148,20 +198,12 @@ export default function FullScreenVideoJournalPage() {
           {hasRecording ? (
             <div className="w-full h-full bg-muted/20 flex items-center justify-center">
               <div className="text-center space-y-4">
-                <Video className="w-16 h-16 text-white/80 mx-auto" />
+                <VideoIcon className="w-16 h-16 text-white/80 mx-auto" />
                 <p className="text-white/80 text-lg">Video recorded successfully</p>
               </div>
             </div>
           ) : (
-            <div className="w-full h-full bg-muted/10 dark:bg-gray-900/30 flex items-center justify-center">
-              <div className="text-center space-y-4">
-                <Video className="w-16 h-16 text-muted-foreground/60 mx-auto" />
-                <p className="text-muted-foreground/60 text-lg">Camera preview</p>
-                <p className="text-muted-foreground/40 text-sm">
-                  Camera facing {cameraFacing === 'user' ? 'front' : 'back'}
-                </p>
-              </div>
-            </div>
+            <video ref={videoRef} className="w-full h-full object-cover bg-black/60" muted playsInline />
           )}
         </div>
 
@@ -271,7 +313,7 @@ export default function FullScreenVideoJournalPage() {
                 size="lg"
                 className="w-20 h-20 rounded-full bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/30 transition-all duration-200 hover:scale-105"
               >
-                <Video className="w-8 h-8" />
+                <VideoIcon className="w-8 h-8" />
               </Button>
             ) : (
               <div className="flex items-center gap-6">
