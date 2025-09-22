@@ -2,6 +2,7 @@ import { streamText, convertToModelMessages } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { stackServerApp } from "@/stack";
 import { searchUserContext } from "@/lib/context-service";
+import { searchUserJournals } from "@/lib/journal-search";
 import { selectAgent, getAgentConfig } from "@/agents/config";
 import { agentTools } from "@/agents/tools";
 
@@ -36,26 +37,43 @@ export async function POST(req: Request) {
 
     // Search context if enabled
     let contextResults: any[] = [];
+    let journalResults: any[] = [];
     if (contextSearch && lastUserContent) {
       try {
         contextResults = await searchUserContext(user.id, lastUserContent);
       } catch (error) {
         console.error('Context search error:', error);
       }
+      try {
+        journalResults = await searchUserJournals(user.id, lastUserContent);
+      } catch (error) {
+        console.error('Journal search error:', error);
+      }
     }
 
     // Prepare system message with context
     let systemMessage = agentConfig.systemPrompt;
-    if (contextResults.length > 0) {
-      systemMessage += `\n\nRelevant context:\n${contextResults.map(r => `- ${r.content}`).join('\n')}`;
+    if (contextResults.length > 0 || journalResults.length > 0) {
+      const ctxLines = contextResults
+        .slice(0, 5)
+        .map((r: any) => `- [Context] ${r.payload?.title ?? 'Untitled'}: ${r.payload?.chunkText?.slice(0,160) ?? ''} (id:${r.id})`)
+        .join('\n');
+      const jrnlLines = journalResults
+        .slice(0, 5)
+        .map((r: any) => `- [Journal ${r.entryDate ? new Date(r.entryDate).toLocaleDateString() : ''}] ${r.title ?? 'Untitled'}: ${r.snippet}`)
+        .join('\n');
+      const header = '\n\nRelevant knowledge (use for grounding, cite briefly in answers):\n';
+      systemMessage += header + [ctxLines, jrnlLines].filter(Boolean).join('\n');
     }
 
-    // Stream the response
+    // Ensure the model continues after tool calls and produces a final answer
     const result = await streamText({
       model: selectedModel,
-      system: systemMessage,
+      system: systemMessage + "\n\nWhen you use tools, always produce a concise final answer for the user based on tool results.",
       messages: modelMessages,
       tools: agentTools,
+      toolChoice: 'auto',
+      maxSteps: 5,
     });
 
     // Return streaming response

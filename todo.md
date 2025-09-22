@@ -92,3 +92,9 @@ Add semantic search in /jornals make the audio uploading transcribing and also a
 use https://context7.com/llmstxt/assistant-ui_llms_txt mcp or fetch https://context7.com/llmstxt/assistant-ui_llms_txt/llms.txt?tokens=100000  and gather info about assistant ui 
 
 and create the agents and all the features that are there in the assistant ui - like file upload and all and also create the context file feature in /context page and also create the vector embedding of the context file and save it in qdrant and also save it in supabase db - use drizzle orm to create the db schema and all - use openai embedding model to create the vector embedding and save it in qdrant and also save the context file in supabase db - in /chat we must able to fetch the context from the context file and use it as a priorety context over other context so that it can be used in the chat page to answer the questions search for online docs for creating the agents .
+
+
+---
+
+
+Make this page work and connected to backend use cloud flare R2 to store the audio files in http://localhost:3000/journal/audio and do the same for video page. All the transcribing features and speech to text text to speak features. Use the open API key for all these things.
