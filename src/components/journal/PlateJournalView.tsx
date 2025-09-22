@@ -468,25 +468,41 @@ export function PlateJournalView({ id, initialMode = 'view' }: PlateJournalViewP
 
                         {/* Content */}
                         <Card className="border-none shadow-sm">
-                            <CardContent className="p-6 sm:p-8">
-                                {isEditing ? (
-                                    <YooptaJournalEditor
-                                        key={`edit-${editorKey}`}
-                                        initialValue={yooptaContent}
-                                        onChange={setYooptaContent}
-                                        className="min-h-[400px] p-4 border rounded-lg focus-within:ring-2 focus-within:ring-primary focus-within:border-primary"
-                                    />
-                                ) : (
-                                    <div
-                                        className="min-h-[200px] cursor-pointer hover:bg-muted/20 rounded p-4 -m-4 transition-colors"
-                                        onClick={handleEdit}
-                                    >
+                            <CardContent className="p-6 sm:p-8 space-y-4">
+                                {entry.type === 'text' ? (
+                                    isEditing ? (
                                         <YooptaJournalEditor
-                                            key={`view-${editorKey}`}
+                                            key={`edit-${editorKey}`}
                                             initialValue={yooptaContent}
-                                            readOnly
-                                            className="prose prose-sm sm:prose-base lg:prose-lg max-w-none"
+                                            onChange={setYooptaContent}
+                                            className="min-h-[400px] p-4 border rounded-lg focus-within:ring-2 focus-within:ring-primary focus-within:border-primary"
                                         />
+                                    ) : (
+                                        <div
+                                            className="min-h-[200px] cursor-pointer hover:bg-muted/20 rounded p-4 -m-4 transition-colors"
+                                            onClick={handleEdit}
+                                        >
+                                            <YooptaJournalEditor
+                                                key={`view-${editorKey}`}
+                                                initialValue={yooptaContent}
+                                                readOnly
+                                                className="prose prose-sm sm:prose-base lg:prose-lg max-w-none"
+                                            />
+                                        </div>
+                                    )
+                                ) : (
+                                    <div className="space-y-4">
+                                        {entry.type === 'audio' && entry.audioUrl && (
+                                            <audio src={entry.audioUrl} controls className="w-full" />
+                                        )}
+                                        {entry.type === 'video' && entry.videoUrl && (
+                                            <video src={entry.videoUrl} controls className="w-full rounded-lg" />
+                                        )}
+                                        {entry.transcript && (
+                                            <div className="p-4 bg-muted/20 rounded-lg">
+                                                <p className="text-sm leading-relaxed whitespace-pre-wrap">{entry.transcript}</p>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </CardContent>
