@@ -29,6 +29,7 @@ import {
 } from "@/components/assistant-ui/attachment";
 import { MarkdownText } from "@/components/assistant-ui/markdown-text";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
+import { ToolFallback } from "@/components/assistant-ui/tool-fallback";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { LazyMotion, MotionConfig, domAnimation } from "motion/react";
@@ -243,8 +244,7 @@ const AssistantMessage: FC = () => {
           <MessagePrimitive.Parts
             components={{
               Text: MarkdownText,
-              // Remove tool UI components to hide tool execution
-              tools: {},
+              tools: ToolFallback,
             }}
           />
           <MessageError />
