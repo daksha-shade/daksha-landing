@@ -8,7 +8,7 @@ import { ArrowLeft, Edit3, Share, Trash2, MapPin, Cloud, BarChart3, Loader2, Mor
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
+ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
@@ -475,11 +475,11 @@ export function PlateJournalView({ id, initialMode = 'view' }: PlateJournalViewP
                                             key={`edit-${editorKey}`}
                                             initialValue={yooptaContent}
                                             onChange={setYooptaContent}
-                                            className="min-h-[400px] p-4 border rounded-lg focus-within:ring-2 focus-within:ring-primary focus-within:border-primary"
+                                            className="min-h-[400px] p-4 rounded-lg focus-within:ring-2 focus-within:ring-primary"
                                         />
                                     ) : (
                                         <div
-                                            className="min-h-[200px] cursor-pointer hover:bg-muted/20 rounded p-4 -m-4 transition-colors"
+                                            className="min-h-[200px] cursor-pointer rounded p-4 -m-4"
                                             onClick={handleEdit}
                                         >
                                             <YooptaJournalEditor
@@ -510,88 +510,74 @@ export function PlateJournalView({ id, initialMode = 'view' }: PlateJournalViewP
                     </div>
 
                     {/* Sidebar */}
-                    <div className="space-y-4 xl:sticky xl:top-24 h-fit">
-                        {!isEditing && !entry.mood && (
-                            <Card className="border rounded-xl">
-                                <CardHeader className="pb-2"><CardTitle className="text-sm">How are you feeling?</CardTitle></CardHeader>
-                                <CardContent className="pt-0 space-y-3">
-                                    <MoodSelector
-                                        mood={pendingMood.mood}
-                                        moodIntensity={pendingMood.moodIntensity}
-                                        emotionalTags={pendingMood.emotionalTags}
-                                        onChange={(m, i, tags) => setPendingMood({ mood: m, moodIntensity: i, emotionalTags: tags || [] })}
-                                    />
-                                    <div className="flex gap-2">
-                                        <Button size="sm" onClick={handleSaveMood}>Save mood</Button>
-                                        <Button size="sm" variant="outline" onClick={handleDecideMoodAI}>Decide for me</Button>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        )}
-                        {isEditing && (
-                            <>
-                                {/* Mood & Emotions */}
-                                <Card className="border-none shadow-sm">
-                                    <CardContent className="p-4">
+                    <div className="space-y-4 xl:sticky xl:top-24 h-fit  ">
+                        {/* Mood & Advanced (Accordion) */}
+                        <Accordion   type="multiple" defaultValue={[]}> 
+                            <AccordionItem value="mood">
+                                <AccordionTrigger>How are you feeling?</AccordionTrigger>
+                                <AccordionContent>
+                                    <div className="space-y-3">
                                         <MoodSelector
-                                            mood={editData.mood}
-                                            moodIntensity={editData.moodIntensity}
-                                            emotionalTags={editData.emotionalTags}
-                                            onChange={(mood, intensity, emotions) =>
-                                                setEditData(prev => ({
-                                                    ...prev,
-                                                    mood,
-                                                    moodIntensity: intensity,
-                                                    emotionalTags: emotions || []
-                                                }))
-                                            }
+                                            mood={isEditing ? editData.mood : pendingMood.mood}
+                                            moodIntensity={isEditing ? editData.moodIntensity : pendingMood.moodIntensity}
+                                            emotionalTags={isEditing ? editData.emotionalTags : pendingMood.emotionalTags}
+                                            onChange={(m, i, tags) => {
+                                                if (isEditing) {
+                                                    setEditData(prev => ({ ...prev, mood: m, moodIntensity: i, emotionalTags: tags || [] }))
+                                                } else {
+                                                    setPendingMood({ mood: m, moodIntensity: i, emotionalTags: tags || [] })
+                                                }
+                                            }}
                                         />
-                                    </CardContent>
-                                </Card>
+                                        {!isEditing && !entry.mood && (
+                                            <div className="flex gap-2">
+                                                <Button size="sm" onClick={handleSaveMood}>Save mood</Button>
+                                                <Button size="sm" variant="outline" onClick={handleDecideMoodAI}>Decide for me</Button>
+                                            </div>
+                                        )}
+                                    </div>
+                                </AccordionContent>
+                            </AccordionItem>
 
-                                {/* Tags */}
-                                <Card className="border-none shadow-sm">
-                                    <CardContent className="p-4">
-                                        <TagInput
-                                            tags={editData.tags || []}
-                                            onChange={(tags) => setEditData(prev => ({ ...prev, tags }))}
-                                        />
-                                    </CardContent>
-                                </Card>
-
-                                {/* Context */}
-                                <Card className="border-none shadow-sm">
-                                    <CardHeader className="pb-3">
-                                        <CardTitle className="text-sm font-medium">Context</CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="pt-0 space-y-3">
-                                        <div className="relative">
-                                            <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                            <Input
-                                                placeholder="Location"
-                                                value={editData.location || ''}
-                                                onChange={(e) => setEditData(prev => ({ ...prev, location: e.target.value }))}
-                                                className="pl-10 h-9"
+                            {isEditing && (
+                                <AccordionItem value="advanced">
+                                    <AccordionTrigger>Advanced</AccordionTrigger>
+                                    <AccordionContent>
+                                        <div className="space-y-4">
+                                            <TagInput
+                                                tags={editData.tags || []}
+                                                onChange={(tags) => setEditData(prev => ({ ...prev, tags }))}
                                             />
+                                            <div className="space-y-3">
+                                                <div className="relative">
+                                                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                                    <Input
+                                                        placeholder="Location"
+                                                        value={editData.location || ''}
+                                                        onChange={(e) => setEditData(prev => ({ ...prev, location: e.target.value }))}
+                                                        className="pl-10 h-9"
+                                                    />
+                                                </div>
+                                                <div className="relative">
+                                                    <Cloud className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                                    <Input
+                                                        placeholder="Weather"
+                                                        value={editData.weather || ''}
+                                                        onChange={(e) => setEditData(prev => ({ ...prev, weather: e.target.value }))}
+                                                        className="pl-10 h-9"
+                                                    />
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="relative">
-                                            <Cloud className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                            <Input
-                                                placeholder="Weather"
-                                                value={editData.weather || ''}
-                                                onChange={(e) => setEditData(prev => ({ ...prev, weather: e.target.value }))}
-                                                className="pl-10 h-9"
-                                            />
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            </>
-                        )}
+                                    </AccordionContent>
+                                </AccordionItem>
+                            )}
+                        </Accordion>
 
                         {/* AI Analysis (Accordion) */}
                         {(entry.aiSummary || entry.aiSentiment || (entry.aiInsights && entry.aiInsights.length > 0)) && (
                             <div className="rounded-xl">
-                                <Accordion type="single" collapsible defaultValue="insights">
+                                <Accordion type="single" collapsible>
                                     <AccordionItem value="insights">
                                         <AccordionTrigger className="text-sm">AI Insights</AccordionTrigger>
                                         <AccordionContent className="space-y-6">
