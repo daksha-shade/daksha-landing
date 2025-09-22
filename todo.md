@@ -103,3 +103,10 @@ and create the agents and all the features that are there in the assistant ui - 
 ----
 
 fix all tsc errors and delete all unused codes and components and files
+
+
+---
+
+
+remove all the tools from /chat and assistant-ui and git commit then use context7 and search about assistant-ui and mem0 and integrate it to /chat with pgvector - you'r free to modify db schema and also save the chat-data and history make it persistant save it too db (search docs online if yournt sure  about assistant-ui.com and mem0 ) - and also read the docs of assistant-ui so that if it fetches the memory layer of chats or jourrnals. or contexts it will show the text also its a little glitch so I would say you to always read and go with the docs
+
