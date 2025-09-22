@@ -97,4 +97,9 @@ and create the agents and all the features that are there in the assistant ui - 
 ---
 
 
-Make this page work and connected to backend use cloud flare R2 to store the audio files in http://localhost:3000/journal/audio and do the same for video page. All the transcribing features and speech to text text to speak features. Use the open API key for all these things.
+<!-- Make this page work and connected to backend use cloud flare R2 to store the audio files in http://localhost:3000/journal/audio and do the same for video page. All the transcribing features and speech to text text to speak features. Use the open API key for all these things. -->
+
+
+----
+
+fix all tsc errors and delete all unused codes and components and files

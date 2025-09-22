@@ -1,6 +1,6 @@
 import "server-only";
 import { db } from "@/db/client";
-import { contextFiles } from "@/db/schema";
+import { contextFiles, journalEntries } from "@/db/schema";
 import { embedText } from "@/lib/embeddings";
 import { sql } from "drizzle-orm";
 import { ensureDbSchema } from "@/db/sync";
@@ -42,21 +42,39 @@ export async function createContextFileForUser(input: CreateContextInput) {
 export async function searchUserContext(userId: string, query: string, limit = 5) {
   // Generate embedding for the search query
   const queryEmbedding = await embedText(query);
-  
-  // Use pgvector's cosine similarity for search
+
+  // Use pgvector's cosine similarity for search across both context files and journal entries
   const results = await db.execute(sql`
-    SELECT 
+    SELECT
       id,
       title,
       content,
       source_url,
       created_at,
       updated_at,
+      'context_file' as source_type,
       1 - (embedding <=> ${sql.raw(`'[${queryEmbedding.join(',')}]'`)}::vector) as similarity
-    FROM context_files 
+    FROM context_files
     WHERE user_id = ${userId}
       AND embedding IS NOT NULL
-    ORDER BY embedding <=> ${sql.raw(`'[${queryEmbedding.join(',')}]'`)}::vector
+
+    UNION ALL
+
+    SELECT
+      id,
+      title,
+      plain_text_content as content,
+      NULL as source_url,
+      created_at,
+      updated_at,
+      'journal_entry' as source_type,
+      1 - (embedding <=> ${sql.raw(`'[${queryEmbedding.join(',')}]'`)}::vector) as similarity
+    FROM journal_entries
+    WHERE user_id = ${userId}
+      AND embedding IS NOT NULL
+      AND plain_text_content IS NOT NULL
+
+    ORDER BY similarity DESC
     LIMIT ${limit}
   `);
 
@@ -70,6 +88,7 @@ export async function searchUserContext(userId: string, query: string, limit = 5
       title: row.title,
       chunkText: row.content,
       sourceUrl: row.source_url,
+      sourceType: row.source_type,
     }
   }));
 }
