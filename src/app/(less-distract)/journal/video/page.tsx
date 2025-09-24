@@ -136,16 +136,6 @@ export default function FullScreenVideoJournalPage() {
     } catch (e) { console.error(e) }
   }
 
-  const handleAIQuestion = async () => {
-    if (!aiQuestion.trim()) return
-    setIsProcessingAI(true)
-    try {
-      // Placeholder hook; you can route this to /api/chat with transcript as context.
-      setAiResponse(`I'll analyze this recording after it's saved. Question: ${aiQuestion}`)
-    } finally {
-      setIsProcessingAI(false)
-    }
-  }
 
   const handleSave = async () => {
     try {

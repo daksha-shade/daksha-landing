@@ -10,5 +10,4 @@ export default function ChatPage() {
       <Thread />
     </AssistantProvider>
   );
-}</search>
-</search_and_replace>
+}

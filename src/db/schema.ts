@@ -104,3 +104,28 @@ export const messages = pgTable("messages", {
   content: jsonb("content").notNull(), // For assistant-ui's message format
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
+
+// Journal streaks for tracking writing consistency
+export const journalStreaks = pgTable("journal_streaks", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  currentStreak: integer("current_streak"),
+  longestStreak: integer("longest_streak"),
+  totalEntries: integer("total_entries"),
+  lastEntryDate: timestamp("last_entry_date", { withTimezone: true }),
+  streakStartDate: timestamp("streak_start_date", { withTimezone: true }),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+// Daily analytics for journal entries
+export const journalAnalytics = pgTable("journal_analytics", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  date: timestamp("date", { withTimezone: true }).notNull(),
+  entryCount: integer("entry_count").default(0),
+  wordCount: integer("word_count").default(0),
+  averageMood: real("average_mood"),
+  dominantEmotions: jsonb("dominant_emotions").$type<string[]>(),
+  topTags: jsonb("top_tags").$type<string[]>(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
