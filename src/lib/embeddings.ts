@@ -1,5 +1,5 @@
-import "server-only";
 import OpenAI from "openai";
+import { milvusClient } from "@/db/milvus";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -10,6 +10,24 @@ export async function embedText(text: string) {
   const res = await openai.embeddings.create({ model: EMBEDDING_MODEL, input: text });
   const [embedding] = res.data;
   return embedding?.embedding as number[];
+}
+
+export async function storeEmbeddingsInMilvus(embeddings: number[][], ids: string[], collectionName: string) {
+  await milvusClient.insert({
+    collection_name: collectionName,
+    fields_data: [
+      {
+        field_name: "id",
+        type: 101, // String
+        values: ids,
+      },
+      {
+        field_name: "embedding",
+        type: 101, // FloatVector
+        values: embeddings,
+      },
+    ],
+  });
 }
 
 // Simple chunker: split by paragraphs and cap length
@@ -41,4 +59,3 @@ export function chunkText(text: string, maxChars = 1200): string[] {
   if (buf) chunks.push(buf.trim());
   return chunks;
 }
-

@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, jsonb, vector, integer, boolean, real } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, jsonb, integer, boolean, real } from "drizzle-orm/pg-core";
 
 // Users from StackAuth (Stack) — enhanced with user profile data
 export const users = pgTable("users", {
@@ -26,8 +26,6 @@ export const contextFiles = pgTable("context_files", {
   title: text("title").notNull(),
   // Raw content stored as plain text
   content: text("content").notNull(),
-  // Vector embedding for semantic search (using pgvector)
-  embedding: vector("embedding", { dimensions: 1536 }), // OpenAI text-embedding-3-small uses 1536 dimensions
   // Optional URL if imported from the web
   sourceUrl: text("source_url"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
@@ -78,9 +76,6 @@ export const journalEntries = pgTable("journal_entries", {
   isPrivate: boolean("is_private").default(true),
   shareToken: text("share_token"), // For sharing entries
 
-  // Vector embedding for semantic search
-  embedding: vector("embedding", { dimensions: 1536 }),
-
   // Timestamps
   entryDate: timestamp("entry_date", { withTimezone: true }).notNull(), // User-specified date
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
@@ -124,4 +119,3 @@ export const journalAnalytics = pgTable("journal_analytics", {
   topTags: jsonb("top_tags").$type<string[]>(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
-

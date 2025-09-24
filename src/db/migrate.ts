@@ -3,6 +3,7 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import postgres from 'postgres';
 import * as schema from './schema';
+import { resetDatabase } from './reset';
 
 // Load environment variables from .env.local
 config({ path: '.env.local' });
@@ -33,10 +34,13 @@ async function runMigration() {
 }
 
 if (require.main === module) {
-  runMigration().catch((error) => {
-    console.error('Migration error:', error);
-    process.exit(1);
-  });
+  (async () => {
+    await resetDatabase();
+    runMigration().catch((error) => {
+      console.error('Migration error:', error);
+      process.exit(1);
+    });
+  })();
 }
 
 export { runMigration };

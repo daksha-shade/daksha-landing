@@ -1,9 +1,10 @@
 import "server-only";
 import { db } from "@/db/client";
 import { contextFiles, journalEntries } from "@/db/schema";
-import { embedText } from "@/lib/embeddings";
-import { sql } from "drizzle-orm";
+import { embedText, storeEmbeddingsInMilvus } from "@/lib/embeddings";
 import { ensureDbSchema } from "@/db/sync";
+import { milvusClient } from "@/db/milvus";
+import { inArray } from "drizzle-orm";
 
 export type CreateContextInput = {
   userId: string;
@@ -26,15 +27,17 @@ export async function createContextFileForUser(input: CreateContextInput) {
   // Generate embedding for the content
   const embedding = await embedText(content);
 
-  // Insert context file row with embedding
+  // Insert context file row
   await db.insert(contextFiles).values({
     id,
     userId,
     title,
     content,
-    embedding: embedding, // Store as number array directly
     sourceUrl,
   });
+
+  // Store embedding in Milvus
+  await storeEmbeddingsInMilvus([embedding], [id], "context_files");
 
   return { id, title, content };
 }
@@ -43,52 +46,59 @@ export async function searchUserContext(userId: string, query: string, limit = 5
   // Generate embedding for the search query
   const queryEmbedding = await embedText(query);
 
-  // Use pgvector's cosine similarity for search across both context files and journal entries
-  const results = await db.execute(sql`
-    SELECT
-      id,
-      title,
-      content,
-      source_url,
-      created_at,
-      updated_at,
-      'context_file' as source_type,
-      1 - (embedding <=> ${sql.raw(`'[${queryEmbedding.join(',')}]'`)}::vector) as similarity
-    FROM context_files
-    WHERE user_id = ${userId}
-      AND embedding IS NOT NULL
+  // Search in Milvus
+  const contextFilesResults = await milvusClient.search({
+    collection_name: "context_files",
+    vector: queryEmbedding,
+    limit,
+  });
 
-    UNION ALL
+  const journalEntriesResults = await milvusClient.search({
+    collection_name: "journal_entries",
+    vector: queryEmbedding,
+    limit,
+  });
 
-    SELECT
-      id,
-      title,
-      plain_text_content as content,
-      NULL as source_url,
-      created_at,
-      updated_at,
-      'journal_entry' as source_type,
-      1 - (embedding <=> ${sql.raw(`'[${queryEmbedding.join(',')}]'`)}::vector) as similarity
-    FROM journal_entries
-    WHERE user_id = ${userId}
-      AND embedding IS NOT NULL
-      AND plain_text_content IS NOT NULL
+  const contextFilesIds = contextFilesResults.results.map((r: any) => r.id);
+  const journalEntriesIds = journalEntriesResults.results.map((r: any) => r.id);
 
-    ORDER BY similarity DESC
-    LIMIT ${limit}
-  `);
+  const contextFilesRows = contextFilesIds.length > 0 ? await db.select().from(contextFiles).where(inArray(contextFiles.id, contextFilesIds)) : [];
+  const journalEntriesRows = journalEntriesIds.length > 0 ? await db.select().from(journalEntries).where(inArray(journalEntries.id, journalEntriesIds)) : [];
 
-  // Transform results to match expected format
-  return results.map((row: any) => ({
-    id: row.id,
-    score: row.similarity,
-    payload: {
-      userId,
-      contextFileId: row.id,
-      title: row.title,
-      chunkText: row.content,
-      sourceUrl: row.source_url,
-      sourceType: row.source_type,
-    }
-  }));
+  const contextFilesTransformed = contextFilesRows.map((r) => {
+    const milvusResult = contextFilesResults.results.find((sr: any) => sr.id === r.id);
+    return {
+      id: r.id,
+      score: milvusResult.score,
+      payload: {
+        userId,
+        contextFileId: r.id,
+        title: r.title,
+        chunkText: r.content,
+        sourceUrl: r.sourceUrl,
+        sourceType: "context_file",
+      }
+    };
+  });
+
+  const journalEntriesTransformed = journalEntriesRows.map((r) => {
+    const milvusResult = journalEntriesResults.results.find((sr: any) => sr.id === r.id);
+    return {
+      id: r.id,
+      score: milvusResult.score,
+      payload: {
+        userId,
+        contextFileId: r.id,
+        title: r.title,
+        chunkText: r.plainTextContent,
+        sourceUrl: null,
+        sourceType: "journal_entry",
+      }
+    };
+  });
+
+  const allResults = [...contextFilesTransformed, ...journalEntriesTransformed];
+  allResults.sort((a, b) => b.score - a.score);
+
+  return allResults.slice(0, limit);
 }

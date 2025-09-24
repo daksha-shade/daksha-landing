@@ -1,7 +1,7 @@
 import "server-only";
 import { db } from "@/db/client";
 import { journalEntries, journalTemplates, journalStreaks, journalAnalytics } from "@/db/schema";
-import { embedText } from "@/lib/embeddings";
+import { embedText, storeEmbeddingsInMilvus } from "@/lib/embeddings";
 import { eq } from "drizzle-orm";
 
 const SAMPLE_TEMPLATES = [
@@ -237,9 +237,10 @@ export async function seedJournalData(userId: string, forceReseed = false) {
 
             // Generate embedding
             const embedding = await embedText(plain);
+            const id = crypto.randomUUID();
 
             await db.insert(journalEntries).values({
-                id: crypto.randomUUID(),
+                id,
                 userId,
                 title: entry.title,
                 yooptaContent: yooptaValue,
@@ -251,11 +252,12 @@ export async function seedJournalData(userId: string, forceReseed = false) {
                 tags: entry.tags,
                 location: entry.location,
                 weather: entry.weather,
-                embedding,
                 entryDate,
                 createdAt: entryDate,
                 updatedAt: entryDate,
             });
+
+            await storeEmbeddingsInMilvus([embedding], [id], "journal_entries");
         }
 
         // Create streak data
