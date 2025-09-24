@@ -25,26 +25,7 @@ async function dropTables() {
   await sql`DROP TABLE IF EXISTS journal_analytics`;
   await sql`DROP TABLE IF EXISTS __drizzle_migrations`;
 
-  // Create new tables for assistant-ui
-  await sql`CREATE TABLE threads (
-    id text PRIMARY KEY NOT NULL,
-    user_id text NOT NULL,
-    title text,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL
-  )`;
-
-  await sql`CREATE TABLE messages (
-    id text PRIMARY KEY NOT NULL,
-    thread_id text NOT NULL,
-    role text NOT NULL,
-    content jsonb NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL
-  )`;
-
-  await sql`ALTER TABLE messages ADD CONSTRAINT messages_thread_id_threads_id_fk FOREIGN KEY (thread_id) REFERENCES threads(id)`;
-
-  console.log("All tables dropped and new schema created");
+  console.log("All tables dropped");
   await sql.end();
 }
 
