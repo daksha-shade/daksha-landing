@@ -48,3 +48,4 @@ wrangler*
 
 # Secrets setup script (contains sensitive data)
 setup-secrets.sh
+.env

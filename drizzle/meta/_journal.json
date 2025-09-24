@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1758084833158,
-      "tag": "20250917045353_petite_galactus",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1758377428092,
-      "tag": "20250920141028_mysterious_millenium_guard",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1758427765552,
-      "tag": "20250921040925_eager_molly_hayes",
+      "when": 1758745090197,
+      "tag": "20250924201810_clear_switch",
       "breakpoints": true
     }
   ]
