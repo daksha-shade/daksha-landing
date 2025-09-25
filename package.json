@@ -4,6 +4,9 @@
 	"private": true,
 	"scripts": {
 		"dev": "next dev --turbopack",
+		"dev:node": "node ./node_modules/next/dist/bin/next dev --turbopack",
+		"dev:webpack": "TURBOPACK=0 next dev",
+		"dev:trace": "NODE_DEBUG=stream,net next dev --turbopack",
 		"build": "next build",
 		"start": "next start",
 		"lint": "next lint",
@@ -152,6 +155,7 @@
 		"lodash": "^4.17.21",
 		"lowlight": "^3.3.0",
 		"lucide-react": "^0.544.0",
+		"mem0ai": "^2.1.38",
 		"motion": "^12.23.18",
 		"nanoid": "^5.1.5",
 		"next": "15.3.4",

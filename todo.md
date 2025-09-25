@@ -11,7 +11,7 @@ connect apps
 keep
 calender
 
-
+--- delete all useless files and codes and components and also tsc errors unused import/files and all - refractor the whole code and make it clean and working and organised 
 
 <!-- dashboard - show memories from memories vaulte - connected (google photos) and create showcase for that like google photos does for us - and show some plans from the planner like today you have a meeting shedules - this is the todo for your today - have you completed - get the most important tasks from goals app and show on desktop dashboard the percentage so that users can brainstorm and which thing to do - create a thougts apps where users can store there thoughts and ideas -->
 

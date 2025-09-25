@@ -13,16 +13,22 @@ export async function embedText(text: string) {
 }
 
 export async function storeEmbeddingsInMilvus(embeddings: number[][], ids: string[], collectionName: string) {
+  // Only execute on server side
+  if (typeof window !== 'undefined' || !milvusClient) {
+    console.warn('Milvus client not available on client side');
+    return;
+  }
+  
   await milvusClient.insert({
     collection_name: collectionName,
     fields_data: [
       {
-        field_name: "id",
-        type: 101, // String
+        name: "id",
+        type: 21, // VarChar
         values: ids,
       },
       {
-        field_name: "embedding",
+        name: "embedding",
         type: 101, // FloatVector
         values: embeddings,
       },
