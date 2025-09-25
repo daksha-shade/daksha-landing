@@ -129,3 +129,19 @@ export const journalAnalytics = pgTable("journal_analytics", {
   topTags: jsonb("top_tags").$type<string[]>(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
+
+// Notes table for the notes app
+export const notes = pgTable("notes", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  category: text("category").notNull().default("Personal"),
+  tags: jsonb("tags").$type<string[]>().default([]),
+  isFavorite: boolean("is_favorite").default(false),
+  aiGenerated: boolean("ai_generated").default(false),
+  // Milvus embedding ID for vector search
+  embeddingId: text("embedding_id"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});

@@ -25,6 +25,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
+import { useNotes, useNotesActions } from '@/hooks/useNotes'
+import { toast } from 'sonner'
 
 interface Note {
   id: string
@@ -54,31 +56,7 @@ const CATEGORIES = [
   'Reminders'
 ]
 
-const SAMPLE_NOTES: Note[] = [
-  {
-    id: '1',
-    title: 'Morning Reflection',
-    content: 'Today I want to focus on being more present and mindful. I noticed yesterday that I was rushing through tasks without really engaging with them.',
-    category: 'Personal',
-    tags: ['mindfulness', 'reflection'],
-    isFavorite: true,
-    createdAt: '2024-01-15T08:00:00Z',
-    updatedAt: '2024-01-15T08:00:00Z'
-  },
-  {
-    id: '2',
-    title: 'Project Ideas',
-    content: 'Brainstorming session for the new app:\n- Voice-to-text integration\n- AI-powered insights\n- Cross-platform sync\n- Offline mode',
-    category: 'Work',
-    tags: ['brainstorming', 'app-development'],
-    isFavorite: false,
-    createdAt: '2024-01-14T14:30:00Z',
-    updatedAt: '2024-01-14T14:30:00Z'
-  }
-]
-
 export default function NotesPage() {
-  const [notes, setNotes] = useState<Note[]>(SAMPLE_NOTES)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
@@ -94,31 +72,31 @@ export default function NotesPage() {
   const [noteCategory, setNoteCategory] = useState('Personal')
   const [noteTags, setNoteTags] = useState('')
 
-  const filteredNotes = notes.filter(note => {
-    const matchesSearch = note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      note.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      note.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
-    const matchesCategory = selectedCategory === 'All' || note.category === selectedCategory
-    return matchesSearch && matchesCategory
+  // Use hooks for data fetching and actions
+  const { notes, isLoading, error } = useNotes({
+    search: searchTerm,
+    category: selectedCategory,
   })
+  const { createNote, updateNote, deleteNote, toggleFavorite, isCreating, isUpdating, isDeleting } = useNotesActions()
 
-  const handleCreateNote = () => {
+  const handleCreateNote = async () => {
     if (!noteTitle.trim()) return
 
-    const newNote: Note = {
-      id: Date.now().toString(),
+    const noteData = {
       title: noteTitle,
       content: noteContent,
       category: noteCategory,
       tags: noteTags.split(',').map(tag => tag.trim()).filter(tag => tag),
-      isFavorite: false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
     }
 
-    setNotes(prev => [newNote, ...prev])
-    resetForm()
-    setIsCreateModalOpen(false)
+    const result = await createNote(noteData)
+    if (result) {
+      toast.success('Note created successfully!')
+      resetForm()
+      setIsCreateModalOpen(false)
+    } else {
+      toast.error('Failed to create note')
+    }
   }
 
   const handleEditNote = (note: Note) => {
@@ -130,32 +108,41 @@ export default function NotesPage() {
     setIsCreateModalOpen(true)
   }
 
-  const handleUpdateNote = () => {
+  const handleUpdateNote = async () => {
     if (!editingNote || !noteTitle.trim()) return
 
-    const updatedNote: Note = {
-      ...editingNote,
+    const updateData = {
       title: noteTitle,
       content: noteContent,
       category: noteCategory,
       tags: noteTags.split(',').map(tag => tag.trim()).filter(tag => tag),
-      updatedAt: new Date().toISOString()
     }
 
-    setNotes(prev => prev.map(note => note.id === editingNote.id ? updatedNote : note))
-    resetForm()
-    setIsCreateModalOpen(false)
-    setEditingNote(null)
+    const result = await updateNote(editingNote.id, updateData)
+    if (result) {
+      toast.success('Note updated successfully!')
+      resetForm()
+      setIsCreateModalOpen(false)
+      setEditingNote(null)
+    } else {
+      toast.error('Failed to update note')
+    }
   }
 
-  const handleDeleteNote = (noteId: string) => {
-    setNotes(prev => prev.filter(note => note.id !== noteId))
+  const handleDeleteNote = async (noteId: string) => {
+    const result = await deleteNote(noteId)
+    if (result) {
+      toast.success('Note deleted successfully!')
+    } else {
+      toast.error('Failed to delete note')
+    }
   }
 
-  const handleToggleFavorite = (noteId: string) => {
-    setNotes(prev => prev.map(note =>
-      note.id === noteId ? { ...note, isFavorite: !note.isFavorite } : note
-    ))
+  const handleToggleFavorite = async (noteId: string, currentFavorite: boolean) => {
+    const result = await toggleFavorite(noteId, currentFavorite)
+    if (!result) {
+      toast.error('Failed to update favorite status')
+    }
   }
 
   const resetForm = () => {
@@ -189,24 +176,26 @@ export default function NotesPage() {
         const title = lines[0]?.replace(/^(Title:|#\s*)/i, '').trim() || 'AI Generated Note'
         const content = lines.slice(1).join('\n').trim() || data.response
 
-        const aiNote: Note = {
-          id: Date.now().toString(),
+        const aiNote = {
           title,
           content,
           category: 'Ideas',
           tags: ['ai-generated', 'daksha'],
-          isFavorite: false,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
           aiGenerated: true
         }
 
-        setNotes(prev => [aiNote, ...prev])
+        const result = await createNote(aiNote)
+        if (result) {
+          toast.success('AI note created successfully!')
+        } else {
+          toast.error('Failed to create AI note')
+        }
         setDakshaPrompt('')
         setIsDakshaModalOpen(false)
       }
     } catch (error) {
       console.error('Error getting Daksha assistance:', error)
+      toast.error('Failed to get AI assistance')
     } finally {
       setIsLoadingDaksha(false)
     }
@@ -219,6 +208,19 @@ export default function NotesPage() {
       hour: '2-digit',
       minute: '2-digit'
     })
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#fafafa] dark:bg-[#1f1f1f] p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center py-12">
+            <h3 className="text-lg font-medium text-red-600 mb-2">Error loading notes</h3>
+            <p className="text-muted-foreground">Please try refreshing the page</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -402,7 +404,7 @@ export default function NotesPage() {
         </div>
 
         {/* Notes Grid/List */}
-        {filteredNotes.length === 0 ? (
+        {notes.length === 0 ? (
           <div className="text-center py-12">
             <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-medium text-muted-foreground mb-2">
@@ -427,7 +429,7 @@ export default function NotesPage() {
               ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
               : 'space-y-4'
           )}>
-            {filteredNotes.map(note => (
+            {notes.map((note: Note) => (
               <Card
                 key={note.id}
                 className={cn(
@@ -463,7 +465,7 @@ export default function NotesPage() {
                         size="sm"
                         onClick={(e) => {
                           e.stopPropagation()
-                          handleToggleFavorite(note.id)
+                          handleToggleFavorite(note.id, note.isFavorite)
                         }}
                         className="opacity-0 group-hover:opacity-100 transition-opacity"
                       >
