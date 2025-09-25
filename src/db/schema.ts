@@ -145,3 +145,47 @@ export const notes = pgTable("notes", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });
+
+// Google Drive integration table
+export const googleDriveTokens = pgTable("google_drive_tokens", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  accessToken: text("access_token").notNull(),
+  refreshToken: text("refresh_token").notNull(),
+  tokenType: text("token_type").default("Bearer"),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  scope: text("scope").notNull(),
+  // User's Google account info
+  googleAccountId: text("google_account_id").notNull(),
+  email: text("email").notNull(),
+  name: text("name"),
+  picture: text("picture"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+// Google Drive file cache for better performance
+export const googleDriveFiles = pgTable("google_drive_files", {
+  id: text("id").primaryKey(), // Google Drive file ID
+  userId: text("user_id").notNull(),
+  name: text("name").notNull(),
+  mimeType: text("mime_type").notNull(),
+  size: text("size"),
+  parents: jsonb("parents").$type<string[]>(),
+  webViewLink: text("web_view_link"),
+  webContentLink: text("web_content_link"),
+  thumbnailLink: text("thumbnail_link"),
+  iconLink: text("icon_link"),
+  shared: boolean("shared").default(false),
+  // AI analysis results
+  aiSummary: text("ai_summary"),
+  aiTags: jsonb("ai_tags").$type<string[]>(),
+  embeddingId: text("embedding_id"),
+  // Google Drive metadata
+  modifiedTime: timestamp("modified_time", { withTimezone: true }),
+  createdTime: timestamp("created_time", { withTimezone: true }),
+  // Cache timestamps
+  lastSynced: timestamp("last_synced", { withTimezone: true }).defaultNow().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
