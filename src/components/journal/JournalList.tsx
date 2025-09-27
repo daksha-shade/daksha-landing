@@ -101,6 +101,8 @@ export function JournalList() {
     const [displayedEntries, setDisplayedEntries] = useState(12);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [entryToDelete, setEntryToDelete] = useState<string | null>(null);
 
     // Build API URL with filters + semantic search
     const apiUrl = `/api/journal?${new URLSearchParams({
@@ -173,9 +175,17 @@ export function JournalList() {
         }
     };
 
-    const handleDelete = async (id: string) => {
+    const handleDeleteClick = (id: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setEntryToDelete(id);
+        setDeleteDialogOpen(true);
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (!entryToDelete) return;
+        
         try {
-            const response = await fetch(`/api/journal/${id}`, { method: "DELETE" });
+            const response = await fetch(`/api/journal/${entryToDelete}`, { method: "DELETE" });
             if (response.ok) {
                 toast.success("Journal entry deleted");
                 mutate();
@@ -185,6 +195,9 @@ export function JournalList() {
         } catch (error) {
             console.error("Error deleting entry:", error);
             toast.error("Failed to delete entry");
+        } finally {
+            setDeleteDialogOpen(false);
+            setEntryToDelete(null);
         }
     };
 
@@ -421,37 +434,24 @@ export function JournalList() {
                                                         <MoreHorizontal className="h-4 w-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuItem onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    router.push(`/journal/${entry.id}?mode=edit`);
-                                                }}>
-                                                    Edit
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
-                                                    Share
-                                                </DropdownMenuItem>
-                                                <Separator />
-                                                <AlertDialog>
-                                                    <AlertDialogTrigger asChild>
-                                                        <DropdownMenuItem className="text-destructive" onClick={(e) => e.stopPropagation()}>
-                                                            Delete
-                                                        </DropdownMenuItem>
-                                                    </AlertDialogTrigger>
-                                                    <AlertDialogContent>
-                                                        <AlertDialogHeader>
-                                                            <AlertDialogTitle>Delete journal entry?</AlertDialogTitle>
-                                                            <AlertDialogDescription>
-                                                                This action cannot be undone. This will permanently delete your entry.
-                                                            </AlertDialogDescription>
-                                                        </AlertDialogHeader>
-                                                        <AlertDialogFooter>
-                                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                            <AlertDialogAction className="bg-destructive hover:bg-destructive/90" onClick={(e) => { e.stopPropagation(); handleDelete(entry.id); }}>Delete</AlertDialogAction>
-                                                        </AlertDialogFooter>
-                                                    </AlertDialogContent>
-                                                </AlertDialog>
-                                            </DropdownMenuContent>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuItem onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        router.push(`/journal/${entry.id}?mode=edit`);
+                                                    }}>
+                                                        Edit
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+                                                        Share
+                                                    </DropdownMenuItem>
+                                                    <Separator />
+                                                    <DropdownMenuItem 
+                                                        className="text-destructive" 
+                                                        onClick={(e) => handleDeleteClick(entry.id, e)}
+                                                    >
+                                                        Delete
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
                                             </DropdownMenu>
                                         </div>
                                     </CardHeader>
@@ -540,6 +540,29 @@ export function JournalList() {
                     </>
                 )}
             </div>
+
+            <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Delete journal entry?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete your entry.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={(e) => e.stopPropagation()}>Cancel</AlertDialogCancel>
+                        <AlertDialogAction 
+                            className="bg-destructive hover:bg-destructive/90" 
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteConfirm();
+                            }}
+                        >
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

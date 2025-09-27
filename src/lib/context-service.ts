@@ -34,6 +34,7 @@ export async function createContextFileForUser(input: CreateContextInput) {
     title,
     content,
     sourceUrl,
+    embeddingId: null, // Will be set later when we store in Milvus
   });
 
   // Store embedding in Milvus

@@ -28,6 +28,7 @@ export async function ensureDbSchema() {
       title text not null,
       content text not null,
       source_url text,
+      embedding_id text,
       created_at timestamptz not null default now(),
       updated_at timestamptz not null default now()
     )

@@ -49,6 +49,7 @@ Progress:
       userId: user.id,
       title: `[Goal] ${title}`,
       content: goalContent,
+      embeddingId: null, // Will be set later if embeddings are used
     }).returning();
 
     return NextResponse.json({
