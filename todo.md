@@ -117,16 +117,20 @@ remove all the tools from /chat and assistant-ui and git commit then use context
 
 
 ---
-
+<!-- 
 save the threads to db and chat history to db of /chat use assistant-ui [assistant-ui.md](context/assistant-ui.md) delete whole db every table and recreate the schema that is needed only - use bun for docs of assistant-ui see [assistant-ui.md](context/assistant-ui.md) read this file fully and try to save things to db first remove all extra tools added to assistant-ui keep it normal scratch then restart - use context7 mcp and other assistant-ui docs mcp - create the new schema in which instead of pgvector use MILVUS_ENDPOINT=https://in03-7b0379f0e87385d.serverless.aws-eu-central-1.cloud.zilliz.com
 MILVUS_TOKEN=d25a7ee6cb2d0ddbab3eefecf8d96f310b3c262d90de8927a9560f90a0d6005b4668ad8cb8c2d75e2a7a9daaece67db08940372b
  and always see .env keep the useful things in the new db schema only also add mcp support to assistant-ui fetch https://www.assistant-ui.com/docs/getting-started  add all features and leverage all features of it - read all the docs like https://www.assistant-ui.com/docs/copilots/make-assistant-tool-ui  and all make the things that is daksha ment for
 
 
- ---
+ --- -->
 
 
 
 
  
+save the threads to db and chat history to db of /chat use assistant-ui [assistant-ui.md](context/assistant-ui.md) or use context7 mcp and other assistant-ui docs mcp - create the new schema in which instead of pgvector use MILVUS_ENDPOINT=https://in03-7b0379f0e87385d.serverless.aws-eu-central-1.cloud.zilliz.com
 
+use bun for docs of assistant-ui see [assistant-ui.md](context/assistant-ui.md) read this file fully and try to save things to db first remove all extra tools added to assistant-ui keep it normal scratch then restart - use context7 mcp and other assistant-ui docs mcp - create the new schema in which instead of pgvector use MILVUS_ENDPOINT=https://in03-7b0379f0e87385d.serverless.aws-eu-central-1.cloud.zilliz.com
+MILVUS_TOKEN=d25a7ee6cb2d0ddbab3eefecf8d96f310b3c262d90de8927a9560f90a0d6005b4668ad8cb8c2d75e2a7a9daaece67db08940372b
+ and always see .env keep the useful things in the new db schema only also add mcp support to assistant-ui fetch https://www.assistant-ui.com/docs/getting-started  add all features and leverage all features of it - read all the docs like https://www.assistant-ui.com/docs/copilots/make-assistant-tool-ui  and all make the things that is daksha ment for

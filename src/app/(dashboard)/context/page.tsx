@@ -124,6 +124,11 @@ export default function ContextPage() {
     }
   }
 
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false)
+    setItemToDelete(null)
+  }
+
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="space-y-2">
@@ -324,7 +329,10 @@ export default function ContextPage() {
 
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
-        onOpenChange={setDeleteDialogOpen}
+        onOpenChange={(open) => {
+          setDeleteDialogOpen(open)
+          if (!open) setItemToDelete(null)
+        }}
         onConfirm={handleDeleteConfirm}
         title="Delete Context File?"
         description="This action cannot be undone. This will permanently delete your context file."
