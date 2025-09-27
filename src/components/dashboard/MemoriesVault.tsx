@@ -1,44 +1,46 @@
 "use client"
 
-import { useState } from 'react'
-import { Camera, Video, FileText, Heart, MapPin, Users, Calendar, ChevronRight } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Camera, Video, FileText, Heart, MapPin, Users, Calendar, ChevronRight, Loader2 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Memory } from '@/lib/dashboard-data'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
+import { useJournalEntries } from '@/hooks/useDashboard'
+
+interface Memory {
+  id: string
+  title: string
+ type: 'photo' | 'video' | 'journal' | 'note'
+  thumbnail?: string
+  timestamp: Date | string
+  aiDescription?: string | null
+  location?: string | null
+ people?: string[]
+  tags: string[]
+}
 
 interface MemoriesVaultProps {
-  memories: Memory[]
   className?: string
 }
 
-export default function MemoriesVault({ memories = [
-  {
-    id: '1',
-    title: 'My First Memory',
-    type: 'photo',
-    thumbnail: 'https://i.pinimg.com/736x/b1/97/19/b19719387b035d4cf886835dcdafc013.jpg',
-    timestamp: new Date('2023-01-01T10:00:00Z'),
-    aiDescription: 'A beautiful sunrise at the beach.',
-    location: 'Miami Beach, FL',
-    people: ['Alice', 'Bob'],
-    tags: ['sunrise', 'beach', 'vacation']
-  },
-  {
-    id: '2',
-    title: 'Family Gathering',
-    type: 'video',
-    thumbnail: '/images/memories/2.jpg',
-    timestamp: new Date('2023-02-15T15:30:00Z'),
-    aiDescription: 'A fun family reunion with lots of laughter.',
-    location: 'Central Park, NY',
-    people: ['Charlie', 'Diana'],
-    tags: ['family', 'reunion', 'fun']
-  },
-], className }: MemoriesVaultProps) {
+export default function MemoriesVault({ className }: MemoriesVaultProps) {
   const [selectedMemory, setSelectedMemory] = useState<Memory | null>(null)
+  const { entries, isLoading } = useJournalEntries({ limit: 6 })
+
+  // Convert journal entries to memory format
+  const memories: Memory[] = entries.map(entry => ({
+    id: entry.id,
+    title: entry.title,
+    type: entry.type as 'photo' | 'video' | 'journal' | 'note' || 'journal',
+    thumbnail: entry.imageUrls?.[0],
+    timestamp: entry.entryDate,
+    aiDescription: entry.aiSummary,
+    location: entry.location,
+    people: entry.emotionalTags?.filter(tag => tag.includes('@')) || [],
+    tags: entry.tags || []
+  }))
 
   const getTypeIcon = (type: Memory['type']) => {
     switch (type) {
@@ -69,9 +71,10 @@ export default function MemoriesVault({ memories = [
     }
   }
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date: Date | string) => {
+    const dateObj = typeof date === 'string' ? new Date(date) : date
     const now = new Date()
-    const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60)
+    const diffInHours = (now.getTime() - dateObj.getTime()) / (1000 * 60 * 60)
 
     if (diffInHours < 1) {
       return 'Just now'
@@ -80,8 +83,40 @@ export default function MemoriesVault({ memories = [
     } else if (diffInHours < 48) {
       return 'Yesterday'
     } else {
-      return date.toLocaleDateString()
+      return dateObj.toLocaleDateString()
     }
+  }
+
+  if (isLoading) {
+    return (
+      <Card className={cn("", className)}>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+              <Heart className="w-5 h-5 text-red-500" />
+              Memories Vault
+            </CardTitle>
+            <Button
+              asChild
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground"
+            >
+              <Link href="/memories">
+                View All
+                <ChevronRight className="w-4 h-4 ml-1" />
+              </Link>
+            </Button>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Your life's beautiful moments, organized by AI
+          </p>
+        </CardHeader>
+        <CardContent className="flex items-center justify-center h-64">
+          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
@@ -210,7 +245,7 @@ export default function MemoriesVault({ memories = [
               )}
               <span className="flex items-center gap-1">
                 <Calendar className="w-3 h-3" />
-                {selectedMemory.timestamp.toLocaleDateString()}
+                {formatDate(selectedMemory.timestamp)}
               </span>
             </div>
 

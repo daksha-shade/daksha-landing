@@ -4,7 +4,7 @@ import { useUser } from '@stackframe/stack'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { useState } from 'react'
-import { BookOpen, Target, MessageCircle, Mic } from 'lucide-react'
+import { BookOpen, Target, MessageCircle, Mic, Calendar, Heart, Lightbulb, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import FullScreenVoiceInput from '@/components/dashboard/FullScreenVoiceInput'
 import MemoriesVault from '@/components/dashboard/MemoriesVault'
@@ -12,11 +12,15 @@ import TodayPlanner from '@/components/dashboard/TodayPlanner'
 import GoalsProgress from '@/components/dashboard/GoalsProgress'
 import ThoughtsApp from '@/components/dashboard/ThoughtsApp'
 import DailyInspiration from '@/components/dashboard/DailyInspiration'
-import { mockMemories, mockTodayTasks } from '@/lib/dashboard-data'
+import { useDashboardAnalytics, useDashboardSummary } from '@/hooks/useDashboard'
 
 export default function MainDashboardPage() {
   const user = useUser()
   const [showVoiceInput, setShowVoiceInput] = useState(false)
+  
+  // Fetch dashboard data
+  const { data: analyticsData, isLoading: analyticsLoading } = useDashboardAnalytics('week')
+  const { summary, isLoading: summaryLoading } = useDashboardSummary()
 
   // Show loading state while checking authentication
   if (user === null) {
@@ -39,14 +43,29 @@ export default function MainDashboardPage() {
 
   const displayName = user.displayName || user.primaryEmail?.split('@')[0] || 'there'
 
-const quickActions = [
+  const quickActions = [
     { icon: BookOpen, label: 'Journal', href: '/journal', color: 'text-blue-500', description: 'Write your thoughts' },
     { icon: Target, label: 'Goals', href: '/goals', color: 'text-green-500', description: 'Track progress' },
-    { icon: MessageCircle, label: 'Chat', href: '/chat', color: 'text-orange-500', description: 'Talk to Daksha' }
+    { icon: MessageCircle, label: 'Chat', href: '/chat', color: 'text-orange-500', description: 'Talk to Daksha' },
+    { icon: Calendar, label: 'Schedule', href: '/calendar', color: 'text-purple-500', description: 'Plan your day' },
+    { icon: Heart, label: 'Memories', href: '/memories', color: 'text-red-500', description: 'View memories' },
+    { icon: Lightbulb, label: 'Ideas', href: '/ideas', color: 'text-yellow-500', description: 'Capture thoughts' }
   ]
 
+  // Loading state for dashboard data
+ if (analyticsLoading || summaryLoading) {
+    return (
+      <div className="py-8 min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="text-muted-foreground">Loading your dashboard...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className=" py-8 space-y-8 min-h-screen  ">
+    <div className="container mx-auto px-4 py-6 space-y-6 min-h-screen">
       {/* Improved Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
@@ -66,6 +85,28 @@ const quickActions = [
           Talk to Daksha
         </Button>
       </div>
+
+      {/* Dashboard Stats Summary */}
+      {summary && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-card p-4 rounded-lg border border-border/30">
+            <div className="text-2xl font-bold text-blue-500">{summary.totalJournalEntries}</div>
+            <div className="text-sm text-muted-foreground">Journal Entries</div>
+          </div>
+          <div className="bg-card p-4 rounded-lg border border-border/30">
+            <div className="text-2xl font-bold text-orange-500">{summary.currentStreak}</div>
+            <div className="text-sm text-muted-foreground">Day Streak</div>
+          </div>
+          <div className="bg-card p-4 rounded-lg border border-border/30">
+            <div className="text-2xl font-bold text-green-500">{summary.activeGoals}</div>
+            <div className="text-sm text-muted-foreground">Active Goals</div>
+          </div>
+          <div className="bg-card p-4 rounded-lg border border-border/30">
+            <div className="text-sm text-muted-foreground truncate">{summary.recentActivity}</div>
+            <div className="text-xs text-muted-foreground">Recent Activity</div>
+          </div>
+        </div>
+      )}
 
       {/* Daily Inspiration */}
       <DailyInspiration />
@@ -98,12 +139,7 @@ const quickActions = [
         <div className="space-y-6">
           {/* Today's Tasks */}
           <div className="h-fit">
-            <TodayPlanner
-              tasks={mockTodayTasks}
-              onTaskToggle={(taskId) => {
-                console.log('Toggle task:', taskId)
-              }}
-            />
+            <TodayPlanner />
           </div>
 
           {/* Goals Progress */}
@@ -116,7 +152,7 @@ const quickActions = [
         <div className="space-y-6">
           {/* Memories Vault */}
           <div className="h-fit">
-            <MemoriesVault memories={mockMemories.slice(0, 4)} />
+            <MemoriesVault />
           </div>
 
           {/* Quick Thoughts */}

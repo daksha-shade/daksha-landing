@@ -17,6 +17,7 @@
 		"db:migrate": "tsx src/db/migrate.ts",
 		"db:sync": "tsx src/db/sync-standalone.ts",
 		"db:milvus-setup": "tsx src/db/milvus-setup.ts",
+		"db:chat-milvus-setup": "tsx src/db/milvus-chat-setup.ts",
 		"setup": "bash setup-env.sh"
 	},
 	"dependencies": {

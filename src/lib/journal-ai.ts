@@ -44,7 +44,7 @@ Be empathetic, supportive, and focus on personal growth and self-awareness.
             model: openai("gpt-4o"),
             prompt,
             temperature: 0.7,
-            maxTokens: 500,
+            maxCompletionTokens: 500,
         });
 
         // Parse the JSON response, handling markdown code blocks

@@ -90,7 +90,7 @@ export async function PUT(
       .set({
         title,
         content,
-        embedding,
+        embeddingId: "updated_" + Date.now(), // Or whatever logic you need for embedding ID
         updatedAt: new Date(),
       })
       .where(eq(contextFiles.id, id))

@@ -16,6 +16,10 @@ export type JournalSearchResult = {
 export async function searchUserJournals(userId: string, query: string, limit = 5): Promise<JournalSearchResult[]> {
   const queryEmbedding = await embedText(query);
 
+  if (!milvusClient) {
+    throw new Error("Milvus client is not available");
+  }
+
   const searchResults = await milvusClient.search({
     collection_name: "journal_entries",
     vector: queryEmbedding,
@@ -36,7 +40,7 @@ export async function searchUserJournals(userId: string, query: string, limit = 
       id: r.id,
       title: r.title,
       entryDate: r.entryDate,
-      similarity: milvusResult.score,
+      similarity: milvusResult?.score || 0,
       snippet: (r.plainTextContent || "").slice(0, 280),
     };
   });
