@@ -11,7 +11,6 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 
@@ -101,8 +100,6 @@ export function JournalList() {
     const [displayedEntries, setDisplayedEntries] = useState(12);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [entryToDelete, setEntryToDelete] = useState<string | null>(null);
 
     // Build API URL with filters + semantic search
     const apiUrl = `/api/journal?${new URLSearchParams({
@@ -175,17 +172,13 @@ export function JournalList() {
         }
     };
 
-    const handleDeleteClick = (id: string, e: React.MouseEvent) => {
-        e.stopPropagation();
-        setEntryToDelete(id);
-        setDeleteDialogOpen(true);
-    };
+    const handleDelete = async (id: string) => {
+        if (!confirm("Are you sure you want to delete this journal entry? This cannot be undone.")) {
+            return;
+        }
 
-    const handleDeleteConfirm = async () => {
-        if (!entryToDelete) return;
-        
         try {
-            const response = await fetch(`/api/journal/${entryToDelete}`, { method: "DELETE" });
+            const response = await fetch(`/api/journal/${id}`, { method: "DELETE" });
             if (response.ok) {
                 toast.success("Journal entry deleted");
                 mutate();
@@ -195,15 +188,7 @@ export function JournalList() {
         } catch (error) {
             console.error("Error deleting entry:", error);
             toast.error("Failed to delete entry");
-        } finally {
-            setDeleteDialogOpen(false);
-            setEntryToDelete(null);
         }
-    };
-
-    const handleDeleteCancel = () => {
-        setDeleteDialogOpen(false);
-        setEntryToDelete(null);
     };
 
     const stats = {
@@ -452,7 +437,10 @@ export function JournalList() {
                                                     <Separator />
                                                     <DropdownMenuItem 
                                                         className="text-destructive" 
-                                                        onClick={(e) => handleDeleteClick(entry.id, e)}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleDelete(entry.id);
+                                                        }}
                                                     >
                                                         Delete
                                                     </DropdownMenuItem>
@@ -545,35 +533,6 @@ export function JournalList() {
                     </>
                 )}
             </div>
-
-            <AlertDialog open={deleteDialogOpen} onOpenChange={(open) => {
-                setDeleteDialogOpen(open);
-                if (!open) setEntryToDelete(null);
-            }}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Delete journal entry?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete your entry.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteCancel();
-                        }}>Cancel</AlertDialogCancel>
-                        <AlertDialogAction 
-                            className="bg-destructive hover:bg-destructive/90" 
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteConfirm();
-                            }}
-                        >
-                            Delete
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
         </div>
     );
 }

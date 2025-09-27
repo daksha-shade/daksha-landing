@@ -10,7 +10,6 @@ import { Input } from "@/components/ui/input"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Separator } from "@/components/ui/separator"
 import { ContextSearch } from "@/components/context/ContextSearch"
-import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog"
 
 type ContextFile = { 
   id: string; 
@@ -29,8 +28,6 @@ export default function ContextPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [items, setItems] = useState<ContextFile[]>([])
   const [loading, setLoading] = useState(true)
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [itemToDelete, setItemToDelete] = useState<string | null>(null)
 
   async function load() {
     setLoading(true)
@@ -99,17 +96,10 @@ export default function ContextPage() {
     return content.length > maxLength ? content.substring(0, maxLength) + "..." : content
   }
 
-  const handleDeleteClick = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation()
-    setItemToDelete(id)
-    setDeleteDialogOpen(true)
-  }
-
-  const handleDeleteConfirm = async () => {
-    if (!itemToDelete) return
-    
+  const handleDelete = async (id: string) => {
+    if (!confirm("Delete this context file?")) return
     try {
-      const res = await fetch(`/api/context/${itemToDelete}`, { method: "DELETE" })
+      const res = await fetch(`/api/context/${id}`, { method: "DELETE" })
       if (res.ok) {
         load() // Refresh the list
       } else {
@@ -118,15 +108,7 @@ export default function ContextPage() {
     } catch (error) {
       console.error("Error deleting file:", error)
       alert("Error deleting file")
-    } finally {
-      setDeleteDialogOpen(false)
-      setItemToDelete(null)
     }
-  }
-
-  const handleDeleteCancel = () => {
-    setDeleteDialogOpen(false)
-    setItemToDelete(null)
   }
 
   return (
@@ -276,7 +258,10 @@ export default function ContextPage() {
                           Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem 
-                          onClick={(e) => handleDeleteClick(item.id, e)}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleDelete(item.id)
+                          }}
                           className="text-destructive"
                         >
                           Delete
@@ -326,17 +311,6 @@ export default function ContextPage() {
           )}
         </>
       )}
-
-      <DeleteConfirmationDialog
-        open={deleteDialogOpen}
-        onOpenChange={(open) => {
-          setDeleteDialogOpen(open)
-          if (!open) setItemToDelete(null)
-        }}
-        onConfirm={handleDeleteConfirm}
-        title="Delete Context File?"
-        description="This action cannot be undone. This will permanently delete your context file."
-      />
     </div>
   )
 }
