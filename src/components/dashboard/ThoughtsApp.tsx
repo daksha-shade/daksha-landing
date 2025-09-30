@@ -35,7 +35,7 @@ export default function ThoughtsApp({ className }: ThoughtsAppProps) {
 
   // Convert journal entries to thoughts format
   useEffect(() => {
-    if (journalEntries) {
+    if (!isLoading && journalEntries) {
       const convertedThoughts = journalEntries.map(entry => {
         // Determine category based on content
         let category: Thought['category'] = 'random'
@@ -64,7 +64,7 @@ export default function ThoughtsApp({ className }: ThoughtsAppProps) {
       })
       setThoughts(convertedThoughts)
     }
-  }, [journalEntries])
+  }, [journalEntries, isLoading])
 
   const getCategoryIcon = (category: Thought['category']) => {
     switch (category) {

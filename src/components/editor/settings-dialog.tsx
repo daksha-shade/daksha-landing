@@ -75,11 +75,9 @@ export function SettingsDialog() {
     const chatOptions = editor.getOptions(aiChatPlugin).chatOptions ?? {};
     editor.setOption(aiChatPlugin, 'chatOptions', {
       ...chatOptions,
-      body: {
-        ...chatOptions.body,
-        apiKey: tempKeys.openai,
-        model: tempModel.value,
-      },
+      api: '/api/ai/chat',
+      apiKey: tempKeys.openai,
+      model: tempModel.value,
     });
 
     setOpen(false);

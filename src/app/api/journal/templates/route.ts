@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
             .select()
             .from(journalTemplates)
             .where(or(...conditions))
-            .orderBy(desc(journalTemplates.isSystem), desc(journalTemplates.createdAt));
+            .orderBy(desc(journalTemplates.createdAt));
 
         return NextResponse.json({ templates });
     } catch (error) {

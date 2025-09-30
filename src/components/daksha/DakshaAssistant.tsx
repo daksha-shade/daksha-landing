@@ -71,7 +71,7 @@ export default function DakshaAssistant() {
             </CardHeader>
             <CardContent className="space-y-2 text-sm text-muted-foreground">
               {samplePrompts.map((p, i) => (
-                <div key={i} className="rounded-md border p-2 hover:bg-muted/60 cursor-pointer" onClick={() => runtime?.thread?.sendUserMessage?.(p)}>
+                <div key={i} className="rounded-md border p-2 hover:bg-muted/60 cursor-pointer" onClick={() => runtime?.append?.({ role: 'user', content: p })}>
                   {p}
                 </div>
               ))}

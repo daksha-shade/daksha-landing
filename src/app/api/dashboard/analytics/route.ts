@@ -91,37 +91,37 @@ async function getJournalStats(userId: string, startDate: Date, endDate: Date) {
   // Total words written
   const wordCountResult = await db.execute(sql`
     SELECT COALESCE(SUM(
-      CASE 
-        WHEN plain_text_content IS NOT NULL 
+      CASE
+        WHEN plain_text_content IS NOT NULL
         THEN array_length(string_to_array(trim(plain_text_content), ' '), 1)
-        ELSE 0 
+        ELSE 0
       END
     ), 0) as total_words
-    FROM journal_entries 
-    WHERE user_id = ${userId} 
-      AND entry_date >= '${startDateStr}' 
-      AND entry_date <= '${endDateStr}'
+    FROM journal_entries
+    WHERE user_id = ${userId}
+      AND entry_date >= ${startDate}
+      AND entry_date <= ${endDate}
   `);
 
   // Entries by type
   const entriesByTypeResult = await db.execute(sql`
     SELECT type, COUNT(*) as count
-    FROM journal_entries 
-    WHERE user_id = ${userId} 
-      AND entry_date >= '${startDateStr}' 
-      AND entry_date <= '${endDateStr}'
+    FROM journal_entries
+    WHERE user_id = ${userId}
+      AND entry_date >= ${startDate}
+      AND entry_date <= ${endDate}
     GROUP BY type
   `);
 
   // Daily entry counts for chart
   const dailyEntriesResult = await db.execute(sql`
-    SELECT 
+    SELECT
       DATE(entry_date) as date,
       COUNT(*) as count
-    FROM journal_entries 
-    WHERE user_id = ${userId} 
-      AND entry_date >= '${startDateStr}' 
-      AND entry_date <= '${endDateStr}'
+    FROM journal_entries
+    WHERE user_id = ${userId}
+      AND entry_date >= ${startDate}
+      AND entry_date <= ${endDate}
     GROUP BY DATE(entry_date)
     ORDER BY date
   `);
@@ -171,30 +171,30 @@ async function getMoodTrends(userId: string, startDate: Date, endDate: Date) {
   const endDateStr = endDate.toISOString().split('T')[0];
 
   const moodTrendsResult = await db.execute(sql`
-    SELECT 
+    SELECT
       DATE(entry_date) as date,
       AVG(mood_intensity) as avg_mood,
       COUNT(*) as entry_count,
       array_agg(DISTINCT mood) FILTER (WHERE mood IS NOT NULL) as moods
-    FROM journal_entries 
-    WHERE user_id = ${userId} 
-      AND entry_date >= '${startDateStr}' 
-      AND entry_date <= '${endDateStr}'
+    FROM journal_entries
+    WHERE user_id = ${userId}
+      AND entry_date >= ${startDate}
+      AND entry_date <= ${endDate}
       AND mood_intensity IS NOT NULL
     GROUP BY DATE(entry_date)
     ORDER BY date
   `);
 
-  // Most common emotions
+ // Most common emotions
   const emotionsResult = await db.execute(sql`
-    SELECT 
+    SELECT
       emotion,
       COUNT(*) as frequency
     FROM journal_entries,
     LATERAL jsonb_array_elements_text(emotional_tags) as emotion
-    WHERE user_id = ${userId} 
-      AND entry_date >= '${startDateStr}' 
-      AND entry_date <= '${endDateStr}'
+    WHERE user_id = ${userId}
+      AND entry_date >= ${startDate}
+      AND entry_date <= ${endDate}
       AND emotional_tags IS NOT NULL
     GROUP BY emotion
     ORDER BY frequency DESC

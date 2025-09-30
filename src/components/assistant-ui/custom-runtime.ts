@@ -66,7 +66,7 @@ export class CustomAssistantRuntime {
       this.messages = threadMessages.map(msg => ({
         id: msg.id,
         role: msg.role as 'user' | 'assistant',
-        content: msg.content as ThreadUserContent | ThreadAssistantContent,
+        content: typeof msg.content === 'string' ? msg.content : JSON.parse(msg.content as string),
       }));
 
       this.notifyListeners();
@@ -151,7 +151,7 @@ export class CustomAssistantRuntime {
     this.notifyListeners();
   }
 
-  public async editMessage(messageId: string, content: ThreadUserContent) {
+  public async editMessage(messageId: string, content: any) {
     this.messages = this.messages.map(msg => 
       msg.id === messageId ? { ...msg, content } : msg
     );

@@ -18,7 +18,8 @@
 		"db:sync": "tsx src/db/sync-standalone.ts",
 		"db:milvus-setup": "tsx src/db/milvus-setup.ts",
 		"db:chat-milvus-setup": "tsx src/db/milvus-chat-setup.ts",
-		"setup": "bash setup-env.sh"
+		"setup": "bash setup-env.sh",
+		"rm-unused": "npx eslint . --ext .js,.jsx,.ts,.tsx --fix"
 	},
 	"dependencies": {
 		"@ai-sdk/anthropic": "^2.0.17",

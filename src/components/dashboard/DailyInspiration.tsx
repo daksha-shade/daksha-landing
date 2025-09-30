@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from 'react'
@@ -53,6 +52,7 @@ const defaultContent: DailyContent[] = [
     thought: {
       text: "Your unique perspective is your superpower. Don't try to fit into someone else's mold.",
       category: "self-acceptance"
+    },
     suggestion: {
       text: "Take a 10-minute walk without your phone and observe your surroundings",
       action: "Mindful Walk",
@@ -118,16 +118,16 @@ interface DailyInspirationProps {
 }
 
 export default function DailyInspiration({ className }: DailyInspirationProps) {
-  const { data: analyticsData, isLoading } = useDashboardAnalytics()
-  const [currentContent, setCurrentContent] = useState<DailyContent>(defaultContent[0])
+  const { data: analyticsData, isLoading: analyticsLoading } = useDashboardAnalytics()
+  const [currentContent, setCurrentContent] = useState<DailyContent | null>(null)
   const [isRefreshing, setIsRefreshing] = useState(false)
 
   useEffect(() => {
-    // Get today's content based on date
+    // Get today's content based on date only once on mount
     const today = new Date()
     const dayIndex = today.getDate() % defaultContent.length
     setCurrentContent(defaultContent[dayIndex])
-  }, [])
+  }, []) // Empty dependency array to run only once
 
   const refreshContent = () => {
     setIsRefreshing(true)
@@ -174,11 +174,11 @@ export default function DailyInspiration({ className }: DailyInspirationProps) {
     return defaultContent[selectedIndex]
   }
 
-  if (isLoading) {
+  if (analyticsLoading || !currentContent) {
     return (
       <Card className={cn("", className)}>
         <CardContent className="p-4 flex items-center justify-center h-32">
-          <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
         </CardContent>
       </Card>
     )
@@ -188,10 +188,10 @@ export default function DailyInspiration({ className }: DailyInspirationProps) {
     <Card className={cn("", className)}>
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-medium flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-yellow-500" />
-            Daily Inspiration
-          </h3>
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-yellow-500" />
+            <h3 className="text-lg font-semibold">Daily Inspiration</h3>
+          </div>
           <Button
             variant="ghost"
             size="sm"
@@ -199,7 +199,7 @@ export default function DailyInspiration({ className }: DailyInspirationProps) {
             disabled={isRefreshing}
             className="h-8 w-8 p-0"
           >
-            <RefreshCw className={cn("w-3 h-3", isRefreshing && "animate-spin")} />
+            <RefreshCw className={cn("w-4 h-4", isRefreshing && "animate-spin")} />
           </Button>
         </div>
 
