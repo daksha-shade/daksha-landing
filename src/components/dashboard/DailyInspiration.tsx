@@ -1,10 +1,12 @@
+
 "use client"
 
 import { useState, useEffect } from 'react'
-import { Quote, Lightbulb, Sparkles, RefreshCw, Brain } from 'lucide-react'
+import { Quote, Lightbulb, Sparkles, RefreshCw, Brain, Loader2 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { useDashboardAnalytics } from '@/hooks/useDashboard'
 
 interface DailyContent {
   quote: {
@@ -24,7 +26,7 @@ interface DailyContent {
   }
 }
 
-const dailyContent: DailyContent[] = [
+const defaultContent: DailyContent[] = [
   {
     quote: {
       text: "The only way to do great work is to love what you do.",
@@ -51,7 +53,6 @@ const dailyContent: DailyContent[] = [
     thought: {
       text: "Your unique perspective is your superpower. Don't try to fit into someone else's mold.",
       category: "self-acceptance"
-    },
     suggestion: {
       text: "Take a 10-minute walk without your phone and observe your surroundings",
       action: "Mindful Walk",
@@ -117,23 +118,70 @@ interface DailyInspirationProps {
 }
 
 export default function DailyInspiration({ className }: DailyInspirationProps) {
-  const [currentContent, setCurrentContent] = useState<DailyContent>(dailyContent[0])
+  const { data: analyticsData, isLoading } = useDashboardAnalytics()
+  const [currentContent, setCurrentContent] = useState<DailyContent>(defaultContent[0])
   const [isRefreshing, setIsRefreshing] = useState(false)
 
   useEffect(() => {
     // Get today's content based on date
     const today = new Date()
-    const dayIndex = today.getDate() % dailyContent.length
-    setCurrentContent(dailyContent[dayIndex])
+    const dayIndex = today.getDate() % defaultContent.length
+    setCurrentContent(defaultContent[dayIndex])
   }, [])
 
   const refreshContent = () => {
     setIsRefreshing(true)
     setTimeout(() => {
-      const randomIndex = Math.floor(Math.random() * dailyContent.length)
-      setCurrentContent(dailyContent[randomIndex])
+      const randomIndex = Math.floor(Math.random() * defaultContent.length)
+      setCurrentContent(defaultContent[randomIndex])
       setIsRefreshing(false)
     }, 500)
+  }
+
+  // Generate personalized content based on user analytics
+  const generatePersonalizedContent = () => {
+    if (!analyticsData) return defaultContent[0]
+    
+    // This is a simplified example - in a real implementation, you would call an AI service
+    // to generate personalized content based on the user's analytics data
+    const journalStats = analyticsData.journalStats
+    const streakInfo = analyticsData.streakInfo
+    const moodTrends = analyticsData.moodTrends
+    
+    // Example logic for personalization
+    const totalEntries = journalStats.totalEntries
+    const currentStreak = streakInfo.currentStreak
+    const avgMood = moodTrends.dailyMoods.length > 0 
+      ? moodTrends.dailyMoods.reduce((sum, day) => sum + day.averageMood, 0) / moodTrends.dailyMoods.length
+      : 0
+    
+    // Select content based on user data
+    let selectedIndex = 0
+    if (currentStreak >= 7) {
+      // If user has a good streak, encourage continuation
+      selectedIndex = 1
+    } else if (totalEntries < 10) {
+      // If user is new, provide motivational content
+      selectedIndex = 0
+    } else if (avgMood < 3) {
+      // If user seems down, provide uplifting content
+      selectedIndex = 3
+    } else {
+      // Default to random selection
+      selectedIndex = Math.floor(Math.random() * defaultContent.length)
+    }
+    
+    return defaultContent[selectedIndex]
+  }
+
+  if (isLoading) {
+    return (
+      <Card className={cn("", className)}>
+        <CardContent className="p-4 flex items-center justify-center h-32">
+          <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    )
   }
 
   return (

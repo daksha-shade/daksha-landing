@@ -36,21 +36,32 @@ export default function ThoughtsApp({ className }: ThoughtsAppProps) {
   // Convert journal entries to thoughts format
   useEffect(() => {
     if (journalEntries) {
-      const convertedThoughts = journalEntries.map(entry => ({
-        id: entry.id,
-        title: entry.title,
-        content: entry.plainTextContent || '',
-        category: (entry.title.toLowerCase().includes('idea') || entry.plainTextContent?.toLowerCase().includes('idea')) ? 'idea' :
-                 (entry.title.toLowerCase().includes('insight') || entry.plainTextContent?.toLowerCase().includes('insight')) ? 'insight' :
-                 (entry.title.toLowerCase().includes('inspiration') || entry.plainTextContent?.toLowerCase().includes('inspiration')) ? 'inspiration' :
-                 (entry.title.toLowerCase().includes('problem') || entry.plainTextContent?.toLowerCase().includes('problem')) ? 'problem' :
-                 (entry.title.toLowerCase().includes('solution') || entry.plainTextContent?.toLowerCase().includes('solution')) ? 'solution' :
-                 'random',
-        tags: [...(entry.emotionalTags || []), ...(entry.tags || [])],
-        isFavorite: false,
-        createdAt: new Date(entry.createdAt),
-        updatedAt: new Date(entry.updatedAt)
-      }))
+      const convertedThoughts = journalEntries.map(entry => {
+        // Determine category based on content
+        let category: Thought['category'] = 'random'
+        if (entry.title.toLowerCase().includes('idea') || entry.plainTextContent?.toLowerCase().includes('idea')) {
+          category = 'idea'
+        } else if (entry.title.toLowerCase().includes('insight') || entry.plainTextContent?.toLowerCase().includes('insight')) {
+          category = 'insight'
+        } else if (entry.title.toLowerCase().includes('inspiration') || entry.plainTextContent?.toLowerCase().includes('inspiration')) {
+          category = 'inspiration'
+        } else if (entry.title.toLowerCase().includes('problem') || entry.plainTextContent?.toLowerCase().includes('problem')) {
+          category = 'problem'
+        } else if (entry.title.toLowerCase().includes('solution') || entry.plainTextContent?.toLowerCase().includes('solution')) {
+          category = 'solution'
+        }
+
+        return {
+          id: entry.id,
+          title: entry.title,
+          content: entry.plainTextContent || '',
+          category: category,
+          tags: [...(entry.emotionalTags || []), ...(entry.tags || [])],
+          isFavorite: false,
+          createdAt: new Date(entry.createdAt),
+          updatedAt: new Date(entry.updatedAt)
+        }
+      })
       setThoughts(convertedThoughts)
     }
   }, [journalEntries])
@@ -78,13 +89,15 @@ export default function ThoughtsApp({ className }: ThoughtsAppProps) {
 
   const formatDate = (date: Date) => {
     const now = new Date()
-    const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60)
+    const diffInMinutes = (now.getTime() - date.getTime()) / (1000 * 60)
 
-    if (diffInHours < 1) {
+    if (diffInMinutes < 1) {
       return 'Just now'
-    } else if (diffInHours < 24) {
-      return `${Math.floor(diffInHours)}h ago`
-    } else if (diffInHours < 48) {
+    } else if (diffInMinutes < 60) {
+      return `${Math.floor(diffInMinutes)}m ago`
+    } else if (diffInMinutes < 24 * 60) {
+      return `${Math.floor(diffInMinutes / 60)}h ago`
+    } else if (diffInMinutes < 48 * 60) {
       return 'Yesterday'
     } else {
       return date.toLocaleDateString()

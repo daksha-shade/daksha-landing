@@ -119,7 +119,7 @@ export default function FullScreenVideoJournalPage() {
     fd.append('file', new File([blob], `journal-video-${Date.now()}.webm`, { type: mimeType }))
     const res = await fetch('/api/upload', { method: 'POST', body: fd })
     if (!res.ok) throw new Error('Upload failed')
-    const json = await res.json()
+    const json = await res.json() as { file?: { url: string } }
     return json.file?.url as string
   }
 
@@ -130,7 +130,7 @@ export default function FullScreenVideoJournalPage() {
       fd.append('action', 'transcribe')
       const res = await fetch('/api/journal/audio', { method: 'POST', body: fd })
       if (res.ok) {
-        const data = await res.json()
+        const data = await res.json() as { transcript?: string }
         setTranscript(data.transcript || '')
       }
     } catch (e) { console.error(e) }
@@ -155,7 +155,7 @@ export default function FullScreenVideoJournalPage() {
         })
       })
       if (!res.ok) throw new Error('Save failed')
-      const json = await res.json()
+      const json = await res.json() as { id: string }
       toast.success('Journal saved')
       window.location.href = `/journal/${json.id}`
     } catch (e) { console.error(e); toast.error('Save failed') }
