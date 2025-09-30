@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from 'react'
-import { Lightbulb, Plus, Search, Brain, Star, Clock } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Lightbulb, Plus, Search, Brain, Star, Clock, Loader2 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
+import { useJournalEntries } from '@/hooks/useDashboard'
 
 interface Thought {
   id: string
@@ -21,58 +22,49 @@ interface Thought {
   updatedAt: Date
 }
 
-const mockThoughts: Thought[] = [
-  {
-    id: '1',
-    title: 'AI-powered habit tracking',
-    content: 'What if Daksha could automatically detect habits from journal entries and suggest improvements? Like noticing patterns in sleep, exercise, or mood.',
-    category: 'idea',
-    tags: ['ai', 'habits', 'automation'],
-    isFavorite: true,
-    createdAt: new Date('2024-01-15T10:30:00'),
-    updatedAt: new Date('2024-01-15T10:30:00')
-  },
-  {
-    id: '2',
-    title: 'Simplicity is key',
-    content: 'Users don\'t want complexity. They want tools that feel invisible but powerful. The best apps are the ones you don\'t have to think about using.',
-    category: 'insight',
-    tags: ['ux', 'design', 'philosophy'],
-    isFavorite: false,
-    createdAt: new Date('2024-01-14T15:20:00'),
-    updatedAt: new Date('2024-01-14T15:20:00')
-  },
-  {
-    id: '3',
-    title: 'Memory palace for digital life',
-    content: 'Could we create a visual memory palace where users can navigate through their digital memories? Like a 3D space where photos, notes, and journal entries are spatially organized.',
-    category: 'idea',
-    tags: ['memory', 'visualization', '3d', 'spatial'],
-    isFavorite: true,
-    createdAt: new Date('2024-01-13T09:15:00'),
-    updatedAt: new Date('2024-01-13T09:15:00')
-  },
-  {
-    id: '4',
-    title: 'Coffee shop productivity',
-    content: 'Why do I work better in coffee shops? Maybe it\'s the ambient noise, the presence of others being productive, or just the change of environment. Need to recreate this at home.',
-    category: 'random',
-    tags: ['productivity', 'environment', 'focus'],
-    isFavorite: false,
-    createdAt: new Date('2024-01-12T14:45:00'),
-    updatedAt: new Date('2024-01-12T14:45:00')
-  }
-]
-
 interface ThoughtsAppProps {
   className?: string
 }
 
 export default function ThoughtsApp({ className }: ThoughtsAppProps) {
-  const [thoughts, setThoughts] = useState<Thought[]>(mockThoughts)
+  const { entries: journalEntries, isLoading } = useJournalEntries()
+  const [thoughts, setThoughts] = useState<Thought[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [isAddingThought, setIsAddingThought] = useState(false)
   const [newThought, setNewThought] = useState<{ title: string; content: string; category: Thought['category'] }>({ title: '', content: '', category: 'idea' })
+
+  // Convert journal entries to thoughts format
+  useEffect(() => {
+    if (!isLoading && journalEntries) {
+      const convertedThoughts = journalEntries.map(entry => {
+        // Determine category based on content
+        let category: Thought['category'] = 'random'
+        if (entry.title.toLowerCase().includes('idea') || entry.plainTextContent?.toLowerCase().includes('idea')) {
+          category = 'idea'
+        } else if (entry.title.toLowerCase().includes('insight') || entry.plainTextContent?.toLowerCase().includes('insight')) {
+          category = 'insight'
+        } else if (entry.title.toLowerCase().includes('inspiration') || entry.plainTextContent?.toLowerCase().includes('inspiration')) {
+          category = 'inspiration'
+        } else if (entry.title.toLowerCase().includes('problem') || entry.plainTextContent?.toLowerCase().includes('problem')) {
+          category = 'problem'
+        } else if (entry.title.toLowerCase().includes('solution') || entry.plainTextContent?.toLowerCase().includes('solution')) {
+          category = 'solution'
+        }
+
+        return {
+          id: entry.id,
+          title: entry.title,
+          content: entry.plainTextContent || '',
+          category: category,
+          tags: [...(entry.emotionalTags || []), ...(entry.tags || [])],
+          isFavorite: false,
+          createdAt: new Date(entry.createdAt),
+          updatedAt: new Date(entry.updatedAt)
+        }
+      })
+      setThoughts(convertedThoughts)
+    }
+  }, [journalEntries, isLoading])
 
   const getCategoryIcon = (category: Thought['category']) => {
     switch (category) {
@@ -97,13 +89,15 @@ export default function ThoughtsApp({ className }: ThoughtsAppProps) {
 
   const formatDate = (date: Date) => {
     const now = new Date()
-    const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60)
+    const diffInMinutes = (now.getTime() - date.getTime()) / (1000 * 60)
 
-    if (diffInHours < 1) {
+    if (diffInMinutes < 1) {
       return 'Just now'
-    } else if (diffInHours < 24) {
-      return `${Math.floor(diffInHours)}h ago`
-    } else if (diffInHours < 48) {
+    } else if (diffInMinutes < 60) {
+      return `${Math.floor(diffInMinutes)}m ago`
+    } else if (diffInMinutes < 24 * 60) {
+      return `${Math.floor(diffInMinutes / 60)}h ago`
+    } else if (diffInMinutes < 48 * 60) {
       return 'Yesterday'
     } else {
       return date.toLocaleDateString()
@@ -140,6 +134,16 @@ export default function ThoughtsApp({ className }: ThoughtsAppProps) {
         ? { ...thought, isFavorite: !thought.isFavorite }
         : thought
     ))
+  }
+
+  if (isLoading) {
+    return (
+      <Card className={cn("h-full", className)}>
+        <CardContent className="p-6 flex items-center justify-center h-64">
+          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    )
   }
 
   return (

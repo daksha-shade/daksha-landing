@@ -1,20 +1,49 @@
 "use client"
 
-import { Calendar, Clock, CheckCircle2, AlertCircle, ChevronRight, Plus } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Calendar, Clock, CheckCircle2, AlertCircle, ChevronRight, Plus, Loader2 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
-import { PlannerTask } from '@/lib/dashboard-data'
 import { cn } from '@/lib/utils'
+import { useJournalEntries } from '@/hooks/useDashboard'
+
+interface PlannerTask {
+  id: string
+  title: string
+  description?: string
+  type: 'meeting' | 'task' | 'reminder' | 'event'
+  startTime: Date | string
+  endTime?: Date | string
+ completed: boolean
+ priority: 'low' | 'medium' | 'high'
+  category: string
+}
 
 interface TodayPlannerProps {
-  tasks: PlannerTask[]
-  onTaskToggle?: (taskId: string) => void
   className?: string
 }
 
-export default function TodayPlanner({ tasks, onTaskToggle, className }: TodayPlannerProps) {
+export default function TodayPlanner({ className }: TodayPlannerProps) {
+  const { entries, isLoading } = useJournalEntries({
+    type: 'task',
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: new Date().toISOString().split('T')[0]
+  })
+
+  // Convert journal entries to task format
+  const tasks: PlannerTask[] = entries.map(entry => ({
+    id: entry.id,
+    title: entry.title,
+    description: entry.aiSummary || entry.plainTextContent?.substring(0, 100) + '...',
+    type: (entry.type as 'meeting' | 'task' | 'reminder' | 'event') || 'task',
+    startTime: entry.entryDate || new Date(),
+    completed: entry.tags?.includes('completed') || false,
+    priority: (entry.emotionalTags?.find(tag => ['high', 'medium', 'low'].includes(tag)) as 'low' | 'medium' | 'high') || 'medium',
+    category: entry.tags?.find(tag => !['completed'].includes(tag)) || 'General'
+  }))
+
   const completedTasks = tasks.filter(task => task.completed)
   const pendingTasks = tasks.filter(task => !task.completed)
   const completionPercentage = tasks.length > 0 ? Math.round((completedTasks.length / tasks.length) * 100) : 0
@@ -47,8 +76,9 @@ export default function TodayPlanner({ tasks, onTaskToggle, className }: TodayPl
     }
   }
 
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', {
+ const formatTime = (date: Date | string) => {
+    const dateObj = typeof date === 'string' ? new Date(date) : date
+    return dateObj.toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true
@@ -56,13 +86,35 @@ export default function TodayPlanner({ tasks, onTaskToggle, className }: TodayPl
   }
 
   const isOverdue = (task: PlannerTask) => {
-    return !task.completed && task.startTime < new Date()
+    const startTime = typeof task.startTime === 'string' ? new Date(task.startTime) : task.startTime
+    return !task.completed && startTime < new Date()
   }
 
   const handleTaskToggle = (taskId: string) => {
-    if (onTaskToggle) {
-      onTaskToggle(taskId)
-    }
+    // In a real implementation, this would update the task status via API
+    console.log('Toggle task:', taskId)
+  }
+
+  if (isLoading) {
+    return (
+      <Card className={cn("", className)}>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-blue-500" />
+              Today's Plan
+            </CardTitle>
+            <Button variant="ghost" size="sm" className="text-muted-foreground">
+              <Plus className="w-4 h-4 mr-1" />
+              Add Task
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="flex items-center justify-center h-64">
+          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
@@ -108,7 +160,7 @@ export default function TodayPlanner({ tasks, onTaskToggle, className }: TodayPl
                 key={task.id}
                 className={cn(
                   "flex items-start gap-3 p-3 rounded-lg border transition-all duration-200 hover:border-border/60",
-                  isOverdue(task) ? "border-red-200 bg-red-50/50 dark:border-red-800 dark:bg-red-950/10" : "border-border/30"
+                  isOverdue(task) ? "border-red-20 bg-red-50/50 dark:border-red-800 dark:bg-red-950/10" : "border-border/30"
                 )}
               >
                 <Checkbox

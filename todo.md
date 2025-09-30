@@ -2,6 +2,12 @@
 journal page
 
  -->
+make http://localhost:3000/goals and make it work
+ add skeletons to load instead on loaing circles and all in full dashboard
+ make the /goals page work
+make /app minimailastically beautiful and working
+
+
 
 daksha apps
 
@@ -134,3 +140,42 @@ save the threads to db and chat history to db of /chat use assistant-ui [assista
 use bun for docs of assistant-ui see [assistant-ui.md](context/assistant-ui.md) read this file fully and try to save things to db first remove all extra tools added to assistant-ui keep it normal scratch then restart - use context7 mcp and other assistant-ui docs mcp - create the new schema in which instead of pgvector use MILVUS_ENDPOINT=https://in03-7b0379f0e87385d.serverless.aws-eu-central-1.cloud.zilliz.com
 MILVUS_TOKEN=d25a7ee6cb2d0ddbab3eefecf8d96f310b3c262d90de8927a9560f90a0d6005b4668ad8cb8c2d75e2a7a9daaece67db08940372b
  and always see .env keep the useful things in the new db schema only also add mcp support to assistant-ui fetch https://www.assistant-ui.com/docs/getting-started  add all features and leverage all features of it - read all the docs like https://www.assistant-ui.com/docs/copilots/make-assistant-tool-ui  and all make the things that is daksha ment for
+
+# TODO
+
+## High Priority
+
+- [ ] Add voice journaling feature
+- [ ] Implement AI-powered goal tracking
+- [ ] Add collaborative features for teams
+- [ ] Integrate with more AI models (Claude, Gemini, etc.)
+
+## Medium Priority
+
+- [ ] Add dark mode toggle
+- [ ] Implement offline support
+- [ ] Add export functionality for journal entries
+- [ ] Create mobile app version
+
+## Low Priority
+
+- [ ] Improve UI/UX design
+- [ ] Add more customization options
+- [ ] Implement analytics dashboard
+
+## Completed
+
+- [x] Save the threads to db and chat history to db of /chat use assistant-ui [assistant-ui.md](context/assistant-ui.md) or use context7 mcp and other assistant-ui docs mcp - create the new schema in which instead of pgvector use MILVUS_ENDPOINT=https://in03-7b0379f0e87385d.serverless.aws-eu-central-1.cloud.zilliz.com
+
+use bun for docs of assistant-ui see [assistant-ui.md](context/assistant-ui.md) read this file fully and try to save things to db first remove all extra tools added to assistant-ui keep it normal scratch then restart - use context7 mcp and other assistant-ui docs mcp - create the new schema in which instead of pgvector use MILVUS_ENDPOINT=https://in03-7b0379f0e87385d.serverless.aws-eu-central-1.cloud.zilliz.com
+MILVUS_TOKEN=d25a7ee6cb2d0ddbab3eefecf8d96f310b3c262d90de8927a9560f90a0d6005b4668ad8cb8c2d75e2a7a9daaece67db08940372b
+ and always see .env keep the useful things in the new db schema only also add mcp support to assistant-ui fetch https://www.assistant-ui.com/docs/getting-started  add all features and leverage all features of it - read all the docs like https://www.assistant-ui.com/docs/copilots/make-assistant-tool-ui  and all make the things that is daksha ment for
+
+Completed tasks:
+- [x] Implemented chat history and thread storage in the database using assistant-ui
+- [x] Created custom runtime that saves threads and messages to PostgreSQL database
+- [x] Set up Milvus collections for vector storage instead of pgvector
+- [x] Added API endpoints for threads and messages management
+- [x] Created custom hooks for chat thread management
+- [x] Integrated Milvus for vector embeddings storage
+- [x] Leveraged assistant-ui features for chat interface

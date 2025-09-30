@@ -189,3 +189,16 @@ export const googleDriveFiles = pgTable("google_drive_files", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });
+
+// Journal templates for structured journaling
+export const journalTemplates = pgTable("journal_templates", {
+  id: text("id").primaryKey(),
+  userId: text("user_id"), // null for global templates
+  name: text("name").notNull(),
+  description: text("description"),
+  content: jsonb("content").notNull(), // Yoopta Editor JSON structure
+  tags: jsonb("tags").$type<string[]>(),
+  isPublic: boolean("is_public").default(false),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});

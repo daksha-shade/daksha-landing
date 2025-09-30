@@ -34,7 +34,7 @@ export async function ensureDbSchema() {
     )
   `);
 
-  await db.execute(sql`create index if not exists idx_context_files_user on context_files(user_id)`);
+  await db.execute(sql`create index if not exists idx_context_files_user_id on context_files(user_id)`);
 
   await db.execute(sql`
     create table if not exists context_embeddings (
@@ -49,5 +49,5 @@ export async function ensureDbSchema() {
     )
   `);
 
-  await db.execute(sql`create index if not exists idx_context_embeddings_user on context_embeddings(user_id)`);
+  await db.execute(sql`create index if not exists idx_context_embeddings_user_id on context_embeddings(user_id)`);
 }

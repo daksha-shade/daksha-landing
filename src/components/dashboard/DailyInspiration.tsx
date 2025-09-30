@@ -1,10 +1,11 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { Quote, Lightbulb, Sparkles, RefreshCw, Brain } from 'lucide-react'
+import { Quote, Lightbulb, Sparkles, RefreshCw, Brain, Loader2 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { useDashboardAnalytics } from '@/hooks/useDashboard'
 
 interface DailyContent {
   quote: {
@@ -24,7 +25,7 @@ interface DailyContent {
   }
 }
 
-const dailyContent: DailyContent[] = [
+const defaultContent: DailyContent[] = [
   {
     quote: {
       text: "The only way to do great work is to love what you do.",
@@ -117,33 +118,80 @@ interface DailyInspirationProps {
 }
 
 export default function DailyInspiration({ className }: DailyInspirationProps) {
-  const [currentContent, setCurrentContent] = useState<DailyContent>(dailyContent[0])
+  const { data: analyticsData, isLoading: analyticsLoading } = useDashboardAnalytics()
+  const [currentContent, setCurrentContent] = useState<DailyContent | null>(null)
   const [isRefreshing, setIsRefreshing] = useState(false)
 
   useEffect(() => {
-    // Get today's content based on date
+    // Get today's content based on date only once on mount
     const today = new Date()
-    const dayIndex = today.getDate() % dailyContent.length
-    setCurrentContent(dailyContent[dayIndex])
-  }, [])
+    const dayIndex = today.getDate() % defaultContent.length
+    setCurrentContent(defaultContent[dayIndex])
+  }, []) // Empty dependency array to run only once
 
   const refreshContent = () => {
     setIsRefreshing(true)
     setTimeout(() => {
-      const randomIndex = Math.floor(Math.random() * dailyContent.length)
-      setCurrentContent(dailyContent[randomIndex])
+      const randomIndex = Math.floor(Math.random() * defaultContent.length)
+      setCurrentContent(defaultContent[randomIndex])
       setIsRefreshing(false)
     }, 500)
+  }
+
+  // Generate personalized content based on user analytics
+  const generatePersonalizedContent = () => {
+    if (!analyticsData) return defaultContent[0]
+    
+    // This is a simplified example - in a real implementation, you would call an AI service
+    // to generate personalized content based on the user's analytics data
+    const journalStats = analyticsData.journalStats
+    const streakInfo = analyticsData.streakInfo
+    const moodTrends = analyticsData.moodTrends
+    
+    // Example logic for personalization
+    const totalEntries = journalStats.totalEntries
+    const currentStreak = streakInfo.currentStreak
+    const avgMood = moodTrends.dailyMoods.length > 0 
+      ? moodTrends.dailyMoods.reduce((sum, day) => sum + day.averageMood, 0) / moodTrends.dailyMoods.length
+      : 0
+    
+    // Select content based on user data
+    let selectedIndex = 0
+    if (currentStreak >= 7) {
+      // If user has a good streak, encourage continuation
+      selectedIndex = 1
+    } else if (totalEntries < 10) {
+      // If user is new, provide motivational content
+      selectedIndex = 0
+    } else if (avgMood < 3) {
+      // If user seems down, provide uplifting content
+      selectedIndex = 3
+    } else {
+      // Default to random selection
+      selectedIndex = Math.floor(Math.random() * defaultContent.length)
+    }
+    
+    return defaultContent[selectedIndex]
+  }
+
+  if (analyticsLoading || !currentContent) {
+    return (
+      <Card className={cn("", className)}>
+        <CardContent className="p-4 flex items-center justify-center h-32">
+          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
     <Card className={cn("", className)}>
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-medium flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-yellow-500" />
-            Daily Inspiration
-          </h3>
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-yellow-500" />
+            <h3 className="text-lg font-semibold">Daily Inspiration</h3>
+          </div>
           <Button
             variant="ghost"
             size="sm"
@@ -151,7 +199,7 @@ export default function DailyInspiration({ className }: DailyInspirationProps) {
             disabled={isRefreshing}
             className="h-8 w-8 p-0"
           >
-            <RefreshCw className={cn("w-3 h-3", isRefreshing && "animate-spin")} />
+            <RefreshCw className={cn("w-4 h-4", isRefreshing && "animate-spin")} />
           </Button>
         </div>
 

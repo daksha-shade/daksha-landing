@@ -89,7 +89,7 @@ export default function AudioJournalPage() {
       fd.append('action', 'transcribe')
       const res = await fetch('/api/journal/audio', { method: 'POST', body: fd })
       if (res.ok) {
-        const data = await res.json()
+        const data = await res.json() as { transcript?: string }
         setTranscript(data.transcript || '')
       } else {
         toast.error('Transcription failed')
@@ -104,7 +104,7 @@ export default function AudioJournalPage() {
     fd.append('file', new File([blob], `journal-audio-${Date.now()}.webm`, { type: mimeType }))
     const res = await fetch('/api/upload', { method: 'POST', body: fd })
     if (!res.ok) throw new Error('Upload failed')
-    const json = await res.json()
+    const json = await res.json() as { file?: { url: string } }
     return json.file?.url as string
   }
 
@@ -126,7 +126,7 @@ export default function AudioJournalPage() {
         })
       })
       if (!response.ok) throw new Error('Save failed')
-      const result = await response.json()
+      const result = await response.json() as { id: string }
       toast.success('Journal saved')
       window.location.href = `/journal/${result.id}`
     } catch (e) { console.error(e); toast.error('Save failed') }

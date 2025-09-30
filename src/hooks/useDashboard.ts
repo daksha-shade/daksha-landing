@@ -2,6 +2,7 @@
 
 import useSWR from 'swr';
 import { useUser } from '@stackframe/stack';
+import { useMemo } from 'react';
 
 // Types for dashboard data
 export interface DashboardAnalytics {
@@ -163,8 +164,10 @@ export function useJournalEntries(params?: {
     }
   );
 
+  const entries = useMemo(() => data?.entries || [], [data?.entries]);
+
   return {
-    entries: data?.entries || [],
+    entries,
     pagination: data?.pagination,
     error,
     isLoading,

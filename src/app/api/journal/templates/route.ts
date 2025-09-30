@@ -17,20 +17,16 @@ export async function GET(req: NextRequest) {
         // Get both system templates and user's custom templates
         let conditions = [
             or(
-                eq(journalTemplates.isSystem, true),
+                isNull(journalTemplates.userId), // System templates have no userId
                 eq(journalTemplates.userId, user.id)
             )
         ];
-
-        if (category) {
-            conditions.push(eq(journalTemplates.category, category));
-        }
 
         const templates = await db
             .select()
             .from(journalTemplates)
             .where(or(...conditions))
-            .orderBy(desc(journalTemplates.isSystem), desc(journalTemplates.createdAt));
+            .orderBy(desc(journalTemplates.createdAt));
 
         return NextResponse.json({ templates });
     } catch (error) {
@@ -47,11 +43,11 @@ export async function POST(req: NextRequest) {
         }
 
         const body = (await req.json()) as any;
-        const { name, description, prompts, category } = body;
+        const { name, description, content } = body;
 
-        if (!name || !prompts || !Array.isArray(prompts)) {
+        if (!name || !content) {
             return NextResponse.json(
-                { error: "Name and prompts array are required" },
+                { error: "Name and content are required" },
                 { status: 400 }
             );
         }
@@ -63,9 +59,8 @@ export async function POST(req: NextRequest) {
             userId: user.id,
             name,
             description,
-            prompts,
-            category,
-            isSystem: false,
+            content,
+            isPublic: false,
             createdAt: new Date(),
             updatedAt: new Date(),
         });

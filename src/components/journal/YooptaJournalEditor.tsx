@@ -160,7 +160,7 @@ export default function YooptaJournalEditor({
         <div className={`yoopta-editor-container ${className}`}>
             <YooptaEditor
                 editor={editor}
-                plugins={PLUGINS}
+                plugins={PLUGINS as any}
                 tools={TOOLS}
                 marks={MARKS}
                 value={value}

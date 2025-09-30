@@ -32,6 +32,13 @@ interface JournalEntry {
     tags?: string[];
     location?: string;
     weather?: string;
+    audioUrl?: string;
+    videoUrl?: string;
+    imageUrls?: string[];
+    attachmentUrls?: string[];
+    duration?: number;
+    transcript?: string;
+    transcriptConfidence?: number;
     aiSummary?: string;
     aiInsights?: string[];
     aiSentiment?: {

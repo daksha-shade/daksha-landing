@@ -282,7 +282,7 @@ export async function POST(req: NextRequest) {
       aiInsights,
       aiQuestions,
       aiSentiment,
-      embedding,
+      embeddingId: id, // Use the journal entry ID as embedding ID
       entryDate: journalDate,
       createdAt: now,
       updatedAt: now,

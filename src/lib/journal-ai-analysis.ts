@@ -67,7 +67,7 @@ Be empathetic, supportive, and focus on personal growth and self-awareness. Use 
             model: openai("gpt-4o"),
             prompt,
             temperature: 0.7,
-            maxTokens: 800,
+            maxCompletionTokens: 800,
         });
 
         // Parse the JSON response, handling markdown code blocks
@@ -142,7 +142,7 @@ Focus on the primary emotions and overall sentiment. Confidence should be betwee
             model: openai("gpt-4o"),
             prompt,
             temperature: 0.3,
-            maxTokens: 300,
+            maxCompletionTokens: 300,
         });
 
         let jsonText = result.text.trim();

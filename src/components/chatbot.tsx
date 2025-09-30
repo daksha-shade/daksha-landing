@@ -59,7 +59,7 @@ export function Chatbot() {
                 </div>
               </div>
             ) : (
-              messages.map((message) => (
+              messages.map((message: any) => (
                 <Message key={message.id} from={message.role}>
                   <MessageAvatar 
                     src={message.role === 'user' ? '/user-avatar.png' : '/ai-avatar.png'}
@@ -88,7 +88,7 @@ export function Chatbot() {
               <PromptInputToolbar>
                 <div />
                 <PromptInputSubmit 
-                  status={isLoading ? 'streaming' : 'idle'}
+                  status={isLoading ? 'streaming' : 'ready'}
                   disabled={!input.trim()}
                 />
               </PromptInputToolbar>

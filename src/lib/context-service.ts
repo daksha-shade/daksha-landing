@@ -47,6 +47,10 @@ export async function searchUserContext(userId: string, query: string, limit = 5
   // Generate embedding for the search query
   const queryEmbedding = await embedText(query);
 
+  if (!milvusClient) {
+    throw new Error("Milvus client is not available");
+  }
+
   // Search in Milvus
   const contextFilesResults = await milvusClient.search({
     collection_name: "context_files",
@@ -70,7 +74,7 @@ export async function searchUserContext(userId: string, query: string, limit = 5
     const milvusResult = contextFilesResults.results.find((sr: any) => sr.id === r.id);
     return {
       id: r.id,
-      score: milvusResult.score,
+      score: milvusResult?.score || 0,
       payload: {
         userId,
         contextFileId: r.id,
@@ -86,7 +90,7 @@ export async function searchUserContext(userId: string, query: string, limit = 5
     const milvusResult = journalEntriesResults.results.find((sr: any) => sr.id === r.id);
     return {
       id: r.id,
-      score: milvusResult.score,
+      score: milvusResult?.score || 0,
       payload: {
         userId,
         contextFileId: r.id,
