@@ -8,7 +8,7 @@
 my-app/
 # testing
 /coverage
-
+cleanup-archive
 # next.js
 /.next/
 /out/
@@ -19,6 +19,7 @@ my-app/
 # misc
 .DS_Store
 *.pem
+cleanup-archive/
 
 # debug
 npm-debug.log*

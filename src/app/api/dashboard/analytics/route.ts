@@ -83,8 +83,8 @@ async function getJournalStats(userId: string, startDate: Date, endDate: Date) {
     .where(
       and(
         eq(journalEntries.userId, userId),
-        gte(journalEntries.entryDate, startDate),
-        lte(journalEntries.entryDate, endDate)
+        gte(journalEntries.entryDate, sql`${startDateStr}::date`),
+        lte(journalEntries.entryDate, sql`${endDateStr}::date`)
       )
     );
 
@@ -99,8 +99,8 @@ async function getJournalStats(userId: string, startDate: Date, endDate: Date) {
     ), 0) as total_words
     FROM journal_entries
     WHERE user_id = ${userId}
-      AND entry_date >= ${startDate}
-      AND entry_date <= ${endDate}
+      AND entry_date >= '${startDateStr}'
+      AND entry_date <= '${endDateStr}'
   `);
 
   // Entries by type
@@ -108,8 +108,8 @@ async function getJournalStats(userId: string, startDate: Date, endDate: Date) {
     SELECT type, COUNT(*) as count
     FROM journal_entries
     WHERE user_id = ${userId}
-      AND entry_date >= ${startDate}
-      AND entry_date <= ${endDate}
+      AND entry_date >= '${startDateStr}'
+      AND entry_date <= '${endDateStr}'
     GROUP BY type
   `);
 
@@ -120,8 +120,8 @@ async function getJournalStats(userId: string, startDate: Date, endDate: Date) {
       COUNT(*) as count
     FROM journal_entries
     WHERE user_id = ${userId}
-      AND entry_date >= ${startDate}
-      AND entry_date <= ${endDate}
+      AND entry_date >= '${startDateStr}'
+      AND entry_date <= '${endDateStr}'
     GROUP BY DATE(entry_date)
     ORDER BY date
   `);
@@ -167,9 +167,9 @@ async function getStreakInfo(userId: string) {
 
 async function getMoodTrends(userId: string, startDate: Date, endDate: Date) {
   // Format dates as strings for SQL queries
-  const startDateStr = startDate.toISOString().split('T')[0];
+ const startDateStr = startDate.toISOString().split('T')[0];
   const endDateStr = endDate.toISOString().split('T')[0];
-
+  
   const moodTrendsResult = await db.execute(sql`
     SELECT
       DATE(entry_date) as date,
@@ -178,8 +178,8 @@ async function getMoodTrends(userId: string, startDate: Date, endDate: Date) {
       array_agg(DISTINCT mood) FILTER (WHERE mood IS NOT NULL) as moods
     FROM journal_entries
     WHERE user_id = ${userId}
-      AND entry_date >= ${startDate}
-      AND entry_date <= ${endDate}
+      AND entry_date >= '${startDateStr}'
+      AND entry_date <= '${endDateStr}'
       AND mood_intensity IS NOT NULL
     GROUP BY DATE(entry_date)
     ORDER BY date
@@ -193,8 +193,8 @@ async function getMoodTrends(userId: string, startDate: Date, endDate: Date) {
     FROM journal_entries,
     LATERAL jsonb_array_elements_text(emotional_tags) as emotion
     WHERE user_id = ${userId}
-      AND entry_date >= ${startDate}
-      AND entry_date <= ${endDate}
+      AND entry_date >= '${startDateStr}'
+      AND entry_date <= '${endDateStr}'
       AND emotional_tags IS NOT NULL
     GROUP BY emotion
     ORDER BY frequency DESC
