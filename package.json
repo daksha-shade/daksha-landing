@@ -19,7 +19,8 @@
 		"db:milvus-setup": "tsx src/db/milvus-setup.ts",
 		"db:chat-milvus-setup": "tsx src/db/milvus-chat-setup.ts",
 		"setup": "bash setup-env.sh",
-		"rm-unused": "npx eslint . --ext .js,.jsx,.ts,.tsx --fix"
+		"rm-unused": "npx eslint . --ext .js,.jsx,.ts,.tsx --fix",
+		"reset": "rm -rf node_modules && rm -f package-lock.json && bun install && rm -rf .next"
 	},
 	"dependencies": {
 		"@ai-sdk/anthropic": "^2.0.17",

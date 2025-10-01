@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db/client';
 import { threads, messages } from '@/db/schema';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, desc } from 'drizzle-orm';
 import { stackServerApp } from '@/stack';
+import { nanoid } from 'nanoid';
 
 export const runtime = 'edge';
 
@@ -23,7 +24,7 @@ export async function GET(req: Request) {
       .select()
       .from(threads)
       .where(eq(threads.userId, user.id))
-      .orderBy(threads.updatedAt);
+      .orderBy(desc(threads.updatedAt));
 
     // Format dates properly for JSON serialization
     const formattedThreads = userThreads.map(thread => ({
@@ -51,35 +52,19 @@ export async function POST(req: Request) {
     const body: ThreadRequestBody = await req.json();
     const { title } = body;
 
+    const threadId = nanoid();
+    const now = new Date();
+
     const newThread = await db
       .insert(threads)
       .values({
-        id: crypto.randomUUID(),
+        id: threadId,
         userId: user.id,
         title: title || 'New Chat',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: now,
+        updatedAt: now,
       })
-      .onConflictDoNothing()
       .returning();
-
-    if (newThread.length === 0) {
-      // Thread already exists, fetch it
-      const existingThread = await db
-        .select()
-        .from(threads)
-        .where(eq(threads.id, crypto.randomUUID()))
-        .limit(1);
-      
-      if (existingThread.length > 0) {
-        const formattedThread = {
-          ...existingThread[0],
-          createdAt: existingThread[0].createdAt instanceof Date ? existingThread[0].createdAt.toISOString() : existingThread[0].createdAt,
-          updatedAt: existingThread[0].updatedAt instanceof Date ? existingThread[0].updatedAt.toISOString() : existingThread[0].updatedAt,
-        };
-        return NextResponse.json({ thread: formattedThread });
-      }
-    }
 
     // Format dates properly for JSON serialization
     const formattedThread = {

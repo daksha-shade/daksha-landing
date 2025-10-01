@@ -30,6 +30,12 @@ import {
 import { MarkdownText } from "@/components/assistant-ui/markdown-text";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
 import { ToolFallback } from "@/components/assistant-ui/tool-fallback";
+import { 
+  WeatherToolUI, 
+  TimeToolUI, 
+  SearchToolUI, 
+  CalculatorToolUI 
+} from "@/components/assistant-ui/tools";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { LazyMotion, MotionConfig, domAnimation } from "motion/react";
@@ -61,6 +67,12 @@ export const Thread: FC = () => {
             <Composer />
           </ThreadPrimitive.Viewport>
         </ThreadPrimitive.Root>
+        
+        {/* Tool UI Components - these register the tool UIs with the runtime */}
+        <WeatherToolUI />
+        <TimeToolUI />
+        <SearchToolUI />
+        <CalculatorToolUI />
       </MotionConfig>
     </LazyMotion>
   );

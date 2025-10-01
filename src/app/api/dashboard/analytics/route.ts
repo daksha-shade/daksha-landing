@@ -99,8 +99,8 @@ async function getJournalStats(userId: string, startDate: Date, endDate: Date) {
     ), 0) as total_words
     FROM journal_entries
     WHERE user_id = ${userId}
-      AND entry_date >= '${startDateStr}'
-      AND entry_date <= '${endDateStr}'
+      AND entry_date >= ${startDateStr}::date
+      AND entry_date <= ${endDateStr}::date
   `);
 
   // Entries by type
@@ -108,8 +108,8 @@ async function getJournalStats(userId: string, startDate: Date, endDate: Date) {
     SELECT type, COUNT(*) as count
     FROM journal_entries
     WHERE user_id = ${userId}
-      AND entry_date >= '${startDateStr}'
-      AND entry_date <= '${endDateStr}'
+      AND entry_date >= ${startDateStr}::date
+      AND entry_date <= ${endDateStr}::date
     GROUP BY type
   `);
 
@@ -120,8 +120,8 @@ async function getJournalStats(userId: string, startDate: Date, endDate: Date) {
       COUNT(*) as count
     FROM journal_entries
     WHERE user_id = ${userId}
-      AND entry_date >= '${startDateStr}'
-      AND entry_date <= '${endDateStr}'
+      AND entry_date >= ${startDateStr}::date
+      AND entry_date <= ${endDateStr}::date
     GROUP BY DATE(entry_date)
     ORDER BY date
   `);

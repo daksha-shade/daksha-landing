@@ -43,11 +43,14 @@ export const sql =
   postgres(connectionString, {
     // Supabase requires SSL
     ssl: "require",
-    max: 3, // Increased connection pool
+    max: 1, // Reduced for edge runtime stability
     idle_timeout: 20,
-    connect_timeout: 10,
+    connect_timeout: 30, // Increased timeout for edge runtime
     // Suppress schema notices that clutter console logs
-    onnotice: () => {}
+    onnotice: () => {},
+    // Edge runtime compatibility
+    transform: postgres.camel,
+    prepare: false
   });
 
 export const db = globalForDb.__db__ ?? drizzle(sql, { schema });

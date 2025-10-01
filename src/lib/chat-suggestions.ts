@@ -7,6 +7,30 @@ export const chatSuggestions = [
     category: "journaling"
   },
   {
+    title: "Check the weather",
+    label: "in my location",
+    action: "What's the weather like in San Francisco today?",
+    category: "tools"
+  },
+  {
+    title: "Get current time",
+    label: "in different timezones",
+    action: "What time is it right now in New York?",
+    category: "tools"
+  },
+  {
+    title: "Search knowledge",
+    label: "from my data",
+    action: "Search for information about machine learning in my knowledge base",
+    category: "tools"
+  },
+  {
+    title: "Calculate expenses",
+    label: "and budgeting",
+    action: "Calculate 2500 * 12 / 100 for my monthly budget",
+    category: "tools"
+  },
+  {
     title: "Analyze my patterns",
     label: "from recent entries",
     action: "Analyze my mood and productivity patterns from my recent journal entries",

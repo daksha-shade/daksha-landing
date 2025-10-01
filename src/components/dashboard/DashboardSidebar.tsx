@@ -36,6 +36,13 @@ export default function DashboardSidebar() {
   const pathname = usePathname()
   const user = useUser()
 
+  // Auto-collapse sidebar when on chat page
+  React.useEffect(() => {
+    if (pathname === '/chat') {
+      setCollapsed(true)
+    }
+  }, [pathname])
+
   const signOut = async () => {
     if (user) {
       await user.signOut()
@@ -146,6 +153,7 @@ export default function DashboardSidebar() {
           size="sm"
           onClick={() => setCollapsed(!collapsed)}
           className="w-full justify-center h-8"
+          title={pathname === '/chat' && collapsed ? "Sidebar auto-collapsed for chat. Click to expand." : undefined}
         >
           <ChevronLeft className={cn("w-4 h-4 transition-transform", collapsed && "rotate-180")} />
         </Button>
