@@ -12,7 +12,7 @@ interface ThreadRequestBody {
 }
 
 // Get all threads for a user
-export async function GET(req: Request) {
+export async function GET() {
   try {
     const user = await stackServerApp.getUser({ or: "return-null" });
     
@@ -53,7 +53,6 @@ export async function POST(req: Request) {
     const { title } = body;
 
     const threadId = nanoid();
-    const now = new Date();
 
     const newThread = await db
       .insert(threads)
@@ -61,8 +60,6 @@ export async function POST(req: Request) {
         id: threadId,
         userId: user.id,
         title: title || 'New Chat',
-        createdAt: now,
-        updatedAt: now,
       })
       .returning();
 

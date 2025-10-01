@@ -53,7 +53,7 @@ export function useChatThreads() {
     }
   };
 
-  const createNewThread = async (title: string = 'New Chat') => {
+  const createNewThread = async (title: string = 'New Chat'): Promise<string | null> => {
     try {
       const response = await fetch('/api/threads', {
         method: 'POST',
@@ -72,10 +72,12 @@ export function useChatThreads() {
         setThreads(prev => [...prev, data.thread]);
         setCurrentThread(data.thread.id);
         setMessages([]);
-        return data.thread;
+        return data.thread.id;
       }
+      return null;
     } catch (error) {
       console.error('Error creating thread:', error);
+      return null;
     }
   };
 

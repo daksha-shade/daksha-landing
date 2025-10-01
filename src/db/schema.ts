@@ -99,10 +99,12 @@ export const threads = pgTable("threads", {
 // Messages table for individual messages within threads
 export const messages = pgTable("messages", {
   id: text("id").primaryKey(),
-  threadId: text("thread_id").notNull().references(() => threads.id),
-  role: text("role").notNull(), // 'user' or 'assistant'
-  content: jsonb("content").notNull(), // For assistant-ui's message format
+  threadId: text("thread_id").notNull().references(() => threads.id, { onDelete: "cascade" }),
+  role: text("role").notNull(), // 'user' | 'assistant' | 'system' | 'tool'
+  content: jsonb("content").notNull(), // Assistant-UI message content format
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  parentId: text("parent_id"), // For message branching support
+  toolCallId: text("tool_call_id"), // For tool call/result association
 });
 
 // Journal streaks for tracking writing consistency

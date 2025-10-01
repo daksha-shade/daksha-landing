@@ -215,7 +215,7 @@ async function getMoodTrends(userId: string, startDate: Date, endDate: Date) {
   };
 }
 
-async function getGoalsProgress(userId: string) {
+async function getGoalsProgress(_userId: string) {
   // Mock implementation - replace with actual goals logic
   return {
     completedGoals: 0,

@@ -2,15 +2,96 @@ import { openai } from '@ai-sdk/openai';
 import { streamText, convertToModelMessages, stepCountIs } from 'ai';
 import { z } from 'zod';
 import { stackServerApp } from '@/stack';
+import { db } from '@/db/client';
+import { threads, messages as messagesTable } from '@/db/schema';
+import { nanoid } from 'nanoid';
 
 export const runtime = 'edge';
 
+// Generate thread title using AI
+async function generateThreadTitle(content: string | undefined): Promise<string> {
+  if (!content || typeof content !== 'string' || content.trim() === '') {
+    return 'New Chat';
+  }
+  
+  try {
+    const result = await streamText({
+      model: openai('gpt-4o-mini'),
+      messages: [
+        {
+          role: 'system',
+          content: 'Generate a short, descriptive title (max 50 characters) for a chat conversation based on the first user message. Return only the title, no quotes or extra text.'
+        },
+        {
+          role: 'user',
+          content: content
+        }
+      ]
+    });
+    
+    let title = '';
+    for await (const chunk of result.textStream) {
+      title += chunk;
+    }
+    
+    return title.trim().slice(0, 50) || 'New Chat';
+  } catch (error) {
+    console.error('Error generating thread title:', error);
+    return 'New Chat';
+  }
+}
+
 export async function POST(req: Request) {
   try {
-    const _user = await stackServerApp.getUser({ or: "return-null" }); // TODO: Use when Mem0 is re-enabled
-    const body = await req.json() as { messages: any[] };
-    const { messages } = body;
-    // const userId = user?.id || 'anonymous'; // TODO: Use when Mem0 is re-enabled
+    const user = await stackServerApp.getUser({ or: "return-null" });
+    if (!user) {
+      return new Response('Unauthorized', { status: 401 });
+    }
+    
+    const body = await req.json() as { messages: any[]; threadId?: string };
+    const { messages, threadId } = body;
+
+    let currentThreadId = threadId;
+    
+    // If no threadId provided, create a new thread
+    if (!currentThreadId) {
+      const newThreadId = nanoid();
+      
+      // Generate thread title from first user message
+      const firstUserMessage = messages.find((m: any) => m.role === 'user');
+      let messageContent = 'New Chat';
+      
+      if (firstUserMessage?.content) {
+        if (typeof firstUserMessage.content === 'string') {
+          messageContent = firstUserMessage.content;
+        } else if (Array.isArray(firstUserMessage.content)) {
+          // Handle content array format
+          const textContent = firstUserMessage.content.find((c: any) => c.type === 'text');
+          messageContent = textContent?.text || 'New Chat';
+        }
+      }
+      
+      const threadTitle = await generateThreadTitle(messageContent);
+      
+      await db.insert(threads).values({
+        id: newThreadId,
+        userId: user.id,
+        title: threadTitle
+      });
+      
+      currentThreadId = newThreadId;
+    }
+
+    // Save the user message to the database
+    const userMessage = messages[messages.length - 1];
+    if (userMessage && userMessage.role === 'user' && userMessage.content) {
+      await db.insert(messagesTable).values({
+        id: nanoid(),
+        threadId: currentThreadId,
+        role: 'user',
+        content: userMessage.content
+      });
+    }
 
     const result = await streamText({
       model: openai('gpt-4o-mini'), // Using gpt-4o-mini instead of gpt-4 for cost efficiency
@@ -63,7 +144,7 @@ export async function POST(req: Request) {
             query: z.string().describe('The search query'),
             limit: z.number().optional().default(5).describe('Maximum number of results to return'),
           }),
-          execute: async ({ query, limit: _limit }: { query: string; limit?: number }) => {
+          execute: async ({ query }: { query: string; limit?: number }) => {
             // Mock knowledge search - Mem0 disabled in edge runtime
             try {
               // TODO: Re-enable when moving to serverless runtime or finding edge-compatible alternative
@@ -136,7 +217,16 @@ export async function POST(req: Request) {
       },
     });
 
-    return result.toUIMessageStreamResponse();
+    // Create a custom response that includes the thread ID
+    const response = result.toUIMessageStreamResponse();
+    
+    // Add thread ID to response headers so client can access it
+    response.headers.set('X-Thread-Id', currentThreadId);
+    
+    // TODO: Save assistant response to database when streaming completes
+    // This would require handling the streaming response and extracting the final message
+    
+    return response;
   } catch (error) {
     console.error('Error in chat API:', error);
     return new Response('Internal Server Error', { status: 500 });
