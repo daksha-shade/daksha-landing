@@ -1,16 +1,16 @@
 "use client"
 
 import { AssistantRuntimeProvider } from "@assistant-ui/react";
-import { useChatRuntime } from "@assistant-ui/react-ai-sdk";
 import { Thread } from "@/components/assistant-ui/thread";
 import { ThreadList } from "@/components/assistant-ui/thread-list";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { DbAssistantRuntime } from "@/components/assistant-ui/db-assistant-runtime";
 
 export default function DakshaAssistant() {
-  const runtime = useChatRuntime();
+  const [runtime] = useState(() => new DbAssistantRuntime());
   const [filter, setFilter] = useState("");
 
   const samplePrompts = [
@@ -71,7 +71,7 @@ export default function DakshaAssistant() {
             </CardHeader>
             <CardContent className="space-y-2 text-sm text-muted-foreground">
               {samplePrompts.map((p, i) => (
-                <div key={i} className="rounded-md border p-2 hover:bg-muted/60 cursor-pointer" onClick={() => runtime?.append?.({ role: 'user', content: p })}>
+                <div key={i} className="rounded-md border p-2 hover:bg-muted/60 cursor-pointer" onClick={() => runtime?.append({ role: 'user', content: p })}>
                   {p}
                 </div>
               ))}

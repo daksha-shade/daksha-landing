@@ -29,9 +29,9 @@ export default function RecentActivities({ className }: RecentActivitiesProps) {
   // Generate activity data from analytics
   useEffect(() => {
     if (analyticsData) {
-      const journalStats = analyticsData.journalStats
-      const goalStats = analyticsData.goalStats
-      const thoughtStats = analyticsData.thoughtStats
+      const journalStats = analyticsData.journalStats;
+      const goalStats = analyticsData.goalStats || { totalGoals: 0, completedGoals: 0, inProgressGoals: 0 };
+      const thoughtStats = analyticsData.thoughtStats || { totalThoughts: 0, positiveThoughts: 0, negativeThoughts: 0, neutralThoughts: 0 };
       
       // Create activities based on user data
       const recentActivities: Activity[] = analyticsData.recentActivities.map(activity => {
